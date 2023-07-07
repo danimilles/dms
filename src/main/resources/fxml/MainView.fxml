@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <columnConstraints>
+      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+   </rowConstraints>
+   <children>
+      <TabPane prefHeight="575.0" prefWidth="852.0" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab text="Clientes">
+            <content>
+                  <GridPane>
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" vgrow="SOMETIMES" />
+                        <RowConstraints />
+                        <RowConstraints maxHeight="1.7976931348623157E308" valignment="CENTER" vgrow="ALWAYS" />
+                     </rowConstraints>
+                     <children>
+                        <VBox prefHeight="38.0" prefWidth="832.0" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER">
+                           <children>
+                              <HBox>
+                                 <children>
+                                    <Button mnemonicParsing="false" text="Añadir cliente" GridPane.halignment="RIGHT">
+                                       <GridPane.margin>
+                                          <Insets right="20.0" />
+                                       </GridPane.margin>
+                                       <HBox.margin>
+                                          <Insets bottom="10.0" left="10.0" top="10.0" />
+                                       </HBox.margin>
+                                    </Button>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <VBox GridPane.rowIndex="1">
+                           <children>
+                              <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                 <children>
+                                    <Label text="Filtrar por:">
+                                       <padding>
+                                          <Insets left="20.0" right="8.0" />
+                                       </padding>
+                                    </Label>
+                                    <ChoiceBox prefWidth="150.0">
+                                       <HBox.margin>
+                                          <Insets right="10.0" />
+                                       </HBox.margin>
+                                    </ChoiceBox>
+                                    <TextField prefHeight="25.0" prefWidth="554.0">
+                                       <HBox.margin>
+                                          <Insets left="15.0" />
+                                       </HBox.margin>
+                                    </TextField>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets bottom="10.0" top="10.0" />
+                                 </VBox.margin>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <VBox GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.valignment="BOTTOM" GridPane.vgrow="ALWAYS">
+                           <children>
+                              <TableView maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                                <columns>
+                                  <TableColumn maxWidth="1.7976931348623157E308" prefWidth="129.0" text="Nombre" />
+                                  <TableColumn maxWidth="1.7976931348623157E308" prefWidth="129.0" text="Telefono" />
+                                    <TableColumn maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="107.0" text="DNI" />
+                                    <TableColumn maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="143.0" text="Perros" />
+                                    <TableColumn maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="155.0" text="Proxima Cita" />
+                                    <TableColumn maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="188.0" text="Acciones" />
+                                </columns>
+                                 <HBox.margin>
+                                    <Insets bottom="1.0" />
+                                 </HBox.margin>
+                              </TableView>
+                           </children>
+                        </VBox>
+                     </children>
+                  </GridPane>
+            </content>
+          </Tab>
+          <Tab text="Perros">
+            <content>
+                  <GridPane>
+                     <children>
+                        <VBox prefHeight="38.0" prefWidth="832.0" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER">
+                           <children>
+                              <HBox>
+                                 <children>
+                                    <Button mnemonicParsing="false" text="Añadir perro" GridPane.halignment="RIGHT">
+                                       <GridPane.margin>
+                                          <Insets right="20.0" />
+                                       </GridPane.margin>
+                                       <HBox.margin>
+                                          <Insets bottom="10.0" left="10.0" top="10.0" />
+                                       </HBox.margin>
+                                    </Button>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <VBox GridPane.rowIndex="1">
+                           <children>
+                              <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                 <children>
+                                    <Label text="Filtrar por:">
+                                       <padding>
+                                          <Insets left="20.0" right="8.0" />
+                                       </padding>
+                                    </Label>
+                                    <ChoiceBox prefWidth="150.0">
+                                       <HBox.margin>
+                                          <Insets right="10.0" />
+                                       </HBox.margin>
+                                    </ChoiceBox>
+                                    <TextField prefHeight="25.0" prefWidth="554.0">
+                                       <HBox.margin>
+                                          <Insets left="15.0" />
+                                       </HBox.margin>
+                                    </TextField>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets bottom="10.0" top="10.0" />
+                                 </VBox.margin>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <VBox GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.valignment="BOTTOM" GridPane.vgrow="ALWAYS">
+                           <children>
+                              <TableView maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+                                 <columns>
+                                    <TableColumn prefWidth="142.33333587646484" text="Nombre" />
+                                    <TableColumn prefWidth="231.66666412353516" text="Dueños" />
+                                    <TableColumn prefWidth="234.33334350585938" text="Proxima Cita" />
+                                    <TableColumn maxWidth="1.7976931348623157E308" prefWidth="239.66668701171875" text="Acciones" />
+                                 </columns>
+                              </TableView>
+                           </children>
+                        </VBox>
+                     </children>
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" vgrow="SOMETIMES" />
+                        <RowConstraints />
+                        <RowConstraints maxHeight="1.7976931348623157E308" valignment="CENTER" vgrow="ALWAYS" />
+                     </rowConstraints>
+                  </GridPane>
+            </content>
+          </Tab>
+            <Tab text="Citas">
+              <content>
+                <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" />
+              </content>
+            </Tab>
+            <Tab text="Servicios">
+              <content>
+                  <GridPane>
+                     <children>
+                        <VBox prefHeight="38.0" prefWidth="832.0" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER">
+                           <children>
+                              <HBox>
+                                 <children>
+                                    <Button mnemonicParsing="false" text="Añadir servicio" GridPane.halignment="RIGHT">
+                                       <GridPane.margin>
+                                          <Insets right="20.0" />
+                                       </GridPane.margin>
+                                       <HBox.margin>
+                                          <Insets bottom="10.0" left="10.0" top="10.0" />
+                                       </HBox.margin>
+                                    </Button>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <VBox GridPane.rowIndex="1">
+                           <children>
+                              <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                 <children>
+                                    <Label text="Filtrar por:">
+                                       <padding>
+                                          <Insets left="20.0" right="8.0" />
+                                       </padding>
+                                    </Label>
+                                    <ChoiceBox prefWidth="150.0">
+                                       <HBox.margin>
+                                          <Insets right="10.0" />
+                                       </HBox.margin>
+                                    </ChoiceBox>
+                                    <TextField prefHeight="25.0" prefWidth="554.0">
+                                       <HBox.margin>
+                                          <Insets left="15.0" />
+                                       </HBox.margin>
+                                    </TextField>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets bottom="10.0" top="10.0" />
+                                 </VBox.margin>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <VBox GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.valignment="BOTTOM" GridPane.vgrow="ALWAYS">
+                           <children>
+                              <TableView maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                                 <columns>
+                                    <TableColumn maxWidth="1.7976931348623157E308" prefWidth="261.0" text="Servicio" />
+                                    <TableColumn maxWidth="1.7976931348623157E308" prefWidth="305.0" text="Descripcion" />
+                                    <TableColumn maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="54.0" text="Precio" />
+                                    <TableColumn maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="231.0" text="Acciones" />
+                                 </columns>
+                                 <HBox.margin>
+                                    <Insets bottom="1.0" />
+                                 </HBox.margin>
+                              </TableView>
+                           </children>
+                        </VBox>
+                     </children>
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" vgrow="SOMETIMES" />
+                        <RowConstraints />
+                        <RowConstraints maxHeight="1.7976931348623157E308" valignment="CENTER" vgrow="ALWAYS" />
+                     </rowConstraints>
+                  </GridPane>
+              </content>
+            </Tab>
+            <Tab text="Cobros">
+               <content>
+                  <GridPane>
+                     <children>
+                        <VBox prefHeight="38.0" prefWidth="832.0" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER">
+                           <children>
+                              <HBox>
+                                 <children>
+                                    <Button mnemonicParsing="false" text="Añadir cobro" GridPane.halignment="RIGHT">
+                                       <GridPane.margin>
+                                          <Insets right="20.0" />
+                                       </GridPane.margin>
+                                       <HBox.margin>
+                                          <Insets bottom="10.0" left="10.0" top="10.0" />
+                                       </HBox.margin>
+                                    </Button>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <VBox GridPane.rowIndex="1">
+                           <children>
+                              <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                 <children>
+                                    <Label text="Filtrar por:">
+                                       <padding>
+                                          <Insets left="20.0" right="8.0" />
+                                       </padding>
+                                    </Label>
+                                    <ChoiceBox prefWidth="150.0">
+                                       <HBox.margin>
+                                          <Insets right="10.0" />
+                                       </HBox.margin>
+                                    </ChoiceBox>
+                                    <TextField prefHeight="25.0" prefWidth="554.0">
+                                       <HBox.margin>
+                                          <Insets left="15.0" />
+                                       </HBox.margin>
+                                    </TextField>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets bottom="10.0" top="10.0" />
+                                 </VBox.margin>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <VBox GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.valignment="BOTTOM" GridPane.vgrow="ALWAYS">
+                           <children>
+                              <TableView maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                                 <columns>
+                                    <TableColumn maxWidth="1.7976931348623157E308" prefWidth="110.0" text="Importe" />
+                                    <TableColumn maxWidth="1.7976931348623157E308" prefWidth="152.0" text="Fecha" />
+                                    <TableColumn maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="209.0" text="Servicio" />
+                                    <TableColumn maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="215.0" text="Cliente" />
+                                    <TableColumn maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="165.0" text="Acciones" />
+                                 </columns>
+                                 <HBox.margin>
+                                    <Insets bottom="1.0" />
+                                 </HBox.margin>
+                              </TableView>
+                           </children>
+                        </VBox>
+                     </children>
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" vgrow="SOMETIMES" />
+                        <RowConstraints />
+                        <RowConstraints maxHeight="1.7976931348623157E308" valignment="CENTER" vgrow="ALWAYS" />
+                     </rowConstraints>
+                  </GridPane>
+               </content>
+            </Tab>
+        </tabs>
+      </TabPane>
+   </children>
+</GridPane>

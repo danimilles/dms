@@ -23,27 +23,29 @@ create table main.clientdog
 (
     iddog    INTEGER not null
         constraint clientdog_dog_id_fk
-            references main.dog
+            references dog
             on delete cascade,
     idclient integer not null
         constraint clientdog_client_id_fk
-            references main.client
+            references client
             on delete cascade,
     constraint clientdog_pk
         primary key (idclient, iddog)
 );
 
-create table main.date
+create table date
 (
     id          integer not null
         constraint date_pk
             primary key autoincrement,
     datetime    TEXT    not null,
-    idperro     integer not null
+    idperro     integer
         constraint date_dog_id_fk
-            references main.dog,
+            references dog,
     description TEXT,
-    idservicio  integer
+    idservicio  integer,
+    idclient    integer not null constraint date_client_id_fk
+        references client
 );
 
 create table main.service
@@ -63,9 +65,12 @@ create table main.payment
             primary key autoincrement,
     idservice integer
         constraint payment_service_id_fk
-            references main.service,
+            references service,
     idclient  integer                        not null
         constraint payment_client_id_fk
-            references main.client,
+            references client,
     timestamp TEXT default current_timestamp not null
 );
+
+alter table main.payment
+    add description TEXT;
