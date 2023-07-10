@@ -162,7 +162,14 @@
           </Tab>
             <Tab text="Citas">
               <content>
-                <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" />
+                  <GridPane fx:id="calendar">
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints maxHeight="1.7976931348623157E308" minHeight="489.0" prefHeight="489.0" valignment="CENTER" vgrow="ALWAYS" />
+                     </rowConstraints>
+                  </GridPane>
               </content>
             </Tab>
             <Tab text="Servicios">

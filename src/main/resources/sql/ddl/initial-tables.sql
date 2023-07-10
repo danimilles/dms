@@ -1,7 +1,6 @@
 create table main.client
 (
     name         TEXT    not null,
-    dni          TEXT,
     phone        INTEGER not null,
     observations TEXT,
     id           integer not null
@@ -15,8 +14,10 @@ create table main.dog
         constraint dog_pk
             primary key autoincrement,
     name         TEXT    not null,
+    mantainment         TEXT,
     race         TEXT    not null,
-    observations TEXT
+    observations TEXT,
+    image BLOB
 );
 
 create table main.clientdog
@@ -38,7 +39,8 @@ create table date
     id          integer not null
         constraint date_pk
             primary key autoincrement,
-    datetime    TEXT    not null,
+    datetimestart    TEXT    not null,
+    datetimeend    TEXT    not null,
     idperro     integer
         constraint date_dog_id_fk
             references dog,
@@ -69,8 +71,6 @@ create table main.payment
     idclient  integer                        not null
         constraint payment_client_id_fk
             references client,
+    description TEXT,
     timestamp TEXT default current_timestamp not null
 );
-
-alter table main.payment
-    add description TEXT;
