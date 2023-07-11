@@ -1,4 +1,4 @@
-package com.hairyworld.dms.util;
+package com.hairyworld.dms.model;
 
 public enum EntityType {
     CLIENT(1),

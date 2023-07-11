@@ -1,4 +1,4 @@
-create table main.clientEntity
+create table main.client
 (
     name         TEXT    not null,
     phone        INTEGER not null,

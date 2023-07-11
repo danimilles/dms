@@ -1,9 +1,9 @@
 SELECT c.name as clientname, phone, c.observations as clientobservations, iddog, idclient, d.name as dogname,
-       mantainment, race, d.observations as dogobservations, image
-FROM clientEntity c
+       maintainment, race, d.observations as dogobservations, image
+FROM client c
     LEFT join clientdog cd on c.id = cd.idclient
-    INNER join dog d on d.id = cd.iddog
-ORDER BY clientid, dogid;
+    LEFT join dog d on d.id = cd.iddog
+ORDER BY idclient, iddog;
 
 Select id, datetimestart, datetimeend, idperro, description, idservicio, idclient
 from date;

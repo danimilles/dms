@@ -1,7 +1,6 @@
 package com.hairyworld.dms;
 
 
-import com.hairyworld.dms.controller.MainController;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -12,19 +11,23 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import java.io.IOException;
-
 import static com.hairyworld.dms.util.Path.MAIN_VIEW;
 
 public class DmsFXApplication extends Application {
 	private static final Logger LOGGER = LogManager.getLogger(DmsFXApplication.class);
 
 	private ConfigurableApplicationContext applicationContext;
-	private static Scene scene;
+	private Scene scene;
 
 	@Override
 	public void start(final Stage primaryStage) {
 		try {
+			final FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(this.getClass().getClassLoader().getResource(MAIN_VIEW));
+			loader.setControllerFactory(applicationContext::getBean);
+
+			scene = new Scene(loader.load());
+
 			primaryStage.setScene(scene);
 			primaryStage.show();
 		} catch(Exception e) {
@@ -33,12 +36,7 @@ public class DmsFXApplication extends Application {
 	}
 
 	@Override
-	public void init() throws IOException {
-		final FXMLLoader loader = new FXMLLoader();
-		loader.setLocation(this.getClass().getClassLoader().getResource(MAIN_VIEW));
-		loader.setController(new MainController());
-
-		scene = new Scene(loader.load());
+	public void init() {
 		applicationContext = new SpringApplicationBuilder(DmsApplication.class).run();
 	}
 

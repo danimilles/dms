@@ -1,11 +1,12 @@
 package com.hairyworld.dms.repository;
 
+import com.hairyworld.dms.model.EntityType;
 import com.hairyworld.dms.model.entity.Entity;
 import com.hairyworld.dms.repository.rowmapper.ClientResultSetExtractor;
 import com.hairyworld.dms.repository.rowmapper.DateResultSetExtractor;
 import com.hairyworld.dms.repository.rowmapper.PaymentResultSetExtractor;
 import com.hairyworld.dms.repository.rowmapper.ServiceResultSetExtractor;
-import com.hairyworld.dms.util.EntityType;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -14,15 +15,16 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.util.HashMap;
 import java.util.Map;
 
 @Repository
-public class CacheRepositoryImpl implements CacheRepository {
-    private static final Logger LOGGER = LogManager.getLogger(CacheRepositoryImpl.class);
+public class EntityRepositoryImpl implements EntityRepository {
+    private static final Logger LOGGER = LogManager.getLogger(EntityRepositoryImpl.class);
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
-    public CacheRepositoryImpl(final DataSource dataSource) {
+    public EntityRepositoryImpl(final DataSource dataSource) {
         this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 
@@ -31,7 +33,9 @@ public class CacheRepositoryImpl implements CacheRepository {
         LOGGER.info("Loading clients and dog info...");
 
         try {
-            return jdbcTemplate.query(Query.SELECT_CLIENT_AND_DOGS, new ClientResultSetExtractor());
+            final Map<EntityType, Map<Long, Entity>> result =
+                    jdbcTemplate.query(Query.SELECT_CLIENT_AND_DOGS, new ClientResultSetExtractor());
+            return ObjectUtils.defaultIfNull(result, new HashMap());
         } catch (final Exception e) {
             LOGGER.error("Error loading clients and dog info", e);
             throw e;
@@ -60,7 +64,8 @@ public class CacheRepositoryImpl implements CacheRepository {
         LOGGER.info("Loading {} info...", entityType.name().toLowerCase());
 
         try {
-            return jdbcTemplate.query(query, new MapSqlParameterSource(), resultSetExtractor);
+            final Map<Long, Entity> result = jdbcTemplate.query(query, new MapSqlParameterSource(), resultSetExtractor);
+            return ObjectUtils.defaultIfNull(result, new HashMap());
         } catch (final Exception e) {
             LOGGER.error("Error loading {} info...", entityType.name().toLowerCase(), e);
             throw e;

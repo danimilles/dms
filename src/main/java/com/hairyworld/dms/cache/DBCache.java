@@ -2,6 +2,7 @@ package com.hairyworld.dms.cache;
 
 import com.hairyworld.dms.model.entity.Entity;
 
+import java.util.Collection;
 import java.util.Map;
 
 public class DBCache {
@@ -24,5 +25,9 @@ public class DBCache {
         }
 
         return null;
+    }
+
+    public Collection<Entity> getAll() {
+        return cacheMap.values();
     }
 }

@@ -1,9 +1,9 @@
 package com.hairyworld.dms.repository.rowmapper;
 
+import com.hairyworld.dms.model.EntityType;
 import com.hairyworld.dms.model.entity.ClientEntity;
 import com.hairyworld.dms.model.entity.DogEntity;
 import com.hairyworld.dms.model.entity.Entity;
-import com.hairyworld.dms.util.EntityType;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
@@ -45,7 +45,7 @@ public class ClientResultSetExtractor implements ResultSetExtractor<Map<EntityTy
                 clientEntity = ClientEntity.builder()
                         .id(resultSet.getLong(IDCLIENT_FIELD))
                         .name(resultSet.getString(CLIENTNAME_FIELD))
-                        .phone(resultSet.getString(PHONE_FIELD))
+                        .phone(resultSet.getInt(PHONE_FIELD))
                         .observations(resultSet.getString(CLIENTOBSERVATIONS_FIELD))
                         .dogIds(new HashSet<>())
                         .build();

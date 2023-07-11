@@ -1,21 +1,21 @@
-package com.hairyworld.dms.model.entity;
+package com.hairyworld.dms.model.view;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
+import java.util.Date;
 
 @NoArgsConstructor
+@Data
 @AllArgsConstructor
 @Builder
-@Data
-public class ClientEntity implements Entity {
+public class ClientTableData {
     private Long id;
     private String name;
     private Integer phone;
-    private String observations;
-
-    private Set<Long> dogIds;
+    private String dogs;
+    private Date nextDate;
+    private String mantainment;
 }

@@ -5,7 +5,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<GridPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.hairyworld.dms.controller.MainController">
    <columnConstraints>
       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
    </columnConstraints>
@@ -71,14 +71,14 @@
                         </VBox>
                         <VBox GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.valignment="BOTTOM" GridPane.vgrow="ALWAYS">
                            <children>
-                              <TableView maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                              <TableView fx:id="clientTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
                                 <columns>
-                                  <TableColumn maxWidth="1.7976931348623157E308" prefWidth="129.0" text="Nombre" />
-                                  <TableColumn maxWidth="1.7976931348623157E308" prefWidth="129.0" text="Telefono" />
-                                    <TableColumn maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="107.0" text="DNI" />
-                                    <TableColumn maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="143.0" text="Perros" />
-                                    <TableColumn maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="155.0" text="Proxima Cita" />
-                                    <TableColumn maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="188.0" text="Acciones" />
+                                  <TableColumn fx:id="clientNameColumn" maxWidth="1.7976931348623157E308" prefWidth="129.0" text="Nombre" />
+                                  <TableColumn fx:id="clientPhoneColumn" maxWidth="1.7976931348623157E308" prefWidth="129.0" text="Telefono" />
+                                    <TableColumn fx:id="clientDogsColumn" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="143.0" text="Perros" />
+                                    <TableColumn fx:id="clientNextDateColumn" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="155.0" text="Proxima Cita" />
+                                    <TableColumn fx:id="clientMaintainmentColumn" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="107.0" text="Mantenimiento" />
+                                    <TableColumn fx:id="actions" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="188.0" text="Acciones" />
                                 </columns>
                                  <HBox.margin>
                                     <Insets bottom="1.0" />
