@@ -1,4 +1,4 @@
-create table main.client
+create table main.clientEntity
 (
     name         TEXT    not null,
     phone        INTEGER not null,
@@ -28,7 +28,7 @@ create table main.clientdog
             on delete cascade,
     idclient integer not null
         constraint clientdog_client_id_fk
-            references client
+            references clientEntity
             on delete cascade,
     constraint clientdog_pk
         primary key (idclient, iddog)
@@ -41,13 +41,14 @@ create table date
             primary key autoincrement,
     datetimestart    TEXT    not null,
     datetimeend    TEXT    not null,
-    idperro     integer
+    iddog     integer
         constraint date_dog_id_fk
             references dog,
     description TEXT,
-    idservicio  integer,
+    idservice  integer constraint date_service_id_fk
+        references service,
     idclient    integer not null constraint date_client_id_fk
-        references client
+        references clientEntity
 );
 
 create table main.service
@@ -70,7 +71,7 @@ create table main.payment
             references service,
     idclient  integer                        not null
         constraint payment_client_id_fk
-            references client,
+            references clientEntity,
     description TEXT,
-    timestamp TEXT default current_timestamp not null
+    datetime TEXT default current_timestamp not null
 );
