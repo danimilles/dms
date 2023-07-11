@@ -6,7 +6,8 @@ public class Query {
     }
 
     public static final String SELECT_CLIENT_AND_DOGS = """
-            SELECT c.name as clientname, phone, c.observations as clientobservations, iddog, idclient, d.name as dogname,
+            SELECT c.name as clientname, phone, c.observations as clientobservations,
+            coalesce(iddog, d.id) as iddog, coalesce(idclient, c.id) as idclient, d.name as dogname,
             maintainment, race, d.observations as dogobservations, image
             FROM client c
             LEFT join clientdog cd on c.id = cd.idclient

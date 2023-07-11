@@ -31,7 +31,8 @@
                            <children>
                               <HBox>
                                  <children>
-                                    <Button mnemonicParsing="false" text="Añadir cliente" GridPane.halignment="RIGHT">
+                                    <Button fx:id="addClient" mnemonicParsing="false" text="Añadir cliente"
+                                            GridPane.halignment="RIGHT">
                                        <GridPane.margin>
                                           <Insets right="20.0" />
                                        </GridPane.margin>
@@ -45,19 +46,19 @@
                         </VBox>
                         <VBox GridPane.rowIndex="1">
                            <children>
-                              <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
+                              <HBox fx:id="searchHBox" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                  <children>
                                     <Label text="Filtrar por:">
                                        <padding>
                                           <Insets left="20.0" right="8.0" />
                                        </padding>
                                     </Label>
-                                    <ChoiceBox prefWidth="150.0">
+                                    <ChoiceBox fx:id="clientSearchField" prefWidth="150.0">
                                        <HBox.margin>
                                           <Insets right="10.0" />
                                        </HBox.margin>
                                     </ChoiceBox>
-                                    <TextField prefHeight="25.0" prefWidth="554.0">
+                                    <TextField fx:id="clientSearchText" prefHeight="25.0" prefWidth="554.0">
                                        <HBox.margin>
                                           <Insets left="15.0" />
                                        </HBox.margin>
@@ -73,12 +74,12 @@
                            <children>
                               <TableView fx:id="clientTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
                                 <columns>
+                                  <TableColumn fx:id="clientIdColumn" maxWidth="0" prefWidth="0" text="Id"  />
                                   <TableColumn fx:id="clientNameColumn" maxWidth="1.7976931348623157E308" prefWidth="129.0" text="Nombre" />
                                   <TableColumn fx:id="clientPhoneColumn" maxWidth="1.7976931348623157E308" prefWidth="129.0" text="Telefono" />
                                     <TableColumn fx:id="clientDogsColumn" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="143.0" text="Perros" />
                                     <TableColumn fx:id="clientNextDateColumn" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="155.0" text="Proxima Cita" />
                                     <TableColumn fx:id="clientMaintainmentColumn" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="107.0" text="Mantenimiento" />
-                                    <TableColumn fx:id="actions" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="188.0" text="Acciones" />
                                 </columns>
                                  <HBox.margin>
                                     <Insets bottom="1.0" />

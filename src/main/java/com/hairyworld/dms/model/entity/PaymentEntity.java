@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Date;
+import org.joda.time.DateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,7 +12,7 @@ import java.util.Date;
 @Data
 public class PaymentEntity implements Entity {
     private Long id;
-    private Date datetime;
+    private DateTime datetime;
     private String description;
 
     private Long idservice;

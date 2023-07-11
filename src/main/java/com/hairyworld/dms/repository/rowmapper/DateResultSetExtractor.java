@@ -2,6 +2,7 @@ package com.hairyworld.dms.repository.rowmapper;
 
 import com.hairyworld.dms.model.entity.DateEntity;
 import com.hairyworld.dms.model.entity.Entity;
+import com.hairyworld.dms.util.DMSUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
@@ -12,13 +13,13 @@ import java.util.Map;
 
 public class DateResultSetExtractor implements ResultSetExtractor<Map<Long, Entity>> {
 
-    public static final String ID_FIELD = "id";
-    public static final String DATETIMESTART_FIELD = "datetimestart";
-    public static final String DATETIMEEND_FIELD = "datetimeend";
-    public static final String DESCRIPTION_FIELD = "description";
-    public static final String IDSERVICE_FIELD = "idservice";
-    public static final String IDCLIENT_FIELD = "idclient";
-    public static final String IDDOG_FIELD = "iddog";
+    private static final String ID_FIELD = "id";
+    private static final String DATETIMESTART_FIELD = "datetimestart";
+    private static final String DATETIMEEND_FIELD = "datetimeend";
+    private static final String DESCRIPTION_FIELD = "description";
+    private static final String IDSERVICE_FIELD = "idservice";
+    private static final String IDCLIENT_FIELD = "idclient";
+    private static final String IDDOG_FIELD = "iddog";
 
     public DateResultSetExtractor() {
         super();
@@ -31,8 +32,8 @@ public class DateResultSetExtractor implements ResultSetExtractor<Map<Long, Enti
         while (resultSet.next()) {
             final Entity dateEntity = DateEntity.builder()
                     .id(resultSet.getLong(ID_FIELD))
-                    .datetimestart(resultSet.getTimestamp(DATETIMESTART_FIELD))
-                    .datetimeend(resultSet.getTimestamp(DATETIMEEND_FIELD))
+                    .datetimestart(DMSUtils.parseDate(resultSet.getString(DATETIMESTART_FIELD)))
+                    .datetimeend(DMSUtils.parseDate(resultSet.getString(DATETIMEEND_FIELD)))
                     .description(resultSet.getString(DESCRIPTION_FIELD))
                     .iddog(resultSet.getLong(IDDOG_FIELD))
                     .idclient(resultSet.getLong(IDCLIENT_FIELD))

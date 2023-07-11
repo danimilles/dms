@@ -8,12 +8,12 @@ import com.hairyworld.dms.model.view.ClientTableData;
 
 import java.util.Set;
 
-public class ClientEntityToClientTableDataMapper {
+public class ClientToServiceMapper {
     public static ClientTableData map(final ClientEntity client, final Set<Entity> dogs, final DateEntity date) {
         return ClientTableData.builder()
                 .id(client.getId())
                 .name(client.getName())
-                .nextDate(date != null ? date.getDatetimeend() : null)
+                .nextDate(date != null ? date.getDatetimestart() : null)
                 .dogs(dogs.stream().map(dog -> ((DogEntity) dog).getName() + " : " + ((DogEntity) dog).getRace())
                         .reduce((a, b) -> a + ",\n" + b)
                         .orElse(""))

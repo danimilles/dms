@@ -4,7 +4,7 @@ import com.hairyworld.dms.model.EntityType;
 import com.hairyworld.dms.model.entity.ClientEntity;
 import com.hairyworld.dms.model.entity.DateEntity;
 import com.hairyworld.dms.model.entity.Entity;
-import com.hairyworld.dms.model.mapper.ClientEntityToClientTableDataMapper;
+import com.hairyworld.dms.model.mapper.ClientToServiceMapper;
 import com.hairyworld.dms.model.view.ClientTableData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,7 +38,7 @@ public class ServerServiceImpl implements ServerService {
 
             final DateEntity nextDate = entityService.getNextDateForClient(entry.getId());
 
-            clientTableData.add(ClientEntityToClientTableDataMapper.map((ClientEntity) entry, dogs, nextDate));
+            clientTableData.add(ClientToServiceMapper.map((ClientEntity) entry, dogs, nextDate));
         }
 
         return clientTableData;

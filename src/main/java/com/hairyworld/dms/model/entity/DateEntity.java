@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Date;
+import org.joda.time.DateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,8 +12,8 @@ import java.util.Date;
 @Data
 public class DateEntity implements Entity {
     private Long id;
-    private Date datetimestart;
-    private Date datetimeend;
+    private DateTime datetimestart;
+    private DateTime datetimeend;
     private String description;
 
     private Long iddog;

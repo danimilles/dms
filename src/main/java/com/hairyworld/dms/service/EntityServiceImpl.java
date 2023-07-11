@@ -59,6 +59,7 @@ public class EntityServiceImpl implements EntityService {
         return (DateEntity) cacheManager.getAllEntityFromCacheMatchs(
                 entity -> ((DateEntity) entity).getIdclient().equals(idClient), EntityType.DATE)
                 .stream()
+                .filter(entity -> ((DateEntity) entity).getDatetimestart().getMillis() >= System.currentTimeMillis())
                 .min(Comparator.comparing(date -> ((DateEntity) date).getDatetimestart()))
                 .orElse(null);
     }
