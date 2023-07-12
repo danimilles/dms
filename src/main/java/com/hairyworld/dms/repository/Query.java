@@ -28,4 +28,16 @@ public class Query {
     public static final String INSERT_CLIENT = """
             INSERT OR REPLACE INTO client (%sname, phone, observations)
             VALUES (%s:name, :phone, :observations)""";
+
+    public static final String DELETE_CLIENT = """
+            DELETE FROM client
+            WHERE id = :id""";
+
+    public static final String SELECT_TO_DELETE_DOG_FROM_CLIENT = """
+            Select d.id FROM dog d INNER JOIN clientdog cd ON cd.iddog = d.id
+              where cd.idclient = :id and id in
+               (SELECT cd.iddog FROM clientdog cd GROUP BY cd.iddog HAVING count(cd.iddog) = 1)""";
+
+    public static final String DELETE_DOG_FROM_CLIENT = """
+            delete from dog where id in (%s)""";
 }

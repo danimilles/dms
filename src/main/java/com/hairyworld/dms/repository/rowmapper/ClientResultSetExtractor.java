@@ -45,7 +45,7 @@ public class ClientResultSetExtractor implements ResultSetExtractor<Map<EntityTy
                 clientEntity = ClientEntity.builder()
                         .id(resultSet.getLong(IDCLIENT_FIELD))
                         .name(resultSet.getString(CLIENTNAME_FIELD))
-                        .phone(resultSet.getInt(PHONE_FIELD))
+                        .phone(resultSet.getString(PHONE_FIELD))
                         .observations(resultSet.getString(CLIENTOBSERVATIONS_FIELD))
                         .dogIds(new HashSet<>())
                         .build();

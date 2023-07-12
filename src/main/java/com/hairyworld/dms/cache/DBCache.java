@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class DBCache {
 
-    private Map<Long, Entity> cacheMap;
+    private final Map<Long, Entity> cacheMap;
 
     public DBCache(final Map<Long, Entity> cacheMap) {
         this.cacheMap = cacheMap;
@@ -29,5 +29,11 @@ public class DBCache {
 
     public Collection<Entity> getAll() {
         return cacheMap.values();
+    }
+
+    public void remove(final Long id) {
+        if (id != null) {
+            cacheMap.remove(id);
+        }
     }
 }

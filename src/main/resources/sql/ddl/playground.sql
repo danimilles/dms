@@ -14,3 +14,14 @@ from service;
 
 select id, idservice, idclient, description, datetime
 from payment;
+
+ delete from dog where id in (Select d.id FROM dog d INNER JOIN clientdog cd ON cd.iddog = d.id
+             where cd.idclient = :id and id in
+              (SELECT cd.iddog FROM clientdog cd GROUP BY cd.iddog HAVING count(cd.iddog) = 1))
+
+INSERT INTO client (name, phone, observations, id) VALUES ('dssd', '232332', 'dssdds', 1);
+INSERT INTO clientdog (iddog, idclient) VALUES (1, 1);
+INSERT INTO client (name, phone, observations, id) VALUES ('dfdsssd', '232332', 'dssdds', 2);
+INSERT INTO clientdog (iddog, idclient) VALUES (1, 2);
+INSERT INTO dog (name, maintainment, race, observations, image, id)
+VALUES ('dssd', 'sdsdds', 'sdsdsd', null, null, 1);

@@ -1,5 +1,6 @@
 package com.hairyworld.dms.controller;
 
+import com.hairyworld.dms.model.event.DeleteEntityEvent;
 import com.hairyworld.dms.model.event.NewEntityEvent;
 import com.hairyworld.dms.model.view.ClientViewData;
 import com.hairyworld.dms.rmi.DmsCommunicationFacade;
@@ -22,6 +23,8 @@ public class ClientViewController {
     private GridPane root;
     @FXML
     private Button submitButton;
+    @FXML
+    private Button deleteButton;
 
     @FXML
     private Tab clientViewPaymentTab;
@@ -47,7 +50,6 @@ public class ClientViewController {
     private Scene scene;
     private Stage stage;
     private ClientViewData clientViewData;
-    private Validator validator = new Validator();
 
 
     public ClientViewController(final DmsCommunicationFacade dmsCommunicationFacadeImpl, final ApplicationContext applicationContext) {
@@ -57,8 +59,8 @@ public class ClientViewController {
 
     @FXML
     private void initialize() {
+        clientViewData = ClientViewData.builder().build();
         createFormValidations();
-
         scene = new Scene(root);
         stage = new Stage();
         stage.setTitle("Vista de cliente");
@@ -66,7 +68,8 @@ public class ClientViewController {
         stage.show();
     }
 
-    private void createFormValidations() {
+    private Validator createFormValidations() {
+        final Validator validator = new Validator();
         validator.createCheck()
                 .dependsOn("clientViewFormName", clientViewFormName.textProperty())
                 .withMethod(c -> {
@@ -82,12 +85,13 @@ public class ClientViewController {
                 .dependsOn("clientViewFormPhone", clientViewFormPhone.textProperty())
                 .withMethod(c -> {
                     final String phone = c.get("clientViewFormPhone");
-                    if (phone == null || phone.isEmpty() || !phone.matches("[0-9]+")) {
+                    if (phone == null || phone.isEmpty() || !phone.matches("^\\+?[0-9]{7,14}$")) {
                         c.error("El telefono no puede estar vacio y debe ser correcto");
                     }
                 })
                 .decorates(clientViewFormPhone)
                 .immediate();
+        return validator;
     }
 
     public void showView(final Long clientId) {
@@ -102,24 +106,32 @@ public class ClientViewController {
         }
 
         createSubmitButtonAction();
+        createDeleteButtonAction();
     }
 
     private void createSubmitButtonAction() {
         submitButton.setOnAction(event -> {
-            if (validator.validate()) {
+            if (createFormValidations().validate()) {
                 clientViewData = ClientViewData.builder()
                         .id(clientViewData.getId())
                         .name(clientViewFormName.getText())
-                        .phone(Integer.parseInt(clientViewFormPhone.getText()))
+                        .phone(clientViewFormPhone.getText())
                         .observations(clientViewFormObservations.getText())
                         .build();
 
                 dmsCommunicationFacadeImpl.saveClient(clientViewData);
                 applicationContext.publishEvent(new NewEntityEvent(event.getSource()));
+                stage.close();
+            }
+        });
+    }
 
-                if (clientViewData.getId() == null) {
-                    stage.close();
-                }
+    private void createDeleteButtonAction() {
+        deleteButton.setOnAction(event -> {
+            if (clientViewData.getId() != null) {
+                dmsCommunicationFacadeImpl.deleteClient(clientViewData.getId());
+                applicationContext.publishEvent(new DeleteEntityEvent(event.getSource()));
+                stage.close();
             }
         });
     }
@@ -135,6 +147,7 @@ public class ClientViewController {
         clientViewDateTab.setDisable(false);
         nextDateLabel.setVisible(true);
         clientViewFormNextDate.setDisable(true);
+        deleteButton.setDisable(false);
     }
 
     private void cleanForm() {
@@ -145,6 +158,7 @@ public class ClientViewController {
         clientViewFormNextDate.clear();
         nextDateLabel.setVisible(false);
         clientViewFormNextDate.setVisible(false);
+        deleteButton.setDisable(true);
         clientViewPaymentTab.setDisable(true);
         clientViewDateTab.setDisable(true);
     }

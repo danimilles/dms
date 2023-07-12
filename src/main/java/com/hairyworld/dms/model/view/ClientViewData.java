@@ -16,7 +16,7 @@ import java.util.List;
 public class ClientViewData {
     private Long id;
     private String name;
-    private Integer phone;
+    private String phone;
     private List<DogClientViewData> dogs;
     private DateTime nextDate;
     private String observations;

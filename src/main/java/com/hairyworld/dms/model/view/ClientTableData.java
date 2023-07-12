@@ -14,7 +14,7 @@ import org.joda.time.DateTime;
 public class ClientTableData {
     private Long id;
     private String name;
-    private Integer phone;
+    private String phone;
     private String dogs;
     private DateTime nextDate;
     private String mantainment;

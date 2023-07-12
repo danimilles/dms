@@ -11,4 +11,6 @@ public interface DmsCommunicationFacade {
     ClientViewData getClientViewData(Long clientId);
 
     void saveClient(ClientViewData clientViewData);
+
+    void deleteClient(Long id);
 }

@@ -17,7 +17,6 @@ public class DmsFXApplication extends Application {
 	private static final Logger LOGGER = LogManager.getLogger(DmsFXApplication.class);
 
 	private ConfigurableApplicationContext applicationContext;
-	private Scene scene;
 
 	@Override
 	public void start(final Stage primaryStage) {
@@ -26,8 +25,9 @@ public class DmsFXApplication extends Application {
 			loader.setLocation(this.getClass().getClassLoader().getResource(MAIN_VIEW));
 			loader.setControllerFactory(applicationContext::getBean);
 
-			scene = new Scene(loader.load());
+			final Scene scene = new Scene(loader.load());
 			primaryStage.setTitle("Sistema de Gestion de citas de peluqueria canina");
+			primaryStage.setMaximized(true);
 			primaryStage.setScene(scene);
 			primaryStage.show();
 		} catch(Exception e) {

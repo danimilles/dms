@@ -17,5 +17,8 @@ public interface CacheManager {
 
     Entity getEntityFromCache(Long id, EntityType entityType);
 
-    Set<Entity> getAllEntityFromCacheMatchs(Predicate<Entity> filter, EntityType entityType);
+    Set<Entity> getAllMAtchEntityFromCache(Predicate<Entity> filter, EntityType entityType);
+
+    void removeEntityFromCache(Long id, EntityType entityType);
+    void removeAllMatchEntityFromCache(Predicate<Entity> filter, EntityType entityType);
 }

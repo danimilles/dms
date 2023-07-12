@@ -19,4 +19,6 @@ public interface EntityService {
     DateEntity getNextDateForClient(Long iddclient);
 
     void saveEntity(Entity entity, EntityType entityType);
+
+    void deleteEntity(Long id, EntityType entityType);
 }

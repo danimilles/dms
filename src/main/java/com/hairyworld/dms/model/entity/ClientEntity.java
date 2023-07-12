@@ -14,7 +14,7 @@ import java.util.Set;
 public class ClientEntity implements Entity {
     private Long id;
     private String name;
-    private Integer phone;
+    private String phone;
     private String observations;
 
     private Set<Long> dogIds;

@@ -39,15 +39,22 @@ public class DBCacheManagerImpl implements CacheManager {
 
     @Override
     public Entity getEntityFromCache(final Long id, final EntityType entityType) {
-        if (id != null) {
-            return cache.get(entityType).get(id);
-        }
-
-        return null;
+        return cache.get(entityType).get(id);
     }
 
     @Override
-    public Set<Entity> getAllEntityFromCacheMatchs(final Predicate<Entity> filter, final EntityType entityType) {
+    public Set<Entity> getAllMAtchEntityFromCache(final Predicate<Entity> filter, final EntityType entityType) {
         return cache.get(entityType).getAll().stream().filter(filter).collect(Collectors.toSet());
+    }
+
+    @Override
+    public void removeEntityFromCache(Long id, EntityType entityType) {
+        cache.get(entityType).remove(id);
+    }
+
+    @Override
+    public void removeAllMatchEntityFromCache(Predicate<Entity> filter, EntityType entityType) {
+        cache.get(entityType).getAll().stream().filter(filter).forEach(entity ->
+                cache.get(entityType).remove(entity.getId()));
     }
 }

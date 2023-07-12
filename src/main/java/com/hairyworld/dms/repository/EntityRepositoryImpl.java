@@ -8,6 +8,7 @@ import com.hairyworld.dms.repository.rowmapper.DateResultSetExtractor;
 import com.hairyworld.dms.repository.rowmapper.PaymentResultSetExtractor;
 import com.hairyworld.dms.repository.rowmapper.ServiceResultSetExtractor;
 import com.sun.javafx.binding.StringFormatter;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,8 +21,11 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Repository
 public class EntityRepositoryImpl implements EntityRepository {
@@ -30,6 +34,7 @@ public class EntityRepositoryImpl implements EntityRepository {
     private static final String PHONE_FIELD = "phone";
     private static final String OBSERVATIONS_FIELD = "observations";
     private static final String ID_FIELD = "id";
+    public static final String QUERY_PARAMS_LOG = "Query -> [{}], Params -> [{}]";
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -44,7 +49,7 @@ public class EntityRepositoryImpl implements EntityRepository {
         try {
             final Map<EntityType, Map<Long, Entity>> result =
                     jdbcTemplate.query(Query.SELECT_CLIENT_AND_DOGS, new ClientResultSetExtractor());
-            return ObjectUtils.defaultIfNull(result, new HashMap());
+            return ObjectUtils.defaultIfNull(result, new HashMap<>());
         } catch (final Exception e) {
             LOGGER.error("Error loading clients and dog info", e);
             throw e;
@@ -74,7 +79,7 @@ public class EntityRepositoryImpl implements EntityRepository {
 
         try {
             final Map<Long, Entity> result = jdbcTemplate.query(query, new MapSqlParameterSource(), resultSetExtractor);
-            return ObjectUtils.defaultIfNull(result, new HashMap());
+            return ObjectUtils.defaultIfNull(result, new HashMap<>());
         } catch (final Exception e) {
             LOGGER.error("Error loading {} info...", entityType.name().toLowerCase(), e);
             throw e;
@@ -82,18 +87,18 @@ public class EntityRepositoryImpl implements EntityRepository {
     }
 
     public Long saveEntity(final Entity entity, final EntityType entityType) {
-        LOGGER.info("Saving {} info...", entityType.name().toLowerCase());
+        LOGGER.info("Saving {} info...", entityType.name());
 
         try {
             switch (entityType) {
                 case CLIENT:
                     return saveClient(entity);
                 default:
-                    LOGGER.error("Error saving {} info...", entityType.name().toLowerCase());
+                    LOGGER.error("Unsupported entity type -> {}", entityType.name());
                     return null;
             }
         } catch (final Exception e) {
-            LOGGER.error("Error loading {} info...", entityType.name().toLowerCase(), e);
+            LOGGER.error("Error saving {} info...", entityType.name().toLowerCase(), e);
             throw e;
         }
     }
@@ -115,7 +120,48 @@ public class EntityRepositoryImpl implements EntityRepository {
         parameters.addValue(OBSERVATIONS_FIELD, clientEntity.getObservations());
 
         final KeyHolder keyHolder = new GeneratedKeyHolder();
+        LOGGER.debug("Query -> [{}], params -> [{}]", query, parameters.getValues());
+
         jdbcTemplate.update(query, parameters, keyHolder, new String[]{ID_FIELD});
         return keyHolder.getKey().longValue();
+    }
+
+    public List<Long> deleteEntity(final Long id, final EntityType entityType) {
+        LOGGER.info("Deleting {} info...", entityType.name());
+
+        try {
+            switch (entityType) {
+                case CLIENT:
+                    return deleteClient(id);
+                default:
+                    LOGGER.error("Unsupported entity type -> {}", entityType.name());
+                    return Collections.emptyList();
+            }
+        } catch (final Exception e) {
+            LOGGER.error("Error deleting {} info...", entityType.name().toLowerCase(), e);
+            throw e;
+        }
+    }
+
+    private List<Long> deleteClient(final Long id) {
+        final MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue(ID_FIELD, id);
+
+        LOGGER.debug(QUERY_PARAMS_LOG, Query.SELECT_TO_DELETE_DOG_FROM_CLIENT, parameters.getValues());
+        final List<Long> iddogs = jdbcTemplate.queryForList(Query.SELECT_TO_DELETE_DOG_FROM_CLIENT, parameters,
+                Long.class);
+
+        if (!CollectionUtils.isEmpty(iddogs)) {
+            final String iddogsstring = iddogs.stream().map(String::valueOf).collect(Collectors.joining(","));
+
+            final String query = StringFormatter.format(Query.DELETE_DOG_FROM_CLIENT, iddogsstring).getValue();
+            LOGGER.debug(QUERY_PARAMS_LOG, query, iddogs);
+            jdbcTemplate.update(query, new MapSqlParameterSource());
+        }
+
+        LOGGER.debug(QUERY_PARAMS_LOG, Query.DELETE_CLIENT, parameters.getValues());
+        jdbcTemplate.update(Query.DELETE_CLIENT, parameters);
+
+        return iddogs;
     }
 }

@@ -73,4 +73,9 @@ public class DmsCommunicationFacadeImpl implements DmsCommunicationFacade {
         entityService.saveEntity(ClientToServiceMapper.map(clientViewData), EntityType.CLIENT);
     }
 
+    @Override
+    public void deleteClient(Long id) {
+        entityService.deleteEntity(id, EntityType.CLIENT);
+    }
+
 }

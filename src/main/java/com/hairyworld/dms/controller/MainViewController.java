@@ -1,13 +1,12 @@
 package com.hairyworld.dms.controller;
 
 import com.calendarfx.view.CalendarView;
-import com.hairyworld.dms.model.event.NewEntityEvent;
+import com.hairyworld.dms.model.event.EntityUpdateEvent;
 import com.hairyworld.dms.model.view.ClientTableData;
 import com.hairyworld.dms.model.view.TableFilter;
 import com.hairyworld.dms.rmi.DmsCommunicationFacade;
 import com.hairyworld.dms.util.DmsUtils;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -38,9 +37,9 @@ import java.util.concurrent.TimeUnit;
 import static com.hairyworld.dms.util.Path.CLIENT_VIEW;
 
 @Component
-public class MainViewController implements ApplicationListener<NewEntityEvent> {
+public class MainViewController implements ApplicationListener<EntityUpdateEvent> {
 
-    private final DmsCommunicationFacade DMSCommunicationFacadeImpl;
+    private final DmsCommunicationFacade dmsCommunicationFacadeImpl;
     private final ClientViewController clientViewController;
     private final ApplicationContext context;
 
@@ -67,7 +66,7 @@ public class MainViewController implements ApplicationListener<NewEntityEvent> {
     @FXML
     private TableColumn<ClientTableData, String> clientNameColumn;
     @FXML
-    private TableColumn<ClientTableData, Number> clientPhoneColumn;
+    private TableColumn<ClientTableData, String> clientPhoneColumn;
     @FXML
     private TableColumn<ClientTableData, String> clientDogsColumn;
     @FXML
@@ -77,9 +76,10 @@ public class MainViewController implements ApplicationListener<NewEntityEvent> {
 
     private CalendarView calendarView;
 
-    public MainViewController(final DmsCommunicationFacade DMSCommunicationFacadeImpl, final ClientViewController clientViewController,
+    public MainViewController(final DmsCommunicationFacade dmsCommunicationFacadeImpl,
+                              final ClientViewController clientViewController,
                               final ApplicationContext context) {
-        this.DMSCommunicationFacadeImpl = DMSCommunicationFacadeImpl;
+        this.dmsCommunicationFacadeImpl = dmsCommunicationFacadeImpl;
         this.clientViewController = clientViewController;
         this.context = context;
     }
@@ -97,13 +97,13 @@ public class MainViewController implements ApplicationListener<NewEntityEvent> {
     }
 
     private void initClientTable() {
-        clientTableData = FXCollections.observableList(DMSCommunicationFacadeImpl.getClientTableData());
+        clientTableData = FXCollections.observableList(dmsCommunicationFacadeImpl.getClientTableData());
         clientIdColumn.setVisible(false);
         clientIdColumn.setCellValueFactory(cellData ->  new SimpleLongProperty(cellData.getValue().getId()));
         clientNameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
         clientNameColumn.setSortType(TableColumn.SortType.ASCENDING);
         clientDogsColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDogs()));
-        clientPhoneColumn.setCellValueFactory(cellData ->  new SimpleIntegerProperty(cellData.getValue().getPhone()));
+        clientPhoneColumn.setCellValueFactory(cellData ->  new SimpleStringProperty(cellData.getValue().getPhone()));
         clientNextDateColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
                 cellData.getValue().getNextDate() != null ? DmsUtils.dateToString(cellData.getValue().getNextDate()) : null));
         clientNextDateColumn.setComparator(Comparator.comparing(DmsUtils::parseDate, Comparator.nullsLast(Comparator.naturalOrder())));
@@ -140,7 +140,7 @@ public class MainViewController implements ApplicationListener<NewEntityEvent> {
 
         try {
             loader.load();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new RuntimeException(e);
         }
 
@@ -148,16 +148,15 @@ public class MainViewController implements ApplicationListener<NewEntityEvent> {
     }
 
     private void createClientSearchDatePickerListener() {
-        clientSearchDatePicker.setOnAction(event -> {
-            clientTable.setItems(clientTableData.filtered(clientTableData -> {
-                    if (clientTableData.getNextDate() != null) {
-                        return DmsUtils.dateToString(clientTableData.getNextDate().toLocalDate())
-                                .contains(DmsUtils.dateToString(clientSearchDatePicker.getValue()));
-                    } else {
-                        return false;
-                    }
-                }));
-            }
+        clientSearchDatePicker.setOnAction(event ->
+                clientTable.setItems(clientTableData.filtered(clientData -> {
+                if (clientData.getNextDate() != null) {
+                    return DmsUtils.dateToString(clientData.getNextDate().toLocalDate())
+                            .contains(DmsUtils.dateToString(clientSearchDatePicker.getValue()));
+                } else {
+                    return false;
+                }
+            }))
         );
     }
 
@@ -165,17 +164,17 @@ public class MainViewController implements ApplicationListener<NewEntityEvent> {
         clientSearchText.setOnKeyTyped(event -> {
             if (clientSearchField.getValue() != null) {
                 switch (clientSearchField.getValue()) {
-                    case CLIENT_NAME -> clientTable.setItems(clientTableData.filtered(clientTableData ->
-                            clientTableData.getName().contains(clientSearchText.getText())));
+                    case CLIENT_NAME -> clientTable.setItems(clientTableData.filtered(clientData ->
+                            clientData.getName().contains(clientSearchText.getText())));
 
-                    case DOG_NAME -> clientTable.setItems(clientTableData.filtered(clientTableData ->
-                            clientTableData.getDogs().contains(clientSearchText.getText())));
+                    case DOG_NAME -> clientTable.setItems(clientTableData.filtered(clientData ->
+                            clientData.getDogs().contains(clientSearchText.getText())));
 
-                    case PHONE -> clientTable.setItems(clientTableData.filtered(clientTableData ->
-                            clientTableData.getPhone().toString().contains(clientSearchText.getText())));
+                    case PHONE -> clientTable.setItems(clientTableData.filtered(clientData ->
+                            clientData.getPhone().contains(clientSearchText.getText())));
 
-                    case MANTAINMENT -> clientTable.setItems(clientTableData.filtered(clientTableData ->
-                            clientTableData.getMantainment().contains(clientSearchText.getText())));
+                    case MANTAINMENT -> clientTable.setItems(clientTableData.filtered(clientData ->
+                            clientData.getMantainment().contains(clientSearchText.getText())));
 
                     default -> clientTable.setItems(clientTableData);
                 }
@@ -224,7 +223,8 @@ public class MainViewController implements ApplicationListener<NewEntityEvent> {
     }
 
     @Override
-    public void onApplicationEvent(final NewEntityEvent event) {
-        clientTable.setItems(FXCollections.observableList(DMSCommunicationFacadeImpl.getClientTableData()));
+    public void onApplicationEvent(final EntityUpdateEvent event) {
+        clientTableData = FXCollections.observableList(dmsCommunicationFacadeImpl.getClientTableData());
+        clientTable.setItems(clientTableData);
     }
 }

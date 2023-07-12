@@ -9,9 +9,11 @@ import com.hairyworld.dms.repository.EntityRepositoryImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 import java.util.function.Predicate;
 
 @Service
@@ -51,12 +53,12 @@ public class EntityServiceImpl implements EntityService {
 
     @Override
     public Collection<Entity> getAllMatch(final Predicate<Entity> filter, final EntityType entityType) {
-        return cacheManager.getAllEntityFromCacheMatchs(filter, entityType);
+        return cacheManager.getAllMAtchEntityFromCache(filter, entityType);
     }
 
     @Override
     public DateEntity getNextDateForClient(final Long idClient) {
-        return (DateEntity) cacheManager.getAllEntityFromCacheMatchs(
+        return (DateEntity) cacheManager.getAllMAtchEntityFromCache(
                 entity -> ((DateEntity) entity).getIdclient().equals(idClient), EntityType.DATE)
                 .stream()
                 .filter(entity -> ((DateEntity) entity).getDatetimestart().getMillis() >= System.currentTimeMillis())
@@ -68,5 +70,14 @@ public class EntityServiceImpl implements EntityService {
     public void saveEntity(final Entity entity, final EntityType entityType) {
         entity.setId(entityRepository.saveEntity(entity, entityType));
         cacheManager.putEntityIntoCache(entity, entityType);
+    }
+
+    @Override
+    public void deleteEntity(final Long id, final EntityType entityType) {
+        final List<Long> iddogs = entityRepository.deleteEntity(id, entityType);
+        cacheManager.removeEntityFromCache(id, entityType);
+        if (!CollectionUtils.isEmpty(iddogs) && EntityType.CLIENT.equals(entityType)) {
+            cacheManager.removeAllMatchEntityFromCache(entity -> iddogs.contains(entity.getId()), entityType);
+        }
     }
 }
