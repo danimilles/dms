@@ -22,6 +22,10 @@ public class Query {
             from service""";
 
     public static final String SELECT_PAYMENTS = """
-            select id, idservice, idclient, description, datetime
+            select id, idservice, idclient, description, datetime, amount
             from payment""";
+
+    public static final String INSERT_CLIENT = """
+            INSERT OR REPLACE INTO client (%sname, phone, observations)
+            VALUES (%s:name, :phone, :observations)""";
 }

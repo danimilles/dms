@@ -1,10 +1,11 @@
 package com.hairyworld.dms.controller;
 
 import com.calendarfx.view.CalendarView;
-import com.hairyworld.dms.model.mapper.TableFilter;
+import com.hairyworld.dms.model.event.NewEntityEvent;
 import com.hairyworld.dms.model.view.ClientTableData;
-import com.hairyworld.dms.service.ServerService;
-import com.hairyworld.dms.util.DMSUtils;
+import com.hairyworld.dms.model.view.TableFilter;
+import com.hairyworld.dms.rmi.DmsCommunicationFacade;
+import com.hairyworld.dms.util.DmsUtils;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleLongProperty;
@@ -12,6 +13,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
@@ -20,8 +23,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Comparator;
@@ -29,15 +35,22 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-@Component
-public class MainController {
+import static com.hairyworld.dms.util.Path.CLIENT_VIEW;
 
-    private final ServerService serverServiceImpl;
+@Component
+public class MainViewController implements ApplicationListener<NewEntityEvent> {
+
+    private final DmsCommunicationFacade DMSCommunicationFacadeImpl;
+    private final ClientViewController clientViewController;
+    private final ApplicationContext context;
 
     private ObservableList<ClientTableData> clientTableData;
 
     @FXML
     private GridPane calendar;
+
+    @FXML
+    private Button addClientButton;
 
     @FXML
     private HBox searchHBox;
@@ -64,8 +77,11 @@ public class MainController {
 
     private CalendarView calendarView;
 
-    public MainController(final ServerService serverServiceImpl) {
-        this.serverServiceImpl = serverServiceImpl;
+    public MainViewController(final DmsCommunicationFacade DMSCommunicationFacadeImpl, final ClientViewController clientViewController,
+                              final ApplicationContext context) {
+        this.DMSCommunicationFacadeImpl = DMSCommunicationFacadeImpl;
+        this.clientViewController = clientViewController;
+        this.context = context;
     }
 
     @FXML
@@ -77,10 +93,11 @@ public class MainController {
 
         scheduleUpdateCalendarTime();
         initClientTable();
+        addClientButton.setOnAction(event -> showClientView(null));
     }
 
     private void initClientTable() {
-        clientTableData = FXCollections.observableList(serverServiceImpl.getClientTableData());
+        clientTableData = FXCollections.observableList(DMSCommunicationFacadeImpl.getClientTableData());
         clientIdColumn.setVisible(false);
         clientIdColumn.setCellValueFactory(cellData ->  new SimpleLongProperty(cellData.getValue().getId()));
         clientNameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
@@ -88,8 +105,8 @@ public class MainController {
         clientDogsColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDogs()));
         clientPhoneColumn.setCellValueFactory(cellData ->  new SimpleIntegerProperty(cellData.getValue().getPhone()));
         clientNextDateColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
-                cellData.getValue().getNextDate() != null ? DMSUtils.dateToString(cellData.getValue().getNextDate()) : null));
-        clientNextDateColumn.setComparator(Comparator.comparing(DMSUtils::parseDate, Comparator.nullsLast(Comparator.naturalOrder())));
+                cellData.getValue().getNextDate() != null ? DmsUtils.dateToString(cellData.getValue().getNextDate()) : null));
+        clientNextDateColumn.setComparator(Comparator.comparing(DmsUtils::parseDate, Comparator.nullsLast(Comparator.naturalOrder())));
         clientMaintainmentColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getMantainment()));
 
         clientTable.setItems(clientTableData);
@@ -108,14 +125,34 @@ public class MainController {
         createClientSearchFieldListener();
         createClientSearchTextListener();
         createClientSearchDatePickerListener();
+
+        clientTable.setOnMousePressed(event -> {
+            if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
+                showClientView(clientTable.getSelectionModel().getSelectedItem().getId());
+            }
+        });
+    }
+
+    private void showClientView(final Long selectedItem) {
+        final FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(this.getClass().getClassLoader().getResource(CLIENT_VIEW));
+        loader.setControllerFactory(context::getBean);
+
+        try {
+            loader.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        clientViewController.showView(selectedItem);
     }
 
     private void createClientSearchDatePickerListener() {
         clientSearchDatePicker.setOnAction(event -> {
             clientTable.setItems(clientTableData.filtered(clientTableData -> {
                     if (clientTableData.getNextDate() != null) {
-                        return DMSUtils.dateToString(clientTableData.getNextDate().toLocalDate())
-                                .contains(DMSUtils.dateToString(clientSearchDatePicker.getValue()));
+                        return DmsUtils.dateToString(clientTableData.getNextDate().toLocalDate())
+                                .contains(DmsUtils.dateToString(clientSearchDatePicker.getValue()));
                     } else {
                         return false;
                     }
@@ -186,4 +223,8 @@ public class MainController {
         }
     }
 
+    @Override
+    public void onApplicationEvent(final NewEntityEvent event) {
+        clientTable.setItems(FXCollections.observableList(DMSCommunicationFacadeImpl.getClientTableData()));
+    }
 }

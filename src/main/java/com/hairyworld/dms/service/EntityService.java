@@ -17,4 +17,6 @@ public interface EntityService {
     Collection<Entity> getAllMatch(Predicate<Entity> filter, EntityType entityType);
 
     DateEntity getNextDateForClient(Long iddclient);
+
+    void saveEntity(Entity entity, EntityType entityType);
 }

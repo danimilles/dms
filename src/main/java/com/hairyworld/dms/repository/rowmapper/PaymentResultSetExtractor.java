@@ -18,6 +18,7 @@ public class PaymentResultSetExtractor implements ResultSetExtractor<Map<Long, E
     private static final String DESCRIPTION_FIELD = "description";
     private static final String IDSERVICE_FIELD = "idservice";
     private static final String IDCLIENT_FIELD = "idclient";
+    public static final String AMOUNT_FIELD = "amount";
 
     public PaymentResultSetExtractor() {
         super();
@@ -34,6 +35,7 @@ public class PaymentResultSetExtractor implements ResultSetExtractor<Map<Long, E
                     .description(resultSet.getString(DESCRIPTION_FIELD))
                     .idservice(resultSet.getLong(IDSERVICE_FIELD))
                     .idclient(resultSet.getLong(IDCLIENT_FIELD))
+                    .amount(resultSet.getBigDecimal(AMOUNT_FIELD))
                     .build();
 
             paymentEntityMap.put(paymentEntity.getId(), paymentEntity);

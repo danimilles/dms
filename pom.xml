@@ -65,6 +65,12 @@
 			<version>11.12.5</version>
 		</dependency>
 
+
+		<dependency>
+			<groupId>net.synedra</groupId>
+			<artifactId>validatorfx</artifactId>
+			<version>0.4.2</version>
+		</dependency>
 		<dependency>
 			<groupId>com.dlsc.formsfx</groupId>
 			<artifactId>formsfx-core</artifactId>

@@ -1,4 +1,4 @@
-package com.hairyworld.dms.model.mapper;
+package com.hairyworld.dms.model.view;
 
 public enum TableFilter {
     NO_FILTER("No filtrar"),

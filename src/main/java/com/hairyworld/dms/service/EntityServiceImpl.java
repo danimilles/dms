@@ -20,10 +20,10 @@ public class EntityServiceImpl implements EntityService {
     private static final Logger LOGGER = LogManager.getLogger(EntityServiceImpl.class);
 
     private CacheManager cacheManager;
-    private final EntityRepositoryImpl cacheRepository;
+    private final EntityRepositoryImpl entityRepository;
 
-    public EntityServiceImpl(final EntityRepositoryImpl cacheRepository) {
-        this.cacheRepository = cacheRepository;
+    public EntityServiceImpl(final EntityRepositoryImpl entityRepository) {
+        this.entityRepository = entityRepository;
         this.cacheManager = new DBCacheManagerImpl();
         reloadCache();
     }
@@ -31,11 +31,11 @@ public class EntityServiceImpl implements EntityService {
     @Override
     public void reloadCache() {
         LOGGER.info("Loading DB in memory...");
-        cacheManager.putEntityCache(cacheRepository.loadClientsAndDogs().get(EntityType.CLIENT), EntityType.CLIENT);
-        cacheManager.putEntityCache(cacheRepository.loadClientsAndDogs().get(EntityType.DOG), EntityType.DOG);
-        cacheManager.putEntityCache(cacheRepository.loadDates(), EntityType.DATE);
-        cacheManager.putEntityCache(cacheRepository.loadServices(), EntityType.SERVICE);
-        cacheManager.putEntityCache(cacheRepository.loadPayments(), EntityType.PAYMENT);
+        cacheManager.putEntityCache(entityRepository.loadClientsAndDogs().get(EntityType.CLIENT), EntityType.CLIENT);
+        cacheManager.putEntityCache(entityRepository.loadClientsAndDogs().get(EntityType.DOG), EntityType.DOG);
+        cacheManager.putEntityCache(entityRepository.loadDates(), EntityType.DATE);
+        cacheManager.putEntityCache(entityRepository.loadServices(), EntityType.SERVICE);
+        cacheManager.putEntityCache(entityRepository.loadPayments(), EntityType.PAYMENT);
         LOGGER.info("Load successful");
     }
 
@@ -62,5 +62,11 @@ public class EntityServiceImpl implements EntityService {
                 .filter(entity -> ((DateEntity) entity).getDatetimestart().getMillis() >= System.currentTimeMillis())
                 .min(Comparator.comparing(date -> ((DateEntity) date).getDatetimestart()))
                 .orElse(null);
+    }
+
+    @Override
+    public void saveEntity(final Entity entity, final EntityType entityType) {
+        entity.setId(entityRepository.saveEntity(entity, entityType));
+        cacheManager.putEntityIntoCache(entity, entityType);
     }
 }

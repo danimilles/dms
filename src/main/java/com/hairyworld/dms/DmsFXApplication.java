@@ -27,7 +27,7 @@ public class DmsFXApplication extends Application {
 			loader.setControllerFactory(applicationContext::getBean);
 
 			scene = new Scene(loader.load());
-
+			primaryStage.setTitle("Sistema de Gestion de citas de peluqueria canina");
 			primaryStage.setScene(scene);
 			primaryStage.show();
 		} catch(Exception e) {

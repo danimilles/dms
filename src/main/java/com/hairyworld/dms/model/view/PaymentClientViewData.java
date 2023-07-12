@@ -1,4 +1,4 @@
-package com.hairyworld.dms.model.entity;
+package com.hairyworld.dms.model.view;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,16 +8,15 @@ import org.joda.time.DateTime;
 
 import java.math.BigDecimal;
 
+
 @NoArgsConstructor
+@Data
 @AllArgsConstructor
 @Builder
-@Data
-public class PaymentEntity implements Entity {
+public class PaymentClientViewData {
     private Long id;
-    private DateTime datetime;
+    private String service;
     private String description;
     private BigDecimal amount;
-
-    private Long idservice;
-    private Long idclient;
+    private DateTime datetime;
 }

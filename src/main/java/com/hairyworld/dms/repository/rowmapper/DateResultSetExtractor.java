@@ -2,7 +2,7 @@ package com.hairyworld.dms.repository.rowmapper;
 
 import com.hairyworld.dms.model.entity.DateEntity;
 import com.hairyworld.dms.model.entity.Entity;
-import com.hairyworld.dms.util.DMSUtils;
+import com.hairyworld.dms.util.DmsUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
@@ -32,8 +32,8 @@ public class DateResultSetExtractor implements ResultSetExtractor<Map<Long, Enti
         while (resultSet.next()) {
             final Entity dateEntity = DateEntity.builder()
                     .id(resultSet.getLong(ID_FIELD))
-                    .datetimestart(DMSUtils.parseDate(resultSet.getString(DATETIMESTART_FIELD)))
-                    .datetimeend(DMSUtils.parseDate(resultSet.getString(DATETIMEEND_FIELD)))
+                    .datetimestart(DmsUtils.parseDate(resultSet.getString(DATETIMESTART_FIELD)))
+                    .datetimeend(DmsUtils.parseDate(resultSet.getString(DATETIMEEND_FIELD)))
                     .description(resultSet.getString(DESCRIPTION_FIELD))
                     .iddog(resultSet.getLong(IDDOG_FIELD))
                     .idclient(resultSet.getLong(IDCLIENT_FIELD))

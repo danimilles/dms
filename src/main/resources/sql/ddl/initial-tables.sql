@@ -71,7 +71,8 @@ create table main.payment
             references service,
     idclient  integer                        not null
         constraint payment_client_id_fk
-            references clientEntity,
+            references client,
     description TEXT,
+    amount double not null,
     datetime TEXT default current_timestamp not null
 );
