@@ -15,15 +15,16 @@ import java.util.Map;
 
 public class ClientResultSetExtractor implements ResultSetExtractor<Map<EntityType, Map<Long, Entity>>> {
 
-    private static final String IDCLIENT_FIELD = "idclient";
-    private static final String CLIENTNAME_FIELD = "clientname";
-    private static final String PHONE_FIELD = "phone";
-    private static final String CLIENTOBSERVATIONS_FIELD = "clientobservations";
-    private static final String IDDOG_FIELD = "iddog";
-    private static final String DOGNAME_FIELD = "dogname";
-    private static final String DOGOBSERVATIONS_FIELD = "dogobservations";
-    private static final String MAINTAINMENT_FIELD = "maintainment";
-    private static final String RACE_FIELD = "race";
+    public static final String IDCLIENT_FIELD = "idclient";
+    public static final String CLIENTNAME_FIELD = "clientname";
+    public static final String PHONE_FIELD = "phone";
+    public static final String CLIENTOBSERVATIONS_FIELD = "clientobservations";
+    public static final String IDDOG_FIELD = "iddog";
+    public static final String DOGNAME_FIELD = "dogname";
+    public static final String DOGOBSERVATIONS_FIELD = "dogobservations";
+    public static final String MAINTAINMENT_FIELD = "maintainment";
+    public static final String RACE_FIELD = "race";
+    public static final String IMAGE_FIELD = "image";
 
     public ClientResultSetExtractor() {
         super();
@@ -64,6 +65,7 @@ public class ClientResultSetExtractor implements ResultSetExtractor<Map<EntityTy
                             .name(resultSet.getString(DOGNAME_FIELD))
                             .id(resultSet.getLong(IDDOG_FIELD))
                             .clientIds(new HashSet<>())
+                            .image(resultSet.getBytes(IMAGE_FIELD))
                             .build();
                 }
 

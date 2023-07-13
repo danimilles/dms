@@ -30,11 +30,11 @@
                            <children>
                               <HBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
                                  <children>
-                                    <TableView fx:id="clientViewFormDogTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                                    <TableView fx:id="clientViewDogTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
                                        <columns>
-                                          <TableColumn fx:id="clientViewFormDogNameTableColumn" maxWidth="1.7976931348623157E308" prefWidth="439.0" text="Nombre" />
-                                          <TableColumn fx:id="clientViewFormDogRaceTableColumn" maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="209.0" text="Raza" />
-                                          <TableColumn fx:id="clientViewFormDogObservationsTableColumn" maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="209.0" text="Observaciones" />
+                                          <TableColumn fx:id="clientViewDogNameTableColumn" maxWidth="1.7976931348623157E308" prefWidth="439.0" text="Nombre de perro" />
+                                          <TableColumn fx:id="clientViewDogRaceTableColumn" maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="209.0" text="Raza" />
+                                          <TableColumn fx:id="clientViewDogMaintainmentTableColumn" maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="209.0" text="Mantenimiento" />
                                        </columns>
                                     </TableView>
                                  </children>
@@ -74,22 +74,22 @@
                               </VBox>
                               <VBox alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" HBox.hgrow="ALWAYS">
                                  <children>
-                                    <TextField fx:id="clientViewFormName" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                                    <TextField fx:id="clientViewName" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                                        <VBox.margin>
                                           <Insets />
                                        </VBox.margin>
                                     </TextField>
-                                    <TextField fx:id="clientViewFormPhone" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                                    <TextField fx:id="clientViewPhone" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                                        <VBox.margin>
                                           <Insets />
                                        </VBox.margin>
                                     </TextField>
-                                    <TextField fx:id="clientViewFormObservations" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                                    <TextField fx:id="clientViewObservations" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                                        <VBox.margin>
                                           <Insets />
                                        </VBox.margin>
                                     </TextField>
-                                    <TextField fx:id="clientViewFormNextDate" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                                    <TextField fx:id="clientViewNextDate" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                                        <VBox.margin>
                                           <Insets />
                                        </VBox.margin>

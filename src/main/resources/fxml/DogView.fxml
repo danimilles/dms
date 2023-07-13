@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.image.*?>
-<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-
-<GridPane fx:id="root" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="650.0" prefWidth="900.0" style="-fx-font-size: 11pt;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.hairyworld.dms.controller.DogViewController">
+<GridPane fx:id="root" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="650.0" prefWidth="900.0" style="-fx-font-size: 11pt;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.hairyworld.dms.controller.DogViewController">
    <children>
       <TabPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
          <tabs>
@@ -19,9 +17,9 @@
                            <children>
                               <HBox alignment="CENTER">
                                  <children>
-                                    <TableView fx:id="dogViewFormClientTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="175.0" prefWidth="880.0" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                                    <TableView fx:id="dogViewClientTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="50.0" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
                                        <columns>
-                                          <TableColumn fx:id="dogViewClientNameTableColum" maxWidth="1.7976931348623157E308" prefWidth="439.0" text="Nombre" />
+                                          <TableColumn fx:id="dogViewClientNameTableColum" maxWidth="1.7976931348623157E308" prefWidth="439.0" text="Nombre de cliente" />
                                           <TableColumn fx:id="dogViewClientPhoneTableColum" maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="438.0" text="Telefono" />
                                        </columns>
                                        <HBox.margin>
@@ -32,13 +30,13 @@
                               </HBox>
                               <HBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
                                  <children>
-                                    <TableView fx:id="dogViewFormDateTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                                    <TableView fx:id="dogViewDateTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="50.0" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
                                        <columns>
-                                          <TableColumn fx:id="dogViewFormDateDateStartTableColumn" maxWidth="1.7976931348623157E308" prefWidth="189.0" text="Fecha de cita" />
-                                          <TableColumn fx:id="dogViewFormDateDateEndTableColumn" maxWidth="1.7976931348623157E308" prefWidth="175.0" text="Fecha salida de cita" />
-                                          <TableColumn fx:id="dogViewFormDateClientNameTableColumn" maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="197.0" text="Dueño" />
-                                          <TableColumn fx:id="dogViewFormDateServiceTableColumn" maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="119.0" text="Servicio" />
-                                          <TableColumn fx:id="dogViewFormDateDescriptionTableColumn" maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="199.0" text="Descripcion" />
+                                          <TableColumn fx:id="dogViewDateDateStartTableColumn" maxWidth="1.7976931348623157E308" prefWidth="189.0" text="Fecha de cita" />
+                                          <TableColumn fx:id="dogViewDateDateEndTableColumn" maxWidth="1.7976931348623157E308" prefWidth="175.0" text="Fecha salida de cita" />
+                                          <TableColumn fx:id="dogViewDateClientNameTableColumn" maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="197.0" text="Cliente" />
+                                          <TableColumn fx:id="dogViewDateServiceTableColumn" maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="119.0" text="Servicio" />
+                                          <TableColumn fx:id="dogViewDateDescriptionTableColumn" maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="199.0" text="Descripcion" />
                                        </columns>
                                        <HBox.margin>
                                           <Insets top="9.0" />
@@ -53,12 +51,15 @@
                         </VBox>
                         <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.hgrow="ALWAYS" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
                            <children>
-                              <VBox>
+                              <VBox maxWidth="200.0" minWidth="50.0">
                                  <padding>
                                     <Insets bottom="5.0" left="20.0" right="20.0" top="24.0" />
                                  </padding>
                                  <children>
-                                    <ImageView fx:id="dogImage" fitHeight="128.0" fitWidth="156.0" pickOnBounds="true" preserveRatio="true" />
+                                    <ImageView fx:id="dogImage" fitHeight="128.0" fitWidth="156.0" pickOnBounds="true" preserveRatio="true">
+                                       <viewport>
+                                          <Rectangle2D minX="50.0" minY="50.0" />
+                                       </viewport></ImageView>
                                  </children>
                               </VBox>
                               <VBox>
@@ -82,7 +83,7 @@
                                           <Insets top="9.0" />
                                        </padding>
                                     </Label>
-                                    <Label fx:id="nextDateLabel" layoutX="30.0" layoutY="112.0" text="Siguiente cita:">
+                                    <Label fx:id="nextDateDogLabel" layoutX="30.0" layoutY="112.0" text="Siguiente cita:">
                                        <padding>
                                           <Insets top="7.0" />
                                        </padding>
@@ -94,27 +95,27 @@
                               </VBox>
                               <VBox alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" HBox.hgrow="ALWAYS">
                                  <children>
-                                    <TextField fx:id="dogViewFormName" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                                    <TextField fx:id="dogViewName" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                                        <VBox.margin>
                                           <Insets />
                                        </VBox.margin>
                                     </TextField>
-                                    <TextField fx:id="dogViewFormRace" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                                    <TextField fx:id="dogViewRace" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                                        <VBox.margin>
                                           <Insets />
                                        </VBox.margin>
                                     </TextField>
-                                    <TextField fx:id="dogViewFormObservations" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                                    <TextField fx:id="dogViewObservations" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                                        <VBox.margin>
                                           <Insets />
                                        </VBox.margin>
                                     </TextField>
-                                    <TextField fx:id="dogViewFormMaintainment" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                                    <TextField fx:id="dogViewMaintainment" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                                        <VBox.margin>
                                           <Insets />
                                        </VBox.margin>
                                     </TextField>
-                                    <TextField fx:id="dogViewFormNextDate" layoutX="10.0" layoutY="103.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
+                                    <TextField fx:id="dogViewNextDate" layoutX="10.0" layoutY="103.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
                                  </children>
                                  <HBox.margin>
                                     <Insets right="10.0" top="17.0" />
@@ -126,12 +127,12 @@
                            <children>
                               <HBox alignment="TOP_CENTER" fillHeight="false" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
                                  <children>
-                                    <Button fx:id="submitButton" alignment="BOTTOM_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" text="Guardar perro" textAlignment="CENTER" HBox.hgrow="ALWAYS">
+                                    <Button fx:id="submitDogButton" alignment="BOTTOM_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" text="Guardar perro" textAlignment="CENTER" HBox.hgrow="ALWAYS">
                                        <HBox.margin>
                                           <Insets right="20.0" />
                                        </HBox.margin>
                                     </Button>
-                                    <Button fx:id="deleteButton" alignment="BOTTOM_RIGHT" contentDisplay="RIGHT" layoutX="276.0" layoutY="10.0" mnemonicParsing="false" text="Borrar perro" textAlignment="CENTER">
+                                    <Button fx:id="deleteDogButton" alignment="BOTTOM_RIGHT" contentDisplay="RIGHT" layoutX="276.0" layoutY="10.0" mnemonicParsing="false" text="Borrar perro" textAlignment="CENTER">
                                        <HBox.margin>
                                           <Insets left="20.0" right="20.0" />
                                        </HBox.margin>
@@ -141,7 +142,7 @@
                                           <Insets left="20.0" right="20.0" />
                                        </HBox.margin>
                                     </Button>
-                                    <Button fx:id="addDateButton" alignment="BOTTOM_RIGHT" contentDisplay="RIGHT" layoutX="541.0" layoutY="10.0" mnemonicParsing="false" text="Añadir cita" textAlignment="CENTER">
+                                    <Button fx:id="addDateDogButton" alignment="BOTTOM_RIGHT" contentDisplay="RIGHT" layoutX="541.0" layoutY="10.0" mnemonicParsing="false" text="Añadir cita" textAlignment="CENTER">
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin>
@@ -161,7 +162,7 @@
                         <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="100.0" />
                      </columnConstraints>
                      <rowConstraints>
-                        <RowConstraints fillHeight="false" minHeight="138.0" valignment="TOP" vgrow="NEVER" />
+                        <RowConstraints valignment="TOP" vgrow="NEVER" />
                         <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" valignment="TOP" vgrow="ALWAYS" />
                         <RowConstraints minHeight="60.0" valignment="TOP" />
                      </rowConstraints>
@@ -171,4 +172,10 @@
          </tabs>
       </TabPane>
    </children>
+   <columnConstraints>
+      <ColumnConstraints />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints />
+   </rowConstraints>
 </GridPane>

@@ -29,6 +29,13 @@ public class Query {
             INSERT OR REPLACE INTO client (%sname, phone, observations)
             VALUES (%s:name, :phone, :observations)""";
 
+    public static final String INSERT_DOG = """
+            INSERT OR REPLACE INTO dog (%sname, race,  maintainment, observations, image)
+            VALUES (%s:name, :race, :maintainment, :observations, :image)""";
+
+    public static final String INSERT_CLIENTDOG =
+            "INSERT OR REPLACE INTO clientdog (iddog, idclient) VALUES (:iddog, :idclient)";
+
     public static final String DELETE_CLIENT = """
             DELETE FROM client
             WHERE id = :id""";

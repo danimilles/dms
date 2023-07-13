@@ -2,20 +2,22 @@ package com.hairyworld.dms.cache;
 
 import com.hairyworld.dms.model.EntityType;
 import com.hairyworld.dms.model.entity.Entity;
+import org.springframework.stereotype.Component;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+@Component
 public class DBCacheManagerImpl implements CacheManager {
 
-    private Map<EntityType, DBCache> cache;
+    private final Map<EntityType, DBCache> cache;
 
     public DBCacheManagerImpl() {
-        cache = new HashMap<>();
+        cache = new EnumMap<>(EntityType.class);
     }
 
     @Override
@@ -43,12 +45,12 @@ public class DBCacheManagerImpl implements CacheManager {
     }
 
     @Override
-    public Set<Entity> getAllMAtchEntityFromCache(final Predicate<Entity> filter, final EntityType entityType) {
+    public Set<Entity> getAllMatchEntityFromCache(final Predicate<Entity> filter, final EntityType entityType) {
         return cache.get(entityType).getAll().stream().filter(filter).collect(Collectors.toSet());
     }
 
     @Override
-    public void removeEntityFromCache(Long id, EntityType entityType) {
+    public void removeEntityFromCache(final Long id, final EntityType entityType) {
         cache.get(entityType).remove(id);
     }
 

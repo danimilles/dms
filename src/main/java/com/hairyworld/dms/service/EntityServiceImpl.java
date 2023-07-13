@@ -1,9 +1,10 @@
 package com.hairyworld.dms.service;
 
 import com.hairyworld.dms.cache.CacheManager;
-import com.hairyworld.dms.cache.DBCacheManagerImpl;
 import com.hairyworld.dms.model.EntityType;
+import com.hairyworld.dms.model.entity.ClientEntity;
 import com.hairyworld.dms.model.entity.DateEntity;
+import com.hairyworld.dms.model.entity.DogEntity;
 import com.hairyworld.dms.model.entity.Entity;
 import com.hairyworld.dms.repository.EntityRepositoryImpl;
 import org.apache.logging.log4j.LogManager;
@@ -21,12 +22,12 @@ public class EntityServiceImpl implements EntityService {
 
     private static final Logger LOGGER = LogManager.getLogger(EntityServiceImpl.class);
 
-    private CacheManager cacheManager;
+    private final CacheManager cacheManager;
     private final EntityRepositoryImpl entityRepository;
 
-    public EntityServiceImpl(final EntityRepositoryImpl entityRepository) {
+    public EntityServiceImpl(final EntityRepositoryImpl entityRepository, final CacheManager cacheManager) {
         this.entityRepository = entityRepository;
-        this.cacheManager = new DBCacheManagerImpl();
+        this.cacheManager = cacheManager;
         reloadCache();
     }
 
@@ -53,13 +54,12 @@ public class EntityServiceImpl implements EntityService {
 
     @Override
     public Collection<Entity> getAllMatch(final Predicate<Entity> filter, final EntityType entityType) {
-        return cacheManager.getAllMAtchEntityFromCache(filter, entityType);
+        return cacheManager.getAllMatchEntityFromCache(filter, entityType);
     }
 
     @Override
-    public DateEntity getNextDateForClient(final Long idClient) {
-        return (DateEntity) cacheManager.getAllMAtchEntityFromCache(
-                entity -> ((DateEntity) entity).getIdclient().equals(idClient), EntityType.DATE)
+    public DateEntity getNextDate(final Collection<Entity> dates) {
+        return (DateEntity) dates
                 .stream()
                 .filter(entity -> ((DateEntity) entity).getDatetimestart().getMillis() >= System.currentTimeMillis())
                 .min(Comparator.comparing(date -> ((DateEntity) date).getDatetimestart()))
@@ -67,9 +67,21 @@ public class EntityServiceImpl implements EntityService {
     }
 
     @Override
-    public void saveEntity(final Entity entity, final EntityType entityType) {
+    public Long saveEntity(final Entity entity, final EntityType entityType) {
         entity.setId(entityRepository.saveEntity(entity, entityType));
         cacheManager.putEntityIntoCache(entity, entityType);
+        return entity.getId();
+    }
+
+    @Override
+    public void saveClientDogRelation(final Long idclient, final Long iddog) {
+        entityRepository.saveClientDogRelation(idclient, iddog);
+        final ClientEntity client = (ClientEntity) cacheManager.getEntityFromCache(idclient, EntityType.CLIENT);
+        final DogEntity dog = (DogEntity) cacheManager.getEntityFromCache(iddog, EntityType.DOG);
+        client.getDogIds().add(dog.getId());
+        dog.getClientIds().add(client.getId());
+        cacheManager.putEntityIntoCache(client, EntityType.CLIENT);
+        cacheManager.putEntityIntoCache(dog, EntityType.DOG);
     }
 
     @Override

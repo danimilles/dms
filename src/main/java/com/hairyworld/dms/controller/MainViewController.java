@@ -2,8 +2,8 @@ package com.hairyworld.dms.controller;
 
 import com.calendarfx.view.CalendarView;
 import com.hairyworld.dms.model.event.EntityUpdateEvent;
-import com.hairyworld.dms.model.view.ClientTableData;
 import com.hairyworld.dms.model.view.TableFilter;
+import com.hairyworld.dms.model.view.mainview.ClientTableData;
 import com.hairyworld.dms.rmi.DmsCommunicationFacade;
 import com.hairyworld.dms.util.DmsUtils;
 import javafx.application.Platform;
@@ -19,6 +19,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
@@ -67,6 +68,9 @@ public class MainViewController extends AbstractController implements Applicatio
     private TableColumn<ClientTableData, String> clientMaintainmentColumn;
     @FXML
     private TableColumn<ClientTableData, String> clientNextDateColumn;
+
+    @FXML
+    private GridPane root;
 
     private CalendarView calendarView;
 
@@ -127,7 +131,7 @@ public class MainViewController extends AbstractController implements Applicatio
     }
 
     private void showClientView(final Long selectedItem) {
-        clientViewController.showView(selectedItem);
+        clientViewController.showView((Stage) root.getScene().getWindow(), selectedItem);
     }
 
     private void createClientSearchDatePickerListener() {
@@ -148,21 +152,25 @@ public class MainViewController extends AbstractController implements Applicatio
             if (clientSearchField.getValue() != null) {
                 switch (clientSearchField.getValue()) {
                     case CLIENT_NAME -> clientTable.setItems(clientTableData.filtered(clientData ->
-                            clientData.getName().contains(clientSearchText.getText())));
+                            toLower(clientData.getName()).contains(toLower(clientSearchText.getText()))));
 
                     case DOG_NAME -> clientTable.setItems(clientTableData.filtered(clientData ->
-                            clientData.getDogs().contains(clientSearchText.getText())));
+                            toLower(clientData.getDogs()).contains(toLower(clientSearchText.getText()))));
 
                     case PHONE -> clientTable.setItems(clientTableData.filtered(clientData ->
-                            clientData.getPhone().contains(clientSearchText.getText())));
+                            toLower(clientData.getPhone()).contains(toLower(clientSearchText.getText()))));
 
                     case MANTAINMENT -> clientTable.setItems(clientTableData.filtered(clientData ->
-                            clientData.getMantainment().contains(clientSearchText.getText())));
+                            toLower(clientData.getMantainment()).contains(toLower(clientSearchText.getText()))));
 
                     default -> clientTable.setItems(clientTableData);
                 }
             }
         });
+    }
+
+    private String toLower(final String string){
+        return Strings.isEmpty(string) ? Strings.EMPTY : string.toLowerCase();
     }
 
     private void createClientSearchFieldListener() {

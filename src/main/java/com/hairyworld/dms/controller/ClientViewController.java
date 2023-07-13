@@ -1,11 +1,13 @@
 package com.hairyworld.dms.controller;
 
+import com.hairyworld.dms.model.EntityType;
 import com.hairyworld.dms.model.event.DeleteEntityEvent;
+import com.hairyworld.dms.model.event.EntityUpdateEvent;
 import com.hairyworld.dms.model.event.NewEntityEvent;
-import com.hairyworld.dms.model.view.ClientViewData;
-import com.hairyworld.dms.model.view.DateClientViewData;
-import com.hairyworld.dms.model.view.DogClientViewData;
-import com.hairyworld.dms.model.view.PaymentClientViewData;
+import com.hairyworld.dms.model.view.clientview.ClientViewData;
+import com.hairyworld.dms.model.view.clientview.DateClientViewData;
+import com.hairyworld.dms.model.view.clientview.DogClientViewData;
+import com.hairyworld.dms.model.view.clientview.PaymentClientViewData;
 import com.hairyworld.dms.rmi.DmsCommunicationFacade;
 import com.hairyworld.dms.util.DmsUtils;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -21,17 +23,22 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.synedra.validatorfx.Validator;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Optional;
 
+import static com.hairyworld.dms.util.Path.ICON_IMAGE;
+
 @Component
-public class ClientViewController extends AbstractController {
+public class ClientViewController extends AbstractController implements ApplicationListener<EntityUpdateEvent> {
 
 
     @FXML
@@ -70,13 +77,13 @@ public class ClientViewController extends AbstractController {
     private Button addPaymentButton;
 
     @FXML
-    private TableView<DogClientViewData> clientViewFormDogTable;
+    private TableView<DogClientViewData> clientViewDogTable;
     @FXML
-    private TableColumn<DogClientViewData, String> clientViewFormDogRaceTableColumn;
+    private TableColumn<DogClientViewData, String> clientViewDogRaceTableColumn;
     @FXML
-    private TableColumn<DogClientViewData, String> clientViewFormDogNameTableColumn;
+    private TableColumn<DogClientViewData, String> clientViewDogNameTableColumn;
     @FXML
-    private TableColumn<DogClientViewData, String> clientViewFormDogObservationsTableColumn;
+    private TableColumn<DogClientViewData, String> clientViewDogMaintainmentTableColumn;
     @FXML
     private Button addDogButton;
 
@@ -87,13 +94,13 @@ public class ClientViewController extends AbstractController {
     @FXML
     private Tab clientViewDataTab;
     @FXML
-    private TextField clientViewFormName;
+    private TextField clientViewName;
     @FXML
-    private TextField clientViewFormPhone;
+    private TextField clientViewPhone;
     @FXML
-    private TextField clientViewFormObservations;
+    private TextField clientViewObservations;
     @FXML
-    private TextField clientViewFormNextDate;
+    private TextField clientViewNextDate;
     @FXML
     private Label nextDateLabel;
     @FXML
@@ -122,79 +129,90 @@ public class ClientViewController extends AbstractController {
         clientViewData = ClientViewData.builder()
                 .dogs(new ArrayList<>()).dates(new ArrayList<>()).payments(new ArrayList<>()).build();
 
-        createFormValidations();
+        createValidations();
         bindDogTable();
         bindPaymentTable();
         bindDateTable();
         createTableResponsiveness(clientViewPaymentTable);
-        createTableResponsiveness(clientViewFormDogTable);
+        createTableResponsiveness(clientViewDogTable);
         createTableResponsiveness(clientViewDateTable);
 
         scene = new Scene(root);
         stage = new Stage();
         stage.setScene(scene);
+        stage.getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream(ICON_IMAGE)));
         stage.onCloseRequestProperty().setValue(e -> {
             clientViewDateTab.getTabPane().getSelectionModel().selectFirst();
         });
     }
 
-    private Validator createFormValidations() {
+    private Validator createValidations() {
         final Validator validator = new Validator();
 
         validator.createCheck()
-                .dependsOn("clientViewFormName", clientViewFormName.textProperty())
+                .dependsOn("clientViewName", clientViewName.textProperty())
                 .withMethod(c -> {
-                    final String name = c.get("clientViewFormName");
+                    final String name = c.get("clientViewName");
                     if (name == null || name.isEmpty()) {
                         c.error("El nombre no puede estar vacio");
                     }
                 })
-                .decorates(clientViewFormName)
+                .decorates(clientViewName)
                 .immediate();
 
         validator.createCheck()
-                .dependsOn("clientViewFormPhone", clientViewFormPhone.textProperty())
+                .dependsOn("clientViewPhone", clientViewPhone.textProperty())
                 .withMethod(c -> {
-                    final String phone = c.get("clientViewFormPhone");
+                    final String phone = c.get("clientViewPhone");
                     if (phone == null || phone.isEmpty() || !phone.matches("^\\+?[0-9]{7,14}$")) {
                         c.error("El telefono no puede estar vacio y debe ser correcto");
                     }
                 })
-                .decorates(clientViewFormPhone)
+                .decorates(clientViewPhone)
                 .immediate();
 
         return validator;
     }
 
-    public void showView(final Long clientId) {
+    public void showView(final Stage source, final Long clientId) {
         chargeClientViewData(clientId);
         createSubmitButtonAction();
         createDeleteButtonAction();
         addDogButton.setOnAction(event -> showDogView(null));
+        if (stage.getOwner() == null) {
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(source);
+        }
         stage.show();
     }
 
     private void chargeClientViewData(final Long clientId) {
         if (clientId != null) {
-            fillForm(clientId);
+            fill(clientId);
         } else {
-            cleanForm();
+            clean();
         }
+
+        clientViewDogTable.setItems(FXCollections.observableArrayList(clientViewData.getDogs()));
+        clientViewDateTable.setItems(FXCollections.observableArrayList(clientViewData.getDates()));
+        clientViewPaymentTable.setItems(FXCollections.observableArrayList(clientViewData.getPayments()));
     }
 
     private void createSubmitButtonAction() {
         submitButton.setOnAction(event -> {
-            if (createFormValidations().validate()) {
+            if (createValidations().validate()) {
                 clientViewData = ClientViewData.builder()
                         .id(clientViewData.getId())
-                        .name(clientViewFormName.getText())
-                        .phone(clientViewFormPhone.getText())
-                        .observations(clientViewFormObservations.getText())
+                        .name(clientViewName.getText())
+                        .phone(clientViewPhone.getText())
+                        .observations(clientViewObservations.getText())
                         .dogs(clientViewData.getDogs())
+                        .dates(clientViewData.getDates())
+                        .payments(clientViewData.getPayments())
                         .build();
 
                 dmsCommunicationFacadeImpl.saveClient(clientViewData);
-                context.publishEvent(new NewEntityEvent(event.getSource(), clientViewData.getId()));
+                context.publishEvent(new NewEntityEvent(event.getSource(), clientViewData.getId(), EntityType.CLIENT));
                 stage.close();
             }
         });
@@ -205,16 +223,19 @@ public class ClientViewController extends AbstractController {
             if (clientViewData.getId() != null) {
                 final Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setHeaderText(null);
+                ((Stage) alert.getDialogPane().getScene().getWindow()).getIcons()
+                        .add(new Image(this.getClass().getClassLoader().getResourceAsStream(ICON_IMAGE)));
                 alert.setTitle("Borrar cliente");
                 alert.setContentText("¿Estas seguro de que quieres borrar el cliente? " +
                         "Se borraran las citas del cliente, los perros que no tengan otro dueño y" +
                         " se eliminaran los datos del cliente de los pagos.");
+
                 final Optional<ButtonType> action = alert.showAndWait();
 
                 if (ButtonType.OK.equals(action.orElse(null))) {
                     alert.close();
                     dmsCommunicationFacadeImpl.deleteClient(clientViewData.getId());
-                    context.publishEvent(new DeleteEntityEvent(event.getSource(), clientViewData.getId()));
+                    context.publishEvent(new DeleteEntityEvent(event.getSource(), clientViewData.getId(), EntityType.CLIENT));
                     stage.close();
                 } else {
                     alert.close();
@@ -224,12 +245,12 @@ public class ClientViewController extends AbstractController {
     }
 
     private void bindDogTable() {
-        clientViewFormDogNameTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
-        clientViewFormDogRaceTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getRace()));
-        clientViewFormDogObservationsTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getObservations()));
-        clientViewFormDogTable.setOnMousePressed(event -> {
+        clientViewDogNameTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
+        clientViewDogRaceTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getRace()));
+        clientViewDogMaintainmentTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getMaintainment()));
+        clientViewDogTable.setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
-                showDogView(clientViewFormDogTable.getSelectionModel().getSelectedItem().getId());
+                showDogView(clientViewDogTable.getSelectionModel().getSelectedItem().getId());
             }
         });
     }
@@ -251,33 +272,29 @@ public class ClientViewController extends AbstractController {
         clientViewPaymentDescriptionTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDescription()));
     }
 
-    private void fillForm(final Long clientId) {
+    private void fill(final Long clientId) {
         clientViewData = dmsCommunicationFacadeImpl.getClientViewData(clientId);
 
         stage.setTitle("Vista de cliente");
         stage.setHeight(root.getPrefHeight());
         stage.setWidth(root.getPrefWidth());
 
-        clientViewFormName.setText(clientViewData.getName());
-        clientViewFormPhone.setText(String.valueOf(clientViewData.getPhone()));
-        clientViewFormObservations.setText(clientViewData.getObservations());
-        clientViewFormNextDate.setText(DmsUtils.dateToString(clientViewData.getNextDate()));
+        clientViewName.setText(clientViewData.getName());
+        clientViewPhone.setText(String.valueOf(clientViewData.getPhone()));
+        clientViewObservations.setText(clientViewData.getObservations());
+        clientViewNextDate.setText(DmsUtils.dateToString(clientViewData.getNextDate()));
 
         clientViewPaymentTab.setDisable(false);
         clientViewDateTab.setDisable(false);
         nextDateLabel.setVisible(true);
-        clientViewFormNextDate.setVisible(true);
-        clientViewFormNextDate.setDisable(true);
+        clientViewNextDate.setVisible(true);
+        clientViewNextDate.setDisable(true);
         deleteButton.setDisable(false);
         addDogButton.setDisable(false);
-        clientViewFormDogTable.getParent().setVisible(true);
-
-        clientViewFormDogTable.setItems(FXCollections.observableArrayList(clientViewData.getDogs()));
-        clientViewDateTable.setItems(FXCollections.observableArrayList(clientViewData.getDates()));
-        clientViewPaymentTable.setItems(FXCollections.observableArrayList(clientViewData.getPayments()));
+        clientViewDogTable.getParent().setVisible(true);
     }
 
-    private void cleanForm() {
+    private void clean() {
         clientViewData = ClientViewData.builder()
                 .dogs(new ArrayList<>()).dates(new ArrayList<>()).payments(new ArrayList<>()).build();
 
@@ -285,25 +302,31 @@ public class ClientViewController extends AbstractController {
         stage.setHeight(300);
         stage.setWidth(root.getPrefWidth());
 
-        clientViewFormName.clear();
-        clientViewFormPhone.clear();
-        clientViewFormObservations.clear();
-        clientViewFormNextDate.clear();
+        clientViewName.clear();
+        clientViewPhone.clear();
+        clientViewObservations.clear();
+        clientViewNextDate.clear();
 
         nextDateLabel.setVisible(false);
-        clientViewFormNextDate.setVisible(false);
+        clientViewNextDate.setVisible(false);
         deleteButton.setDisable(true);
         clientViewPaymentTab.setDisable(true);
         clientViewDateTab.setDisable(true);
         addDogButton.setDisable(true);
-        clientViewFormDogTable.getParent().setVisible(false);
-
-        clientViewFormDogTable.setItems(FXCollections.observableArrayList(clientViewData.getDogs()));
-        clientViewDateTable.setItems(FXCollections.observableArrayList(clientViewData.getDates()));
-        clientViewPaymentTable.setItems(FXCollections.observableArrayList(clientViewData.getPayments()));
+        clientViewDogTable.getParent().setVisible(false);
     }
 
     private void showDogView(final Long dogId) {
-        dogViewController.showView(clientViewData.getId(), dogId);
+        dogViewController.showView(stage, clientViewData.getId(), dogId);
+    }
+
+    @Override
+    public void onApplicationEvent(final EntityUpdateEvent event) {
+        if (EntityType.DOG.equals(event.getEntityType())) {
+            clientViewData = dmsCommunicationFacadeImpl.getClientViewData(clientViewData.getId());
+            clientViewDogTable.setItems(FXCollections.observableArrayList(clientViewData.getDogs()));
+            clientViewDateTable.setItems(FXCollections.observableArrayList(clientViewData.getDates()));
+            clientViewPaymentTable.setItems(FXCollections.observableArrayList(clientViewData.getPayments()));
+        }
     }
 }

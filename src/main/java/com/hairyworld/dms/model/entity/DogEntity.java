@@ -17,6 +17,7 @@ public class DogEntity implements Entity {
     private String maintainment;
     private String race;
     private String observations;
+    private byte[] image;
     
     private Set<Long> clientIds;
 }
