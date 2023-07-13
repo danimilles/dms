@@ -25,3 +25,8 @@ INSERT INTO client (name, phone, observations, id) VALUES ('dfdsssd', '232332', 
 INSERT INTO clientdog (iddog, idclient) VALUES (1, 2);
 INSERT INTO dog (name, maintainment, race, observations, image, id)
 VALUES ('dssd', 'sdsdds', 'sdsdsd', null, null, 1);
+INSERT INTO date (datetimestart, datetimeend, iddog, description, idservice, idclient)
+VALUES ('13/07/2023 10:00:00', '13/07/2023 11:00:00', 1, 'fdsfsadfa', null, 1);
+INSERT INTO payment (idservice, idclient, description, amount, datetime)
+VALUES (null, 1, 'hggfhfhf', 10.25, '13/07/2023 11:00:00');
+

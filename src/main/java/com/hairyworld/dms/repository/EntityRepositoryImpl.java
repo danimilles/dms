@@ -75,7 +75,7 @@ public class EntityRepositoryImpl implements EntityRepository {
                                          final ResultSetExtractor<Map<Long, Entity>> resultSetExtractor,
                                          final EntityType entityType) {
 
-        LOGGER.info("Loading {} info...", entityType.name().toLowerCase());
+        LOGGER.info("Loading {} info...", entityType.name());
 
         try {
             final Map<Long, Entity> result = jdbcTemplate.query(query, new MapSqlParameterSource(), resultSetExtractor);

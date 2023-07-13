@@ -72,7 +72,6 @@
                            <children>
                               <TableView fx:id="clientTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
                                 <columns>
-                                  <TableColumn fx:id="clientIdColumn" maxWidth="0" prefWidth="0" text="Id" />
                                   <TableColumn fx:id="clientNameColumn" maxWidth="1.7976931348623157E308" prefWidth="141.0" text="Nombre" />
                                   <TableColumn fx:id="clientPhoneColumn" maxWidth="1.7976931348623157E308" prefWidth="135.0" text="Telefono" />
                                     <TableColumn fx:id="clientDogsColumn" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="161.0" text="Perros" />
@@ -219,12 +218,12 @@
                         </VBox>
                         <VBox GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.valignment="BOTTOM" GridPane.vgrow="ALWAYS">
                            <children>
-                              <TableView maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                              <TableView fx:id="clientViewDateTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
                                  <columns>
-                                    <TableColumn maxWidth="1.7976931348623157E308" prefWidth="261.0" text="Servicio" />
-                                    <TableColumn maxWidth="1.7976931348623157E308" prefWidth="305.0" text="Descripcion" />
-                                    <TableColumn maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="104.0" text="Precio" />
-                                    <TableColumn maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="181.0" text="Acciones" />
+                                    <TableColumn fx:id="clientViewDateTableServiceColumn" maxWidth="1.7976931348623157E308" prefWidth="261.0" text="Servicio" />
+                                    <TableColumn fx:id="clientViewDateTableDescriptionColumn" maxWidth="1.7976931348623157E308" prefWidth="305.0" text="Descripcion" />
+                                    <TableColumn fx:id="clientViewDateTableAmountColumn" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="104.0" text="Precio" />
+                                    <TableColumn fx:id="clientViewDateTableActionsColumn" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="181.0" text="Acciones" />
                                  </columns>
                                  <HBox.margin>
                                     <Insets bottom="1.0" />

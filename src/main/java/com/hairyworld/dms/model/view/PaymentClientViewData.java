@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 @Builder
 public class PaymentClientViewData {
     private Long id;
-    private String service;
+    private ServiceClientViewData service;
     private String description;
     private BigDecimal amount;
     private DateTime datetime;

@@ -7,12 +7,10 @@ import com.hairyworld.dms.model.view.TableFilter;
 import com.hairyworld.dms.rmi.DmsCommunicationFacade;
 import com.hairyworld.dms.util.DmsUtils;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
@@ -26,7 +24,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Comparator;
@@ -34,10 +31,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.hairyworld.dms.util.Path.CLIENT_VIEW;
-
 @Component
-public class MainViewController implements ApplicationListener<EntityUpdateEvent> {
+public class MainViewController extends AbstractController implements ApplicationListener<EntityUpdateEvent> {
 
     private final DmsCommunicationFacade dmsCommunicationFacadeImpl;
     private final ClientViewController clientViewController;
@@ -61,8 +56,7 @@ public class MainViewController implements ApplicationListener<EntityUpdateEvent
 
     @FXML
     private TableView<ClientTableData> clientTable;
-    @FXML
-    private TableColumn<ClientTableData, Number> clientIdColumn;
+
     @FXML
     private TableColumn<ClientTableData, String> clientNameColumn;
     @FXML
@@ -93,13 +87,12 @@ public class MainViewController implements ApplicationListener<EntityUpdateEvent
 
         scheduleUpdateCalendarTime();
         initClientTable();
+        createTableResponsiveness(clientTable);
         addClientButton.setOnAction(event -> showClientView(null));
     }
 
     private void initClientTable() {
         clientTableData = FXCollections.observableList(dmsCommunicationFacadeImpl.getClientTableData());
-        clientIdColumn.setVisible(false);
-        clientIdColumn.setCellValueFactory(cellData ->  new SimpleLongProperty(cellData.getValue().getId()));
         clientNameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
         clientNameColumn.setSortType(TableColumn.SortType.ASCENDING);
         clientDogsColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDogs()));
@@ -134,16 +127,6 @@ public class MainViewController implements ApplicationListener<EntityUpdateEvent
     }
 
     private void showClientView(final Long selectedItem) {
-        final FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(this.getClass().getClassLoader().getResource(CLIENT_VIEW));
-        loader.setControllerFactory(context::getBean);
-
-        try {
-            loader.load();
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
-
         clientViewController.showView(selectedItem);
     }
 

@@ -14,4 +14,5 @@ public class DogClientViewData {
     private Long id;
     private String name;
     private String race;
+    private String observations;
 }

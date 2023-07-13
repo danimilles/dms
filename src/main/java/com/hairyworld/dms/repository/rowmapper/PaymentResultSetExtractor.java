@@ -2,7 +2,7 @@ package com.hairyworld.dms.repository.rowmapper;
 
 import com.hairyworld.dms.model.entity.Entity;
 import com.hairyworld.dms.model.entity.PaymentEntity;
-import org.joda.time.DateTime;
+import com.hairyworld.dms.util.DmsUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
@@ -31,7 +31,7 @@ public class PaymentResultSetExtractor implements ResultSetExtractor<Map<Long, E
         while (resultSet.next()) {
             final Entity paymentEntity = PaymentEntity.builder()
                     .id(resultSet.getLong(ID_FIELD))
-                    .datetime(new DateTime(resultSet.getTimestamp(DATETIME_FIELD).getTime()))
+                    .datetime(DmsUtils.parseDate(resultSet.getString(DATETIME_FIELD)))
                     .description(resultSet.getString(DESCRIPTION_FIELD))
                     .idservice(resultSet.getLong(IDSERVICE_FIELD))
                     .idclient(resultSet.getLong(IDCLIENT_FIELD))
