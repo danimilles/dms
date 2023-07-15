@@ -1,6 +1,7 @@
 package com.hairyworld.dms.controller;
 
 import com.hairyworld.dms.model.EntityType;
+import com.hairyworld.dms.model.event.DeleteEntityEvent;
 import com.hairyworld.dms.model.event.NewEntityEvent;
 import com.hairyworld.dms.model.view.dogview.ClientDogViewData;
 import com.hairyworld.dms.model.view.dogview.DateDogViewData;
@@ -18,10 +19,14 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -48,11 +53,26 @@ public class DogViewController extends AbstractController {
 
 
     @FXML
+    private VBox imageVbox;
+
+
+    private Image dogImage;
+    @FXML
+    private Circle imageCircle;
+    @FXML
+    private Button addImageButton;
+    @FXML
+    private Button deleteImageButton;
+
+
+    @FXML
     private TableView<ClientDogViewData> dogViewClientTable;
     @FXML
-    private TableColumn<ClientDogViewData, String> dogViewClientNameTableColum;
+    private TableColumn<ClientDogViewData, String> dogViewClientNameTableColumn;
     @FXML
-    private TableColumn<ClientDogViewData, String> dogViewClientPhoneTableColum;
+    private TableColumn<ClientDogViewData, String> dogViewClientDniTableColumn;
+    @FXML
+    private TableColumn<ClientDogViewData, String> dogViewClientPhoneTableColumn;
     @FXML
     private TableView<DateDogViewData> dogViewDateTable;
     @FXML
@@ -66,15 +86,13 @@ public class DogViewController extends AbstractController {
     @FXML
     private TableColumn<DateDogViewData, String> dogViewDateDescriptionTableColumn;
     @FXML
-    private ImageView dogImage;
-    @FXML
     private TextField dogViewName;
     @FXML
     private TextField dogViewRace;
     @FXML
-    private TextField dogViewObservations;
+    private TextArea dogViewObservations;
     @FXML
-    private TextField dogViewMaintainment;
+    private TextArea dogViewMaintainment;
     @FXML
     private TextField dogViewNextDate;
     @FXML
@@ -89,7 +107,6 @@ public class DogViewController extends AbstractController {
     private Button deleteDogButton;
     @FXML
     private GridPane root;
-
 
     private final DmsCommunicationFacade dmsCommunicationFacadeImpl;
     private final ApplicationContext context;
@@ -106,6 +123,7 @@ public class DogViewController extends AbstractController {
 
     @FXML
     private void initialize() {
+
         dogViewData = DogViewData.builder()
                 .clients(new ArrayList<>()).dates(new ArrayList<>()).build();
 
@@ -114,11 +132,11 @@ public class DogViewController extends AbstractController {
         bindDateTable();
         createTableResponsiveness(dogViewClientTable);
         createTableResponsiveness(dogViewDateTable);
+        imageCircle.setOnMouseClicked(e -> showImagePopup());
 
-        dogImage.setPreserveRatio(true);
-        dogImage.setStyle("-fx-border-color: black;");
-        dogImage.setAccessibleText("Insertar foto");
-        dogImage.setOnMouseClicked(event -> {if (dogImage.getImage() == null) { openFileChooser(); } else { showImagePopup(); }});
+        addImageButton.setOnAction(e -> openFileChooser());
+        deleteImageButton.setOnAction(e -> deleteImage());
+        deleteImageButton.setDisable(true);
 
         scene = new Scene(root);
         stage = new Stage();
@@ -152,13 +170,13 @@ public class DogViewController extends AbstractController {
                 .immediate();
 
         validator.createCheck()
-                .dependsOn("dogImage", dogImage.imageProperty())
+                .dependsOn("imageCircle", imageCircle.fillProperty())
                 .withMethod(c -> {
                     if (dogViewData.getImage() != null && dogViewData.getImage().length > 4194304) {
                         c.error("La imagen no puede pesar mas de 4MB");
                     }
                 })
-                .decorates(dogImage)
+                .decorates(imageCircle)
                 .immediate();
 
         return validator;
@@ -211,8 +229,8 @@ public class DogViewController extends AbstractController {
                 alert.setHeaderText(null);
                 ((Stage) alert.getDialogPane().getScene().getWindow()).getIcons()
                         .add(new Image(this.getClass().getClassLoader().getResourceAsStream(ICON_IMAGE)));
-                alert.setTitle("Borrar perro");
-                alert.setContentText("¿Estas seguro de que quieres borrar el perro? " +
+                alert.setTitle("Borrar mascota");
+                alert.setContentText("¿Estas seguro de que quieres borrar la mascota? " +
                         "Se elimiran sus datos de todos los clientes y citas asociados a el.");
 
                 final Optional<ButtonType> action = alert.showAndWait();
@@ -220,6 +238,7 @@ public class DogViewController extends AbstractController {
                 if (ButtonType.OK.equals(action.orElse(null))) {
                     alert.close();
                     dmsCommunicationFacadeImpl.deleteDog(dogViewData.getId());
+                    context.publishEvent(new DeleteEntityEvent(event.getSource(), dogViewData.getId(), EntityType.DOG));
                     stage.close();
                 } else {
                     alert.close();
@@ -229,26 +248,30 @@ public class DogViewController extends AbstractController {
     }
 
     private void showImagePopup() {
-        final Stage popup = new Stage();
-        final GridPane popupRoot = new GridPane();
-        final Scene popupScene = new Scene(popupRoot, 400, 400);
+        if (dogViewData.getImage() != null) {
+            final Stage popup = new Stage();
+            final GridPane popupRoot = new GridPane();
+            final Scene popupScene = new Scene(popupRoot, 400, 400);
 
-        final ImageView popupImageView = new ImageView(dogViewData.getImage() != null ?
-                new Image(new ByteArrayInputStream(dogViewData.getImage())) : null);
-        popupImageView.setPreserveRatio(true);
-        popupImageView.setSmooth(true);
-        popupRoot.setAlignment(Pos.CENTER);
+            final ImageView popupImageView = new ImageView(dogViewData.getImage() != null ?
+                    new Image(new ByteArrayInputStream(dogViewData.getImage())) : null);
+            popupImageView.setPreserveRatio(true);
+            popupImageView.setSmooth(true);
+            popupRoot.setAlignment(Pos.CENTER);
 
-        popup.widthProperty().addListener(
-                (observable, oldWidth, newWidth) -> popupImageView.setFitWidth(newWidth.doubleValue()));
-        popup.heightProperty().addListener(
-                (observable, oldHeight, newHeight) -> popupImageView.setFitHeight(newHeight.doubleValue()));
+            popup.widthProperty().addListener(
+                    (observable, oldWidth, newWidth) -> popupImageView.setFitWidth(newWidth.doubleValue()));
+            popup.heightProperty().addListener(
+                    (observable, oldHeight, newHeight) -> popupImageView.setFitHeight(newHeight.doubleValue()));
 
-        popupRoot.getChildren().add(popupImageView);
-        popup.getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream(ICON_IMAGE)));
-        popup.setScene(popupScene);
-        popup.setTitle("Ver imagen");
-        popup.show();
+            popupRoot.getChildren().add(popupImageView);
+            popup.getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream(ICON_IMAGE)));
+            popup.setScene(popupScene);
+            popup.setTitle("Ver imagen");
+            popup.initModality(Modality.WINDOW_MODAL);
+            popup.initOwner(stage);
+            popup.show();
+        }
     }
 
     private void bindDateTable() {
@@ -262,39 +285,70 @@ public class DogViewController extends AbstractController {
     }
 
     private void bindClientTable() {
-        dogViewClientPhoneTableColum.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPhone()));
-        dogViewClientNameTableColum.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
+        dogViewClientPhoneTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPhone()));
+        dogViewClientNameTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
+        dogViewClientDniTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDni()));
     }
 
     private void openFileChooser() {
         final FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Selecciona una imagen");
         fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("Selecciona una imagen", "*.png", "*.jpg", "*.jpeg", "*.gif")
+                new FileChooser.ExtensionFilter(
+                        "Selecciona una imagen", "*.png", "*.jpg", "*.jpeg", "*.gif")
         );
         final File selectedFile = fileChooser.showOpenDialog(this.stage);
 
-        if (selectedFile != null) {
+        if (selectedFile != null && selectedFile.length() < 4194304) {
             try {
                 dogViewData.setImage(Files.readAllBytes(selectedFile.toPath()));
-                dogImage.setImage(new Image(new ByteArrayInputStream(dogViewData.getImage())));
+                dogImage = new Image(new ByteArrayInputStream(dogViewData.getImage()));
+                imageCircle.setFill(new ImagePattern(dogImage));
+                deleteImageButton.setDisable(false);
+                addImageButton.setDisable(true);
             } catch (final IOException e) {
                 LOGGER.error("Error reading image", e);
             }
 
+        } else if (selectedFile != null) {
+            final Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setHeaderText(null);
+            ((Stage) alert.getDialogPane().getScene().getWindow()).getIcons()
+                    .add(new Image(this.getClass().getClassLoader().getResourceAsStream(ICON_IMAGE)));
+            alert.setTitle("Error");
+            alert.setContentText("La imagen no puede ser mayor de 4MB");
+            alert.showAndWait();
         }
+    }
+
+    private void deleteImage() {
+        dogViewData.setImage(null);
+        imageCircle.setFill(null);
+        dogImage = null;
+        deleteImageButton.setDisable(true);
+        addImageButton.setDisable(false);
     }
 
     private void fill(final Long clientId) {
         dogViewData = dmsCommunicationFacadeImpl.getDogData(clientId);
 
-        stage.setTitle("Vista de perro");
+        stage.setTitle("Vista de mascota");
         stage.setHeight(root.getPrefHeight());
         stage.setWidth(root.getPrefWidth());
 
         dogViewName.setText(dogViewData.getName());
-        dogImage.setImage(dogViewData.getImage() != null ?
-                new Image(new ByteArrayInputStream(dogViewData.getImage())) : null);
+
+        if (dogViewData.getImage() != null) {
+            dogImage = new Image(new ByteArrayInputStream(dogViewData.getImage()));
+            imageCircle.setFill(new ImagePattern(dogImage));
+            deleteImageButton.setDisable(false);
+            addImageButton.setDisable(true);
+        } else {
+            imageCircle.setFill(null);
+            deleteImageButton.setDisable(true);
+            addImageButton.setDisable(false);
+        }
+
         dogViewRace.setText(String.valueOf(dogViewData.getRace()));
         dogViewObservations.setText(dogViewData.getObservations());
         dogViewNextDate.setText(DmsUtils.dateToString(dogViewData.getNextDate()));
@@ -312,20 +366,24 @@ public class DogViewController extends AbstractController {
     }
 
     private void clean(final Long clientId) {
-        final ClientDogViewData clientDogViewData = dmsCommunicationFacadeImpl.getClientDogViewData(clientId);
         final List<ClientDogViewData> clients = new ArrayList<>();
-        clients.add(clientDogViewData);
+
+        if (clientId != null) {
+            final ClientDogViewData clientDogViewData = dmsCommunicationFacadeImpl.getClientDogViewData(clientId);
+            clients.add(clientDogViewData);
+        }
 
         dogViewData = DogViewData.builder()
                 .clients(clients).dates(new ArrayList<>()).build();
 
-        stage.setTitle("Crear perro");
-        stage.setHeight(350);
+        stage.setTitle("Crear mascota");
+        stage.setHeight(450);
         stage.setWidth(root.getPrefWidth());
 
         dogViewName.clear();
         dogViewRace.clear();
-        dogImage.setImage(null);
+        dogImage = null;
+        imageCircle.setFill(null);
         dogViewObservations.clear();
         dogViewNextDate.clear();
         dogViewMaintainment.clear();
@@ -336,6 +394,8 @@ public class DogViewController extends AbstractController {
         deleteDogButton.setDisable(true);
         addDateDogButton.setDisable(true);
         addClientToDogButton.setDisable(true);
+        deleteImageButton.setDisable(true);
+        addImageButton.setDisable(false);
 
         dogViewClientTable.setItems(FXCollections.observableArrayList(dogViewData.getClients()));
         dogViewDateTable.setItems(FXCollections.observableArrayList(dogViewData.getDates()));

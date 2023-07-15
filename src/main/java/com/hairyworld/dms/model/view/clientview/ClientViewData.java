@@ -17,9 +17,10 @@ public class ClientViewData {
     private Long id;
     private String name;
     private String phone;
-    private List<DogClientViewData> dogs;
+    private String dni;
     private DateTime nextDate;
     private String observations;
+    private List<DogClientViewData> dogs;
     private List<DateClientViewData> dates;
     private List<PaymentClientViewData> payments;
 }

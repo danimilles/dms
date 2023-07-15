@@ -30,3 +30,6 @@ VALUES ('13/07/2023 10:00:00', '13/07/2023 11:00:00', 1, 'fdsfsadfa', null, 1);
 INSERT INTO payment (idservice, idclient, description, amount, datetime)
 VALUES (null, 1, 'hggfhfhf', 10.25, '13/07/2023 11:00:00');
 
+Select d.id FROM dog d INNER JOIN clientdog cd ON cd.iddog = d.id
+where cd.idclient = ? and id in
+                          (SELECT cd.iddog FROM clientdog cd GROUP BY cd.iddog HAVING count(cd.iddog) = 1)

@@ -93,10 +93,13 @@ public class ClientViewController extends AbstractController implements Applicat
     private Tab clientViewDateTab;
     @FXML
     private Tab clientViewDataTab;
+
     @FXML
     private TextField clientViewName;
     @FXML
     private TextField clientViewPhone;
+    @FXML
+    private TextField clientViewDni;
     @FXML
     private TextField clientViewObservations;
     @FXML
@@ -171,6 +174,17 @@ public class ClientViewController extends AbstractController implements Applicat
                 .decorates(clientViewPhone)
                 .immediate();
 
+        validator.createCheck()
+                .dependsOn("clientViewDni", clientViewDni.textProperty())
+                .withMethod(c -> {
+                    final String dni = c.get("clientViewDni");
+                    if (dni != null && !dni.isEmpty() && !dni.matches("^\\d{8}[a-zA-Z]$")) {
+                        c.error("El dni debe ser correcto");
+                    }
+                })
+                .decorates(clientViewDni)
+                .immediate();
+
         return validator;
     }
 
@@ -206,6 +220,7 @@ public class ClientViewController extends AbstractController implements Applicat
                         .name(clientViewName.getText())
                         .phone(clientViewPhone.getText())
                         .observations(clientViewObservations.getText())
+                        .dni(clientViewDni.getText())
                         .dogs(clientViewData.getDogs())
                         .dates(clientViewData.getDates())
                         .payments(clientViewData.getPayments())
@@ -227,7 +242,7 @@ public class ClientViewController extends AbstractController implements Applicat
                         .add(new Image(this.getClass().getClassLoader().getResourceAsStream(ICON_IMAGE)));
                 alert.setTitle("Borrar cliente");
                 alert.setContentText("¿Estas seguro de que quieres borrar el cliente? " +
-                        "Se borraran las citas del cliente, los perros que no tengan otro dueño y" +
+                        "Se borraran las citas del cliente, las mascotas que no tengan otro dueño y" +
                         " se eliminaran los datos del cliente de los pagos.");
 
                 final Optional<ButtonType> action = alert.showAndWait();
@@ -280,7 +295,8 @@ public class ClientViewController extends AbstractController implements Applicat
         stage.setWidth(root.getPrefWidth());
 
         clientViewName.setText(clientViewData.getName());
-        clientViewPhone.setText(String.valueOf(clientViewData.getPhone()));
+        clientViewDni.setText(clientViewData.getDni());
+        clientViewPhone.setText(clientViewData.getPhone());
         clientViewObservations.setText(clientViewData.getObservations());
         clientViewNextDate.setText(DmsUtils.dateToString(clientViewData.getNextDate()));
 
@@ -299,13 +315,14 @@ public class ClientViewController extends AbstractController implements Applicat
                 .dogs(new ArrayList<>()).dates(new ArrayList<>()).payments(new ArrayList<>()).build();
 
         stage.setTitle("Crear cliente");
-        stage.setHeight(300);
+        stage.setHeight(320);
         stage.setWidth(root.getPrefWidth());
 
         clientViewName.clear();
         clientViewPhone.clear();
         clientViewObservations.clear();
         clientViewNextDate.clear();
+        clientViewDni.clear();
 
         nextDateLabel.setVisible(false);
         clientViewNextDate.setVisible(false);

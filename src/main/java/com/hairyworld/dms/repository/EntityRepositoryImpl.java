@@ -9,7 +9,6 @@ import com.hairyworld.dms.repository.rowmapper.DateResultSetExtractor;
 import com.hairyworld.dms.repository.rowmapper.PaymentResultSetExtractor;
 import com.hairyworld.dms.repository.rowmapper.ServiceResultSetExtractor;
 import com.sun.javafx.binding.StringFormatter;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,12 +21,10 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.hairyworld.dms.repository.rowmapper.ClientResultSetExtractor.IDCLIENT_FIELD;
 import static com.hairyworld.dms.repository.rowmapper.ClientResultSetExtractor.IDDOG_FIELD;
@@ -41,6 +38,7 @@ public class EntityRepositoryImpl implements EntityRepository {
     private static final Logger LOGGER = LogManager.getLogger(EntityRepositoryImpl.class);
     private static final String ID_FIELD = "id";
     private static final String NAME_FIELD = "name";
+    private static final String DNI_FIELD = "dni";
     private static final String OBSERVATIONS_FIELD = "observations";
     private static final String QUERY_PARAMS_LOG = "Query -> [{}], Params -> [{}]";
 
@@ -100,13 +98,16 @@ public class EntityRepositoryImpl implements EntityRepository {
 
         try {
             switch (entityType) {
-                case CLIENT:
+                case CLIENT -> {
                     return saveClient(entity);
-                case DOG:
+                }
+                case DOG -> {
                     return saveDog(entity);
-                default:
+                }
+                default -> {
                     LOGGER.error("Unsupported entity type -> {}", entityType.name());
                     return null;
+                }
             }
         } catch (final Exception e) {
             LOGGER.error("Error saving {} info...", entityType.name().toLowerCase(), e);
@@ -154,6 +155,7 @@ public class EntityRepositoryImpl implements EntityRepository {
         parameters.addValue(NAME_FIELD, clientEntity.getName());
         parameters.addValue(PHONE_FIELD, clientEntity.getPhone());
         parameters.addValue(OBSERVATIONS_FIELD, clientEntity.getObservations());
+        parameters.addValue(DNI_FIELD, clientEntity.getObservations());
 
         final KeyHolder keyHolder = new GeneratedKeyHolder();
         LOGGER.debug(QUERY_PARAMS_LOG, query, parameters.getValues());
@@ -163,21 +165,29 @@ public class EntityRepositoryImpl implements EntityRepository {
     }
 
     @Override
-    public List<Long> deleteEntity(final Long id, final EntityType entityType) {
+    public void deleteEntity(final Long id, final EntityType entityType) {
         LOGGER.info("Deleting {} info...", entityType.name());
 
         try {
             switch (entityType) {
-                case CLIENT:
-                    return deleteClient(id);
-                default:
-                    LOGGER.error("Unsupported entity type -> {}", entityType.name());
-                    return Collections.emptyList();
+                case CLIENT -> deleteClient(id);
+                case DOG -> deleteDog(id);
+                default -> LOGGER.error("Unsupported entity type -> {}", entityType.name());
             }
         } catch (final Exception e) {
             LOGGER.error("Error deleting {} info...", entityType.name().toLowerCase(), e);
             throw e;
         }
+    }
+
+    private void deleteDog(final Long id) {
+        final MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue(ID_FIELD, id);
+
+        LOGGER.debug(QUERY_PARAMS_LOG, Query.SELECT_TO_DELETE_DOG_FROM_CLIENT, parameters.getValues());
+
+        LOGGER.debug(QUERY_PARAMS_LOG, Query.DELETE_DOG, parameters.getValues());
+        jdbcTemplate.update(Query.DELETE_DOG, parameters);
     }
 
     @Override
@@ -196,25 +206,26 @@ public class EntityRepositoryImpl implements EntityRepository {
         }
     }
 
-    private List<Long> deleteClient(final Long id) {
+    private void deleteClient(final Long id) {
+        final MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue(ID_FIELD, id);
+
+        LOGGER.debug(QUERY_PARAMS_LOG, Query.DELETE_CLIENT, parameters.getValues());
+        jdbcTemplate.update(Query.DELETE_CLIENT, parameters);
+    }
+
+    public List<Long> getDogToDeleteForClient(final Long id) {
         final MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue(ID_FIELD, id);
 
         LOGGER.debug(QUERY_PARAMS_LOG, Query.SELECT_TO_DELETE_DOG_FROM_CLIENT, parameters.getValues());
-        final List<Long> iddogs = jdbcTemplate.queryForList(Query.SELECT_TO_DELETE_DOG_FROM_CLIENT, parameters,
-                Long.class);
 
-        if (!CollectionUtils.isEmpty(iddogs)) {
-            final String iddogsstring = iddogs.stream().map(String::valueOf).collect(Collectors.joining(","));
-
-            final String query = StringFormatter.format(Query.DELETE_DOG_FROM_CLIENT, iddogsstring).getValue();
-            LOGGER.debug(QUERY_PARAMS_LOG, query, iddogs);
-            jdbcTemplate.update(query, new MapSqlParameterSource());
+        try {
+            return jdbcTemplate.queryForList(Query.SELECT_TO_DELETE_DOG_FROM_CLIENT, parameters,
+                    Long.class);
+        } catch (final Exception e) {
+            LOGGER.error("Error retrieving dogs to delete", e);
+            throw e;
         }
-
-        LOGGER.debug(QUERY_PARAMS_LOG, Query.DELETE_CLIENT, parameters.getValues());
-        jdbcTemplate.update(Query.DELETE_CLIENT, parameters);
-
-        return iddogs;
     }
 }

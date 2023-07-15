@@ -15,6 +15,7 @@ public class ClientToServiceMapper {
         return ClientEntity.builder()
                 .id(clientData.getId())
                 .name(clientData.getName())
+                .dni(clientData.getDni())
                 .observations(clientData.getObservations())
                 .phone(clientData.getPhone())
                 .dogIds(clientData.getDogs() == null ? new HashSet<>() :

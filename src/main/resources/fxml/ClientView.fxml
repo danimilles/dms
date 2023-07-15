@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane fx:id="root" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="650.0" prefWidth="900.0" style="-fx-font-size: 11pt;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.hairyworld.dms.controller.ClientViewController">
+<GridPane fx:id="root" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="650.0" prefWidth="900.0" style="-fx-font-size: 11pt;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.hairyworld.dms.controller.ClientViewController">
    <columnConstraints>
       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
    </columnConstraints>
@@ -21,8 +22,8 @@
                         <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="100.0" />
                      </columnConstraints>
                      <rowConstraints>
-                        <RowConstraints fillHeight="false" minHeight="138.0" valignment="TOP" vgrow="NEVER" />
-                        <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" valignment="TOP" vgrow="ALWAYS" />
+                        <RowConstraints fillHeight="false" maxHeight="186.0" minHeight="173.0" prefHeight="173.0" valignment="TOP" vgrow="NEVER" />
+                        <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="378.0" valignment="TOP" vgrow="ALWAYS" />
                         <RowConstraints minHeight="60.0" valignment="TOP" />
                      </rowConstraints>
                      <children>
@@ -32,7 +33,7 @@
                                  <children>
                                     <TableView fx:id="clientViewDogTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
                                        <columns>
-                                          <TableColumn fx:id="clientViewDogNameTableColumn" maxWidth="1.7976931348623157E308" prefWidth="439.0" text="Nombre de perro" />
+                                          <TableColumn fx:id="clientViewDogNameTableColumn" maxWidth="1.7976931348623157E308" prefWidth="439.0" text="Nombre de mascota" />
                                           <TableColumn fx:id="clientViewDogRaceTableColumn" maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="209.0" text="Raza" />
                                           <TableColumn fx:id="clientViewDogMaintainmentTableColumn" maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="209.0" text="Mantenimiento" />
                                        </columns>
@@ -61,6 +62,14 @@
                                           <Insets top="5.0" />
                                        </VBox.margin>
                                     </Label>
+                                    <Label text="Dni:">
+                                       <padding>
+                                          <Insets bottom="7.0" />
+                                       </padding>
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
                                     <Label text="Observaciones:" />
                                     <Label fx:id="nextDateLabel" layoutX="30.0" layoutY="66.0" text="Siguiente cita:">
                                        <padding>
@@ -80,6 +89,11 @@
                                        </VBox.margin>
                                     </TextField>
                                     <TextField fx:id="clientViewPhone" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                                       <VBox.margin>
+                                          <Insets />
+                                       </VBox.margin>
+                                    </TextField>
+                                    <TextField fx:id="clientViewDni" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                                        <VBox.margin>
                                           <Insets />
                                        </VBox.margin>
@@ -115,7 +129,7 @@
                                           <Insets left="20.0" right="20.0" />
                                        </HBox.margin>
                                     </Button>
-                                    <Button fx:id="addDogButton" alignment="BOTTOM_RIGHT" contentDisplay="RIGHT" layoutX="317.0" layoutY="10.0" mnemonicParsing="false" text="Añadir Perro" textAlignment="CENTER">
+                                    <Button fx:id="addDogButton" alignment="BOTTOM_RIGHT" contentDisplay="RIGHT" layoutX="317.0" layoutY="10.0" mnemonicParsing="false" text="Añadir mascota" textAlignment="CENTER">
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin>
@@ -145,7 +159,7 @@
                                     <TableColumn fx:id="clientViewDateDateStartTableColumn" maxWidth="1.7976931348623157E308" prefWidth="110.0" text="Fecha cita" />
                                     <TableColumn fx:id="clientViewDateDateEndTableColumn" maxWidth="1.7976931348623157E308" prefWidth="152.0" text="Fecha finalizacion de cita" />
                                     <TableColumn fx:id="clientViewDateServiceTableColumn" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="127.0" text="Servicio" />
-                                    <TableColumn fx:id="clientViewDateDogTableColumn" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="169.0" text="Perro" />
+                                    <TableColumn fx:id="clientViewDateDogTableColumn" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="169.0" text="Mascota" />
                                     <TableColumn fx:id="clientViewDateDescriptionTableColumn" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="169.0" text="Descripcion" />
                                     <TableColumn fx:id="clientViewDateActionsTableColumn" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="169.0" text="Acciones" />
                                  </columns>

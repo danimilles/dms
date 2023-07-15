@@ -14,4 +14,5 @@ public class ClientDogViewData {
     private Long id;
     private String name;
     private String phone;
+    private String dni;
 }

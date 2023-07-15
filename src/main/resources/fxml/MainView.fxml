@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane fx:id="root" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-font-size: 11pt;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.hairyworld.dms.controller.MainViewController">
+<GridPane fx:id="root" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-font-size: 11pt;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.hairyworld.dms.controller.MainViewController">
    <columnConstraints>
       <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" />
    </columnConstraints>
@@ -21,7 +22,7 @@
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
                      </columnConstraints>
                      <rowConstraints>
-                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="-Infinity" />
                         <RowConstraints />
                         <RowConstraints maxHeight="1.7976931348623157E308" valignment="CENTER" vgrow="ALWAYS" />
                      </rowConstraints>
@@ -73,8 +74,9 @@
                               <TableView fx:id="clientTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
                                 <columns>
                                   <TableColumn fx:id="clientNameColumn" maxWidth="1.7976931348623157E308" prefWidth="141.0" text="Nombre" />
+                                  <TableColumn fx:id="clientDniColumn" maxWidth="1.7976931348623157E308" prefWidth="141.0" text="Dni" />
                                   <TableColumn fx:id="clientPhoneColumn" maxWidth="1.7976931348623157E308" prefWidth="135.0" text="Telefono" />
-                                    <TableColumn fx:id="clientDogsColumn" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="161.0" text="Perros" />
+                                    <TableColumn fx:id="clientDogsColumn" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="161.0" text="Mascotas" />
                                     <TableColumn fx:id="clientNextDateColumn" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="187.0" text="Proxima Cita" />
                                     <TableColumn fx:id="clientMaintainmentColumn" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="200.0" text="Mantenimiento" />
                                 </columns>
@@ -88,7 +90,7 @@
                   </GridPane>
             </content>
           </Tab>
-          <Tab text="Perros">
+          <Tab text="Mascotas">
             <content>
                   <GridPane>
                      <children>
@@ -96,7 +98,7 @@
                            <children>
                               <HBox>
                                  <children>
-                                    <Button mnemonicParsing="false" text="Añadir perro" GridPane.halignment="RIGHT">
+                                    <Button mnemonicParsing="false" text="Añadir mascota" GridPane.halignment="RIGHT">
                                        <GridPane.margin>
                                           <Insets right="20.0" />
                                        </GridPane.margin>
@@ -151,7 +153,7 @@
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
                      </columnConstraints>
                      <rowConstraints>
-                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="-Infinity" />
                         <RowConstraints />
                         <RowConstraints maxHeight="1.7976931348623157E308" valignment="CENTER" vgrow="ALWAYS" />
                      </rowConstraints>
@@ -236,7 +238,7 @@
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
                      </columnConstraints>
                      <rowConstraints>
-                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="-Infinity" />
                         <RowConstraints />
                         <RowConstraints maxHeight="1.7976931348623157E308" valignment="CENTER" vgrow="ALWAYS" />
                      </rowConstraints>
@@ -310,7 +312,7 @@
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
                      </columnConstraints>
                      <rowConstraints>
-                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="-Infinity" />
                         <RowConstraints />
                         <RowConstraints maxHeight="1.7976931348623157E308" valignment="CENTER" vgrow="ALWAYS" />
                      </rowConstraints>

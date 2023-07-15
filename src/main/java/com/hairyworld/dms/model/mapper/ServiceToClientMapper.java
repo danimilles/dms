@@ -25,13 +25,14 @@ public class ServiceToClientMapper {
         return ClientTableData.builder()
                 .id(client.getId())
                 .name(client.getName())
+                .dni(client.getDni())
                 .nextDate(date != null ? date.getDatetimestart() : null)
-                .dogs(dogs.stream().map(dog -> ((DogEntity) dog).getName() + " : " + ((DogEntity) dog).getRace())
+                .dogs(dogs.stream().map(dog -> ((DogEntity) dog).getName() + " -> " + ((DogEntity) dog).getRace())
                         .reduce((a, b) -> a + ",\n" + b)
                         .orElse(""))
                 .mantainment(dogs.stream()
                         .filter(dog -> !Strings.isEmpty(((DogEntity) dog).getMaintainment()))
-                        .map(dog -> ((DogEntity) dog).getName() + " : " + ((DogEntity) dog).getMaintainment())
+                        .map(dog -> ((DogEntity) dog).getName() + " -> " + ((DogEntity) dog).getMaintainment())
                         .reduce((a, b) -> a + ",\n" + b).orElse(Strings.EMPTY))
                 .phone(client.getPhone())
                 .build();
@@ -44,6 +45,7 @@ public class ServiceToClientMapper {
         return ClientViewData.builder()
                 .id(client.getId())
                 .name(client.getName())
+                .dni(client.getDni())
                 .nextDate(date != null ? date.getDatetimestart() : null)
                 .dogs(dogs.stream().map(dog -> DogClientViewData.builder()
                                 .name(((DogEntity) dog).getName())
@@ -128,6 +130,7 @@ public class ServiceToClientMapper {
     public static ClientDogViewData map(final ClientEntity client) {
         return ClientDogViewData.builder()
                 .id(client.getId())
+                .dni(client.getDni())
                 .phone(client.getPhone())
                 .name(client.getName())
                 .build();

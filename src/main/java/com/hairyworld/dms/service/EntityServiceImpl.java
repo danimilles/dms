@@ -10,7 +10,6 @@ import com.hairyworld.dms.repository.EntityRepositoryImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -48,7 +47,7 @@ public class EntityServiceImpl implements EntityService {
     }
 
     @Override
-    public Entity get(Long id, EntityType entityType) {
+    public Entity get(final Long id, final EntityType entityType) {
         return cacheManager.getEntityFromCache(id, entityType);
     }
 
@@ -86,10 +85,16 @@ public class EntityServiceImpl implements EntityService {
 
     @Override
     public void deleteEntity(final Long id, final EntityType entityType) {
-        final List<Long> iddogs = entityRepository.deleteEntity(id, entityType);
-        cacheManager.removeEntityFromCache(id, entityType);
-        if (!CollectionUtils.isEmpty(iddogs) && EntityType.CLIENT.equals(entityType)) {
+        if (EntityType.CLIENT.equals(entityType)) {
+            final List<Long> iddogs = entityRepository.getDogToDeleteForClient(id);
+            iddogs.forEach(iddog -> entityRepository.deleteEntity(id, EntityType.DOG));
             cacheManager.removeAllMatchEntityFromCache(entity -> iddogs.contains(entity.getId()), entityType);
         }
+        if (entityType.equals(EntityType.DOG)) {
+            cacheManager.getAllMatchEntityFromCache(client -> ((ClientEntity)client).getDogIds().contains(id), EntityType.CLIENT)
+                    .forEach(client -> ((ClientEntity)client).getDogIds().remove(id));
+        }
+        entityRepository.deleteEntity(id, entityType);
+        cacheManager.removeEntityFromCache(id, entityType);
     }
 }

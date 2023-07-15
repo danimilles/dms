@@ -6,7 +6,7 @@ public class Query {
     }
 
     public static final String SELECT_CLIENT_AND_DOGS = """
-            SELECT c.name as clientname, phone, c.observations as clientobservations,
+            SELECT c.name as clientname, dni, phone, c.observations as clientobservations,
             coalesce(iddog, d.id) as iddog, coalesce(idclient, c.id) as idclient, d.name as dogname,
             maintainment, race, d.observations as dogobservations, image
             FROM client c
@@ -26,8 +26,8 @@ public class Query {
             from payment""";
 
     public static final String INSERT_CLIENT = """
-            INSERT OR REPLACE INTO client (%sname, phone, observations)
-            VALUES (%s:name, :phone, :observations)""";
+            INSERT OR REPLACE INTO client (%sname, dni, phone, observations)
+            VALUES (%s:name, :dni, :phone, :observations)""";
 
     public static final String INSERT_DOG = """
             INSERT OR REPLACE INTO dog (%sname, race,  maintainment, observations, image)
@@ -40,11 +40,12 @@ public class Query {
             DELETE FROM client
             WHERE id = :id""";
 
+    public static final String DELETE_DOG = """
+            DELETE FROM dog
+            WHERE id = :id""";
+
     public static final String SELECT_TO_DELETE_DOG_FROM_CLIENT = """
             Select d.id FROM dog d INNER JOIN clientdog cd ON cd.iddog = d.id
               where cd.idclient = :id and id in
                (SELECT cd.iddog FROM clientdog cd GROUP BY cd.iddog HAVING count(cd.iddog) = 1)""";
-
-    public static final String DELETE_DOG_FROM_CLIENT = """
-            delete from dog where id in (%s)""";
 }

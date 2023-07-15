@@ -90,7 +90,7 @@ public class DmsCommunicationFacadeImpl implements DmsCommunicationFacade {
 
     @Override
     public void deleteDog(final Long id) {
-
+        entityService.deleteEntity(id, EntityType.DOG);
     }
 
     @Override

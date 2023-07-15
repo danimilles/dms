@@ -68,6 +68,8 @@ public class MainViewController extends AbstractController implements Applicatio
     private TableColumn<ClientTableData, String> clientMaintainmentColumn;
     @FXML
     private TableColumn<ClientTableData, String> clientNextDateColumn;
+    @FXML
+    private TableColumn<ClientTableData, String> clientDniColumn;
 
     @FXML
     private GridPane root;
@@ -100,6 +102,7 @@ public class MainViewController extends AbstractController implements Applicatio
         clientNameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
         clientNameColumn.setSortType(TableColumn.SortType.ASCENDING);
         clientDogsColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDogs()));
+        clientDniColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDni()));
         clientPhoneColumn.setCellValueFactory(cellData ->  new SimpleStringProperty(cellData.getValue().getPhone()));
         clientNextDateColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
                 cellData.getValue().getNextDate() != null ? DmsUtils.dateToString(cellData.getValue().getNextDate()) : null));
@@ -114,8 +117,7 @@ public class MainViewController extends AbstractController implements Applicatio
         clientSearchDatePicker = new DatePicker();
         clientSearchDatePicker.setValue(LocalDate.now());
 
-        clientSearchField.setItems(FXCollections.observableArrayList(TableFilter.NO_FILTER, TableFilter.MANTAINMENT,
-                TableFilter.NEXT_DATE, TableFilter.PHONE, TableFilter.DOG_NAME, TableFilter.CLIENT_NAME));
+        clientSearchField.setItems(FXCollections.observableArrayList(TableFilter.values()));
         clientSearchField.setValue(TableFilter.NO_FILTER);
         clientSearchText.setDisable(true);
 
@@ -153,6 +155,9 @@ public class MainViewController extends AbstractController implements Applicatio
                 switch (clientSearchField.getValue()) {
                     case CLIENT_NAME -> clientTable.setItems(clientTableData.filtered(clientData ->
                             toLower(clientData.getName()).contains(toLower(clientSearchText.getText()))));
+
+                    case DNI -> clientTable.setItems(clientTableData.filtered(clientData ->
+                            toLower(clientData.getDni()).contains(toLower(clientSearchText.getText()))));
 
                     case DOG_NAME -> clientTable.setItems(clientTableData.filtered(clientData ->
                             toLower(clientData.getDogs()).contains(toLower(clientSearchText.getText()))));

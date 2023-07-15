@@ -3,7 +3,9 @@ create table main.client
     name         TEXT    not null,
     phone        TEXT not null,
     observations TEXT,
-    id           integer not null
+    dni TEXT
+        constraint client_dni_uq unique,
+    id  integer not null
         constraint client_pk
             primary key autoincrement
 );

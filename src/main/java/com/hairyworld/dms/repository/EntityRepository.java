@@ -3,7 +3,6 @@ package com.hairyworld.dms.repository;
 import com.hairyworld.dms.model.EntityType;
 import com.hairyworld.dms.model.entity.Entity;
 
-import java.util.List;
 import java.util.Map;
 
 public interface EntityRepository {
@@ -18,7 +17,7 @@ public interface EntityRepository {
 
     Long saveEntity(Entity entity, EntityType entityType);
 
-    List<Long> deleteEntity(Long id, EntityType entityType);
+    void deleteEntity(Long id, EntityType entityType);
 
     void saveClientDogRelation(Long idclient, Long iddog);
 }

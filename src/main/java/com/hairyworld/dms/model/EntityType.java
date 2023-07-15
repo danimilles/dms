@@ -9,7 +9,7 @@ public enum EntityType {
 
     private final int id;
 
-    EntityType(int id) {
+    EntityType(final int id) {
         this.id = id;
     }
 

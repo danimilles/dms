@@ -15,6 +15,7 @@ public class ClientEntity implements Entity {
     private Long id;
     private String name;
     private String phone;
+    private String dni;
     private String observations;
 
     private Set<Long> dogIds;
