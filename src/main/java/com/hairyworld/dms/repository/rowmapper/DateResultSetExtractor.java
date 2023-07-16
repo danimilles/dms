@@ -13,13 +13,13 @@ import java.util.Map;
 
 public class DateResultSetExtractor implements ResultSetExtractor<Map<Long, Entity>> {
 
-    public static final String ID_FIELD = "id";
-    public static final String DATETIMESTART_FIELD = "datetimestart";
-    public static final String DATETIMEEND_FIELD = "datetimeend";
-    public static final String DESCRIPTION_FIELD = "description";
-    public static final String IDSERVICE_FIELD = "idservice";
-    public static final String IDCLIENT_FIELD = "idclient";
-    public static final String IDDOG_FIELD = "iddog";
+    private static final String ID_FIELD = "id";
+    private static final String DATETIMESTART_FIELD = "datetimestart";
+    private static final String DATETIMEEND_FIELD = "datetimeend";
+    private static final String DESCRIPTION_FIELD = "description";
+    private static final String IDSERVICE_FIELD = "idservice";
+    private static final String IDCLIENT_FIELD = "idclient";
+    private static final String IDDOG_FIELD = "iddog";
 
     public DateResultSetExtractor() {
         super();

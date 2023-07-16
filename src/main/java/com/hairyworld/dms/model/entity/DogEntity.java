@@ -20,4 +20,10 @@ public class DogEntity implements Entity {
     private byte[] image;
     
     private Set<Long> clientIds;
+
+    @Override
+    public EntityType getEntityType() {
+        return EntityType.DOG;
+    }
+
 }

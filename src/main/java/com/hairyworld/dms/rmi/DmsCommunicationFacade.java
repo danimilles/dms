@@ -1,14 +1,12 @@
 package com.hairyworld.dms.rmi;
 
-import com.hairyworld.dms.model.view.clientview.ClientViewData;
-import com.hairyworld.dms.model.view.dogview.ClientDogViewData;
-import com.hairyworld.dms.model.view.dogview.DogViewData;
-import com.hairyworld.dms.model.view.mainview.ClientTableData;
+import com.hairyworld.dms.model.view.ClientViewData;
+import com.hairyworld.dms.model.view.DogViewData;
 
 import java.util.List;
 
 public interface DmsCommunicationFacade {
-    List<ClientTableData> getClientTableData();
+    List<ClientViewData> getClientTableData();
 
     ClientViewData getClientViewData(Long clientId);
 
@@ -16,11 +14,11 @@ public interface DmsCommunicationFacade {
 
     void deleteClient(Long id);
 
-    void saveDog(DogViewData dogViewName);
+    void saveDog(DogViewData dogViewData);
 
     void deleteDog(Long id);
 
     DogViewData getDogData(Long clientId);
 
-    ClientDogViewData getClientDogViewData(Long clientId);
+    ClientViewData getClientDogViewData(Long clientId);
 }

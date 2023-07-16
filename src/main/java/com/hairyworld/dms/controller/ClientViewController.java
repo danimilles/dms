@@ -1,13 +1,13 @@
 package com.hairyworld.dms.controller;
 
-import com.hairyworld.dms.model.EntityType;
+import com.hairyworld.dms.model.entity.EntityType;
 import com.hairyworld.dms.model.event.DeleteEntityEvent;
 import com.hairyworld.dms.model.event.EntityUpdateEvent;
 import com.hairyworld.dms.model.event.NewEntityEvent;
-import com.hairyworld.dms.model.view.clientview.ClientViewData;
-import com.hairyworld.dms.model.view.clientview.DateClientViewData;
-import com.hairyworld.dms.model.view.clientview.DogClientViewData;
-import com.hairyworld.dms.model.view.clientview.PaymentClientViewData;
+import com.hairyworld.dms.model.view.ClientViewData;
+import com.hairyworld.dms.model.view.DateViewData;
+import com.hairyworld.dms.model.view.DogViewData;
+import com.hairyworld.dms.model.view.PaymentViewData;
 import com.hairyworld.dms.rmi.DmsCommunicationFacade;
 import com.hairyworld.dms.util.DmsUtils;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -45,45 +45,45 @@ public class ClientViewController extends AbstractController implements Applicat
     private GridPane root;
 
     @FXML
-    private TableColumn<DateClientViewData, String> clientViewDateDateStartTableColumn;
+    private TableColumn<DateViewData, String> clientViewDateDateStartTableColumn;
     @FXML
-    private TableColumn<DateClientViewData, String> clientViewDateDateEndTableColumn;
+    private TableColumn<DateViewData, String> clientViewDateDateEndTableColumn;
     @FXML
-    private TableColumn<DateClientViewData, String> clientViewDateServiceTableColumn;
+    private TableColumn<DateViewData, String> clientViewDateServiceTableColumn;
     @FXML
-    private TableColumn<DateClientViewData, String> clientViewDateDogTableColumn;
+    private TableColumn<DateViewData, String> clientViewDateDogTableColumn;
     @FXML
-    private TableColumn<DateClientViewData, String> clientViewDateDescriptionTableColumn;
+    private TableColumn<DateViewData, String> clientViewDateDescriptionTableColumn;
     @FXML
-    private TableColumn<DateClientViewData, String> clientViewDateActionsTableColumn;
+    private TableColumn<DateViewData, String> clientViewDateActionsTableColumn;
     @FXML
-    private TableView<DateClientViewData> clientViewDateTable;
+    private TableView<DateViewData> clientViewDateTable;
     @FXML
     private Button addDateButton;
 
     @FXML
-    private TableView<PaymentClientViewData> clientViewPaymentTable;
+    private TableView<PaymentViewData> clientViewPaymentTable;
     @FXML
-    private TableColumn<PaymentClientViewData, Number> clientViewPaymentAmountTableColumn;
+    private TableColumn<PaymentViewData, Number> clientViewPaymentAmountTableColumn;
     @FXML
-    private TableColumn<PaymentClientViewData, String> clientViewPaymentServiceTableColumn;
+    private TableColumn<PaymentViewData, String> clientViewPaymentServiceTableColumn;
     @FXML
-    private TableColumn<PaymentClientViewData, String> clientViewPaymentDescriptionTableColumn;
+    private TableColumn<PaymentViewData, String> clientViewPaymentDescriptionTableColumn;
     @FXML
-    private TableColumn<PaymentClientViewData, String> clientViewPaymentDateTableColumn;
+    private TableColumn<PaymentViewData, String> clientViewPaymentDateTableColumn;
     @FXML
-    private TableColumn<PaymentClientViewData, String> clientViewPaymentActionsTableColumn;
+    private TableColumn<PaymentViewData, String> clientViewPaymentActionsTableColumn;
     @FXML
     private Button addPaymentButton;
 
     @FXML
-    private TableView<DogClientViewData> clientViewDogTable;
+    private TableView<DogViewData> clientViewDogTable;
     @FXML
-    private TableColumn<DogClientViewData, String> clientViewDogRaceTableColumn;
+    private TableColumn<DogViewData, String> clientViewDogRaceTableColumn;
     @FXML
-    private TableColumn<DogClientViewData, String> clientViewDogNameTableColumn;
+    private TableColumn<DogViewData, String> clientViewDogNameTableColumn;
     @FXML
-    private TableColumn<DogClientViewData, String> clientViewDogMaintainmentTableColumn;
+    private TableColumn<DogViewData, String> clientViewDogMaintainmentTableColumn;
     @FXML
     private Button addDogButton;
 
@@ -276,7 +276,7 @@ public class ClientViewController extends AbstractController implements Applicat
         clientViewDateServiceTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getService() != null ?
                 cellData.getValue().getService().getDescription() : null));
         clientViewDateDescriptionTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDescription()));
-        clientViewDateDogTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDogName()));
+        clientViewDateDogTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDog().getName()));
     }
 
     private void bindPaymentTable() {

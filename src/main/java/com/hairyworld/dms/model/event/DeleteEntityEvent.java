@@ -1,6 +1,6 @@
 package com.hairyworld.dms.model.event;
 
-import com.hairyworld.dms.model.EntityType;
+import com.hairyworld.dms.model.entity.EntityType;
 
 public class DeleteEntityEvent extends EntityUpdateEvent {
 

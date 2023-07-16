@@ -19,4 +19,9 @@ public class DateEntity implements Entity {
     private Long iddog;
     private Long idservice;
     private Long idclient;
+
+    @Override
+    public EntityType getEntityType() {
+        return EntityType.DATE;
+    }
 }

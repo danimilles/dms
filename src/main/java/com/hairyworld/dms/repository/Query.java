@@ -13,6 +13,17 @@ public class Query {
             LEFT join clientdog cd on c.id = cd.idclient
             LEFT join dog d on d.id = cd.iddog""";
 
+    public static final String SELECT_DOGS = """
+            SELECT  d.id as iddog, d.name as dogname,
+            maintainment, race, d.observations as dogobservations, image
+            FROM dog d""";
+
+    public static final String SELECT_CLIENTS = """
+            SELECT c.name as clientname, dni, phone, c.observations as clientobservations, c.id as idclient
+            FROM client c;""";
+
+    public static final String SELECT_CLIENTDOGS = "SELECT idclient, iddog FROM clientdog";
+
     public static final String SELECT_DATES = """ 
             Select id, datetimestart, datetimeend, iddog, description, idservice, idclient
             from date""";

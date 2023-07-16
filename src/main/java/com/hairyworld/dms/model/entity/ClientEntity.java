@@ -19,4 +19,9 @@ public class ClientEntity implements Entity {
     private String observations;
 
     private Set<Long> dogIds;
+
+    @Override
+    public EntityType getEntityType() {
+        return EntityType.CLIENT;
+    }
 }

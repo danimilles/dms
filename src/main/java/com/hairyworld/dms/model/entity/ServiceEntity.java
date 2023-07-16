@@ -12,4 +12,10 @@ import lombok.NoArgsConstructor;
 public class ServiceEntity implements Entity {
     private Long id;
     private String description;
+
+    @Override
+    public EntityType getEntityType() {
+        return EntityType.SERVICE;
+    }
+
 }

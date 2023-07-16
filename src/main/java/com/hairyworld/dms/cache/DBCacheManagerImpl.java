@@ -1,6 +1,6 @@
 package com.hairyworld.dms.cache;
 
-import com.hairyworld.dms.model.EntityType;
+import com.hairyworld.dms.model.entity.EntityType;
 import com.hairyworld.dms.model.entity.Entity;
 import org.springframework.stereotype.Component;
 
@@ -21,42 +21,42 @@ public class DBCacheManagerImpl implements CacheManager {
     }
 
     @Override
-    public void putEntityIntoCache(final Entity entity, final EntityType entityType) {
+    public void put(final Entity entity) {
         if (entity != null) {
-            cache.get(entityType).put(entity);
+            cache.get(entity.getEntityType()).put(entity);
         }
     }
 
     @Override
-    public void putEntityCache(final Map<Long, Entity> newCache, final EntityType entityType) {
+    public void putCache(final Map<Long, Entity> newCache, final EntityType entityType) {
         if (newCache != null) {
             cache.put(entityType, new DBCache(newCache));
         }
     }
 
     @Override
-    public Collection<Entity> getAllEntityFromCache(final EntityType entityType) {
+    public Collection<Entity> getAll(final EntityType entityType) {
         return cache.get(entityType).getAll();
     }
 
     @Override
-    public Entity getEntityFromCache(final Long id, final EntityType entityType) {
-        return cache.get(entityType).get(id);
+    public Entity get(final Entity entity) {
+        return cache.get(entity.getEntityType()).get(entity.getId());
     }
 
     @Override
-    public Set<Entity> getAllMatchEntityFromCache(final Predicate<Entity> filter, final EntityType entityType) {
-        return cache.get(entityType).getAll().stream().filter(filter).collect(Collectors.toSet());
+    public Set<Entity> getAllMatch(final Predicate<Entity> filter, final EntityType entityType) {
+        return cache.get(entityType)
+                .getAll().stream().filter(filter).collect(Collectors.toSet());
     }
 
     @Override
-    public void removeEntityFromCache(final Long id, final EntityType entityType) {
-        cache.get(entityType).remove(id);
+    public void remove(final Entity entity) {
+        cache.get(entity.getEntityType()).remove(entity.getId());
     }
 
     @Override
-    public void removeAllMatchEntityFromCache(Predicate<Entity> filter, EntityType entityType) {
-        cache.get(entityType).getAll().stream().filter(filter).forEach(entity ->
-                cache.get(entityType).remove(entity.getId()));
+    public void removeAllMatch(final Predicate<Entity> filter, final EntityType entityType) {
+        this.getAllMatch(filter, entityType).forEach(this::remove);
     }
 }

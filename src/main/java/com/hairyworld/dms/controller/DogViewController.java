@@ -1,11 +1,11 @@
 package com.hairyworld.dms.controller;
 
-import com.hairyworld.dms.model.EntityType;
+import com.hairyworld.dms.model.entity.EntityType;
 import com.hairyworld.dms.model.event.DeleteEntityEvent;
 import com.hairyworld.dms.model.event.NewEntityEvent;
-import com.hairyworld.dms.model.view.dogview.ClientDogViewData;
-import com.hairyworld.dms.model.view.dogview.DateDogViewData;
-import com.hairyworld.dms.model.view.dogview.DogViewData;
+import com.hairyworld.dms.model.view.ClientViewData;
+import com.hairyworld.dms.model.view.DateViewData;
+import com.hairyworld.dms.model.view.DogViewData;
 import com.hairyworld.dms.rmi.DmsCommunicationFacade;
 import com.hairyworld.dms.util.DmsUtils;
 import javafx.beans.property.SimpleStringProperty;
@@ -66,25 +66,25 @@ public class DogViewController extends AbstractController {
 
 
     @FXML
-    private TableView<ClientDogViewData> dogViewClientTable;
+    private TableView<ClientViewData> dogViewClientTable;
     @FXML
-    private TableColumn<ClientDogViewData, String> dogViewClientNameTableColumn;
+    private TableColumn<ClientViewData, String> dogViewClientNameTableColumn;
     @FXML
-    private TableColumn<ClientDogViewData, String> dogViewClientDniTableColumn;
+    private TableColumn<ClientViewData, String> dogViewClientDniTableColumn;
     @FXML
-    private TableColumn<ClientDogViewData, String> dogViewClientPhoneTableColumn;
+    private TableColumn<ClientViewData, String> dogViewClientPhoneTableColumn;
     @FXML
-    private TableView<DateDogViewData> dogViewDateTable;
+    private TableView<DateViewData> dogViewDateTable;
     @FXML
-    private TableColumn<DateDogViewData, String> dogViewDateDateStartTableColumn;
+    private TableColumn<DateViewData, String> dogViewDateDateStartTableColumn;
     @FXML
-    private TableColumn<DateDogViewData, String> dogViewDateDateEndTableColumn;
+    private TableColumn<DateViewData, String> dogViewDateDateEndTableColumn;
     @FXML
-    private TableColumn<DateDogViewData, String> dogViewDateClientNameTableColumn;
+    private TableColumn<DateViewData, String> dogViewDateClientNameTableColumn;
     @FXML
-    private TableColumn<DateDogViewData, String> dogViewDateServiceTableColumn;
+    private TableColumn<DateViewData, String> dogViewDateServiceTableColumn;
     @FXML
-    private TableColumn<DateDogViewData, String> dogViewDateDescriptionTableColumn;
+    private TableColumn<DateViewData, String> dogViewDateDescriptionTableColumn;
     @FXML
     private TextField dogViewName;
     @FXML
@@ -278,7 +278,7 @@ public class DogViewController extends AbstractController {
         dogViewDateDateStartTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(DmsUtils.dateToString(cellData.getValue().getDatetimestart())));
         dogViewDateDateEndTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(DmsUtils.dateToString(cellData.getValue().getDatetimeend())));
         dogViewDateDateStartTableColumn.setComparator(Comparator.comparing(DmsUtils::parseDate, Comparator.nullsLast(Comparator.naturalOrder())));
-        dogViewDateClientNameTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getClientName()));
+        dogViewDateClientNameTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getClient().getName()));
         dogViewDateServiceTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getService() != null ?
                 cellData.getValue().getService().getDescription() : null));
         dogViewDateDescriptionTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDescription()));
@@ -366,11 +366,11 @@ public class DogViewController extends AbstractController {
     }
 
     private void clean(final Long clientId) {
-        final List<ClientDogViewData> clients = new ArrayList<>();
+        final List<ClientViewData> clients = new ArrayList<>();
 
         if (clientId != null) {
-            final ClientDogViewData clientDogViewData = dmsCommunicationFacadeImpl.getClientDogViewData(clientId);
-            clients.add(clientDogViewData);
+            final ClientViewData clientViewData = dmsCommunicationFacadeImpl.getClientDogViewData(clientId);
+            clients.add(clientViewData);
         }
 
         dogViewData = DogViewData.builder()

@@ -1,23 +1,18 @@
 package com.hairyworld.dms.repository;
 
-import com.hairyworld.dms.model.EntityType;
+import com.hairyworld.dms.model.entity.EntityType;
 import com.hairyworld.dms.model.entity.Entity;
 
 import java.util.Map;
 
 public interface EntityRepository {
 
-    Map<EntityType, Map<Long, Entity>> loadClientsAndDogs();
+    EntityType getEntityType();
 
-    Map<Long, Entity> loadDates();
+    Map<Long, Entity> loadAll();
 
-    Map<Long, Entity> loadPayments();
+    Long save(Entity entity);
 
-    Map<Long, Entity> loadServices();
+    void delete(Long id);
 
-    Long saveEntity(Entity entity, EntityType entityType);
-
-    void deleteEntity(Long id, EntityType entityType);
-
-    void saveClientDogRelation(Long idclient, Long iddog);
 }

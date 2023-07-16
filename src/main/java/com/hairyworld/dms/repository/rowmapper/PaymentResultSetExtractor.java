@@ -13,12 +13,12 @@ import java.util.Map;
 
 public class PaymentResultSetExtractor implements ResultSetExtractor<Map<Long, Entity>> {
 
-    public static final String ID_FIELD = "id";
-    public static final String DATETIME_FIELD = "datetime";
-    public static final String DESCRIPTION_FIELD = "description";
-    public static final String IDSERVICE_FIELD = "idservice";
-    public static final String IDCLIENT_FIELD = "idclient";
-    public static final String AMOUNT_FIELD = "amount";
+    private static final String ID_FIELD = "id";
+    private static final String DATETIME_FIELD = "datetime";
+    private static final String DESCRIPTION_FIELD = "description";
+    private static final String IDSERVICE_FIELD = "idservice";
+    private static final String IDCLIENT_FIELD = "idclient";
+    private static final String AMOUNT_FIELD = "amount";
 
     public PaymentResultSetExtractor() {
         super();

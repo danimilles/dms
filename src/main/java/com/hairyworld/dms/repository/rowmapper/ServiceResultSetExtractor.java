@@ -12,8 +12,8 @@ import java.util.Map;
 
 public class ServiceResultSetExtractor implements ResultSetExtractor<Map<Long, Entity>> {
 
-    public static final String ID_FIELD = "id";
-    public static final String DESCRIPTION_FIELD = "description";
+    private static final String ID_FIELD = "id";
+    private static final String DESCRIPTION_FIELD = "description";
 
     public ServiceResultSetExtractor() {
         super();

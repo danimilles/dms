@@ -33,7 +33,9 @@ public class DBCache {
 
     public void remove(final Long id) {
         if (id != null) {
-            cacheMap.remove(id);
+            synchronized (cacheMap) {
+                cacheMap.remove(id);
+            }
         }
     }
 }

@@ -2,8 +2,8 @@ package com.hairyworld.dms.controller;
 
 import com.calendarfx.view.CalendarView;
 import com.hairyworld.dms.model.event.EntityUpdateEvent;
+import com.hairyworld.dms.model.view.ClientViewData;
 import com.hairyworld.dms.model.view.TableFilter;
-import com.hairyworld.dms.model.view.mainview.ClientTableData;
 import com.hairyworld.dms.rmi.DmsCommunicationFacade;
 import com.hairyworld.dms.util.DmsUtils;
 import javafx.application.Platform;
@@ -39,7 +39,7 @@ public class MainViewController extends AbstractController implements Applicatio
     private final ClientViewController clientViewController;
     private final ApplicationContext context;
 
-    private ObservableList<ClientTableData> clientTableData;
+    private ObservableList<ClientViewData> clientTableData;
 
     @FXML
     private GridPane calendar;
@@ -56,20 +56,20 @@ public class MainViewController extends AbstractController implements Applicatio
     private DatePicker clientSearchDatePicker;
 
     @FXML
-    private TableView<ClientTableData> clientTable;
+    private TableView<ClientViewData> clientTable;
 
     @FXML
-    private TableColumn<ClientTableData, String> clientNameColumn;
+    private TableColumn<ClientViewData, String> clientNameColumn;
     @FXML
-    private TableColumn<ClientTableData, String> clientPhoneColumn;
+    private TableColumn<ClientViewData, String> clientPhoneColumn;
     @FXML
-    private TableColumn<ClientTableData, String> clientDogsColumn;
+    private TableColumn<ClientViewData, String> clientDogsColumn;
     @FXML
-    private TableColumn<ClientTableData, String> clientMaintainmentColumn;
+    private TableColumn<ClientViewData, String> clientMaintainmentColumn;
     @FXML
-    private TableColumn<ClientTableData, String> clientNextDateColumn;
+    private TableColumn<ClientViewData, String> clientNextDateColumn;
     @FXML
-    private TableColumn<ClientTableData, String> clientDniColumn;
+    private TableColumn<ClientViewData, String> clientDniColumn;
 
     @FXML
     private GridPane root;
@@ -101,7 +101,7 @@ public class MainViewController extends AbstractController implements Applicatio
         clientTableData = FXCollections.observableList(dmsCommunicationFacadeImpl.getClientTableData());
         clientNameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
         clientNameColumn.setSortType(TableColumn.SortType.ASCENDING);
-        clientDogsColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDogs()));
+        clientDogsColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDogsString()));
         clientDniColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDni()));
         clientPhoneColumn.setCellValueFactory(cellData ->  new SimpleStringProperty(cellData.getValue().getPhone()));
         clientNextDateColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
@@ -160,7 +160,7 @@ public class MainViewController extends AbstractController implements Applicatio
                             toLower(clientData.getDni()).contains(toLower(clientSearchText.getText()))));
 
                     case DOG_NAME -> clientTable.setItems(clientTableData.filtered(clientData ->
-                            toLower(clientData.getDogs()).contains(toLower(clientSearchText.getText()))));
+                            toLower(clientData.getDogsString()).contains(toLower(clientSearchText.getText()))));
 
                     case PHONE -> clientTable.setItems(clientTableData.filtered(clientData ->
                             toLower(clientData.getPhone()).contains(toLower(clientSearchText.getText()))));

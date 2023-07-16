@@ -20,4 +20,9 @@ public class PaymentEntity implements Entity {
 
     private Long idservice;
     private Long idclient;
+
+    @Override
+    public EntityType getEntityType() {
+        return EntityType.PAYMENT;
+    }
 }
