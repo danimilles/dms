@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane fx:id="root" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-font-size: 11pt;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.hairyworld.dms.controller.SearchViewController">
+   <columnConstraints>
+      <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+   </rowConstraints>
+   <children>
+      <GridPane>
+         <children>
+            <VBox>
+               <children>
+                  <HBox fx:id="searchHBox" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                     <children>
+                        <Label text="Filtrar por:">
+                           <padding>
+                              <Insets left="20.0" right="8.0" />
+                           </padding>
+                        </Label>
+                        <ChoiceBox fx:id="searchField" prefWidth="150.0">
+                           <HBox.margin>
+                              <Insets right="10.0" />
+                           </HBox.margin>
+                        </ChoiceBox>
+                        <TextField fx:id="searchText" prefHeight="25.0" prefWidth="554.0">
+                           <HBox.margin>
+                              <Insets left="15.0" right="15.0" />
+                           </HBox.margin>
+                        </TextField>
+                     </children>
+                     <VBox.margin>
+                        <Insets bottom="10.0" top="10.0" />
+                     </VBox.margin>
+                  </HBox>
+               </children>
+               <padding>
+                  <Insets top="5.0" />
+               </padding>
+            </VBox>
+            <VBox GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.valignment="BOTTOM" GridPane.vgrow="ALWAYS">
+               <children>
+                  <TableView fx:id="searchTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                     <HBox.margin>
+                        <Insets bottom="1.0" />
+                     </HBox.margin>
+                  </TableView>
+               </children>
+            </VBox>
+         </children>
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints />
+            <RowConstraints maxHeight="1.7976931348623157E308" valignment="CENTER" vgrow="ALWAYS" />
+         </rowConstraints>
+      </GridPane>
+   </children>
+</GridPane>

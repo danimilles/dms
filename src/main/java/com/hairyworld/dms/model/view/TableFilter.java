@@ -7,7 +7,9 @@ public enum TableFilter {
     DOG_NAME("Nombre mascota"),
     PHONE("Telefono cliente"),
     MANTAINMENT("Mantenimiento"),
-    NEXT_DATE("Proxima cita");
+    NEXT_DATE("Proxima cita"),
+    OBSERVATIONS("Observaciones"),
+    RACE("Raza");
 
     private final String filter;
 

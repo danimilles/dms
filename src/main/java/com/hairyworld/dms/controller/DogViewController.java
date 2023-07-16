@@ -6,6 +6,7 @@ import com.hairyworld.dms.model.event.NewEntityEvent;
 import com.hairyworld.dms.model.view.ClientViewData;
 import com.hairyworld.dms.model.view.DateViewData;
 import com.hairyworld.dms.model.view.DogViewData;
+import com.hairyworld.dms.model.view.SearchTableRow;
 import com.hairyworld.dms.rmi.DmsCommunicationFacade;
 import com.hairyworld.dms.util.DmsUtils;
 import javafx.beans.property.SimpleStringProperty;
@@ -51,6 +52,7 @@ import static com.hairyworld.dms.util.Path.ICON_IMAGE;
 public class DogViewController extends AbstractController {
     private static final Logger LOGGER = LogManager.getLogger(DogViewController.class);
 
+    private final SearchViewController searchViewController;
 
     @FXML
     private VBox imageVbox;
@@ -116,9 +118,11 @@ public class DogViewController extends AbstractController {
     private DogViewData dogViewData;
 
 
-    public DogViewController(final DmsCommunicationFacade dmsCommunicationFacadeImpl, final ApplicationContext context) {
+    public DogViewController(final DmsCommunicationFacade dmsCommunicationFacadeImpl, final ApplicationContext context,
+                             final SearchViewController searchViewController) {
         this.dmsCommunicationFacadeImpl = dmsCommunicationFacadeImpl;
         this.context = context;
+        this.searchViewController = searchViewController;
     }
 
     @FXML
@@ -133,6 +137,7 @@ public class DogViewController extends AbstractController {
         createTableResponsiveness(dogViewClientTable);
         createTableResponsiveness(dogViewDateTable);
         imageCircle.setOnMouseClicked(e -> showImagePopup());
+        addClientToDogButton.setOnAction(e -> openSearchView());
 
         addImageButton.setOnAction(e -> openFileChooser());
         deleteImageButton.setOnAction(e -> deleteImage());
@@ -142,6 +147,10 @@ public class DogViewController extends AbstractController {
         stage = new Stage();
         stage.getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream(ICON_IMAGE)));
         stage.setScene(scene);
+    }
+
+    private void openSearchView() {
+        final SearchTableRow searchTableRow = searchViewController.showView(stage, dogViewData);
     }
 
     private Validator createValidations() {
@@ -330,7 +339,7 @@ public class DogViewController extends AbstractController {
     }
 
     private void fill(final Long clientId) {
-        dogViewData = dmsCommunicationFacadeImpl.getDogData(clientId);
+        dogViewData = dmsCommunicationFacadeImpl.getDogViewData(clientId);
 
         stage.setTitle("Vista de mascota");
         stage.setHeight(root.getPrefHeight());
@@ -356,9 +365,9 @@ public class DogViewController extends AbstractController {
 
         nextDateDogLabel.setVisible(true);
         dogViewNextDate.setVisible(true);
-        dogViewNextDate.setDisable(true);
         deleteDogButton.setDisable(false);
-        deleteDogButton.setDisable(false);
+        addDateDogButton.setDisable(false);
+        addClientToDogButton.setDisable(false);
         dogViewClientTable.getParent().getParent().setVisible(true);
 
         dogViewClientTable.setItems(FXCollections.observableArrayList(dogViewData.getClients()));

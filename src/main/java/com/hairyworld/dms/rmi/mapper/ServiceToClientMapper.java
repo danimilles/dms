@@ -12,9 +12,9 @@ import com.hairyworld.dms.model.view.DogViewData;
 import com.hairyworld.dms.model.view.PaymentViewData;
 import com.hairyworld.dms.model.view.ServiceViewData;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ServiceToClientMapper {
     public static ClientViewData mapClientDataToMainView(final ClientEntity client, final Set<Entity> dogs, final DateEntity date) {
@@ -25,7 +25,7 @@ public class ServiceToClientMapper {
                 .nextDate(date != null ? date.getDatetimestart() : null)
                 .dogs(dogs.stream().map(dog -> DogViewData.builder().name(((DogEntity) dog).getName()).id(dog.getId())
                         .race(((DogEntity) dog).getRace()).maintainment(((DogEntity) dog).getMaintainment())
-                        .build()).collect(Collectors.toList()))
+                        .build()).toList())
                 .phone(client.getPhone())
                 .build();
     }
@@ -127,6 +127,23 @@ public class ServiceToClientMapper {
                 .dni(client.getDni())
                 .phone(client.getPhone())
                 .name(client.getName())
+                .dates(new ArrayList<>())
+                .dogs(new ArrayList<>())
+                .payments(new ArrayList<>())
+                .observations(client.getObservations())
+                .build();
+    }
+
+    public static DogViewData mapDogDataToDogViewObj(final DogEntity dog) {
+        return DogViewData.builder()
+                .id(dog.getId())
+                .race(dog.getRace())
+                .observations(dog.getObservations())
+                .maintainment(dog.getMaintainment())
+                .name(dog.getName())
+                .dates(new ArrayList<>())
+                .clients(new ArrayList<>())
+                .image(dog.getImage())
                 .build();
     }
 }

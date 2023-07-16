@@ -4,7 +4,10 @@ import com.hairyworld.dms.model.entity.Entity;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.logging.log4j.Logger;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
@@ -47,4 +50,31 @@ public abstract class EntityRepositoryImpl implements EntityRepository {
         }
     }
 
+
+    protected Long save(final String query, final MapSqlParameterSource parameters) {
+        try {
+            final KeyHolder keyHolder = new GeneratedKeyHolder();
+            logger.debug(QUERY_PARAMS_LOG, query, parameters.getValues());
+
+            jdbcTemplate.update(query, parameters, keyHolder, new String[]{ID_FIELD});
+            return keyHolder.getKey().longValue();
+        } catch (final Exception e) {
+            logger.error("Error saving info...", e);
+            throw e;
+        }
+    }
+
+
+    protected void delete(final String query, final Long id) {
+        try {
+            final MapSqlParameterSource parameters = new MapSqlParameterSource();
+            parameters.addValue(ID_FIELD, id);
+
+            logger.debug(QUERY_PARAMS_LOG, query, parameters.getValues());
+            jdbcTemplate.update(query, parameters);
+        } catch (final Exception e) {
+            logger.error("Error deleting info...", e);
+            throw e;
+        }
+    }
 }

@@ -48,11 +48,12 @@ public class EntityServiceImpl implements EntityService {
                 cacheManager.putCache(entityRepository.loadAll(), entityRepository.getEntityType()));
 
         ((ClientRepositoryImpl) entityRepositoryMap.get(EntityType.CLIENT)).loadAllClientAndDogRelations()
-                .forEach((key, value) -> {
-            final ClientEntity clientEntity = (ClientEntity) cacheManager.get(ClientEntity.builder().id(key).build());
-            final DogEntity dogEntity = (DogEntity) cacheManager.get(DogEntity.builder().id(key).build());
-            clientEntity.getDogIds().add(key);
-            dogEntity.getClientIds().add(value);
+                .forEach(clientdog -> {
+            final ClientEntity clientEntity = (ClientEntity) cacheManager.get(ClientEntity.builder()
+                    .id(clientdog.getIdclient()).build());
+            final DogEntity dogEntity = (DogEntity) cacheManager.get(DogEntity.builder().id(clientdog.getIddog()).build());
+            clientEntity.getDogIds().add(clientdog.getIddog());
+            dogEntity.getClientIds().add(clientdog.getIdclient());
         });
 
         LOGGER.info("Load successful");

@@ -8,6 +8,7 @@ import com.hairyworld.dms.model.entity.EntityType;
 import com.hairyworld.dms.model.entity.PaymentEntity;
 import com.hairyworld.dms.model.view.ClientViewData;
 import com.hairyworld.dms.model.view.DogViewData;
+import com.hairyworld.dms.model.view.SearchTableRow;
 import com.hairyworld.dms.rmi.mapper.ClientToServiceMapper;
 import com.hairyworld.dms.rmi.mapper.ServiceToClientMapper;
 import com.hairyworld.dms.service.EntityService;
@@ -53,6 +54,22 @@ public class DmsCommunicationFacadeImpl implements DmsCommunicationFacade {
     }
 
     @Override
+    public List<SearchTableRow> getSearchTableData(final SearchTableRow searchTableRow) {
+        if (searchTableRow instanceof DogViewData dogViewData) {
+            return entityService.getAllEntites(EntityType.CLIENT).stream()
+                    .filter(x -> ((ClientEntity) x).getDogIds().contains(dogViewData.getId()))
+                    .map(x -> ServiceToClientMapper.mapClientDataToClientViewObj((ClientEntity) x))
+                    .collect(Collectors.toList());
+        } else if (searchTableRow instanceof ClientViewData clientViewData) {
+            return entityService.getAllEntites(EntityType.DOG).stream()
+                    .filter(x -> ((DogEntity) x).getClientIds().contains(clientViewData.getId()))
+                    .map(x -> ServiceToClientMapper.mapDogDataToDogViewObj((DogEntity) x))
+                    .collect(Collectors.toList());
+        }
+        return null;
+    }
+
+    @Override
     public ClientViewData getClientViewData(final Long clientId) {
         final ClientEntity client = (ClientEntity) entityService.getEntity(ClientEntity.builder().id(clientId).build());
 
@@ -93,7 +110,7 @@ public class DmsCommunicationFacadeImpl implements DmsCommunicationFacade {
     }
 
     @Override
-    public DogViewData getDogData(final Long dogId) {
+    public DogViewData getDogViewData(final Long dogId) {
         final DogEntity dog = (DogEntity) entityService.getEntity(DogEntity.builder().id(dogId).build());
 
         if (dog == null) {
