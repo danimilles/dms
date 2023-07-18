@@ -57,7 +57,8 @@ public abstract class EntityRepositoryImpl implements EntityRepository {
             logger.debug(QUERY_PARAMS_LOG, query, parameters.getValues());
 
             jdbcTemplate.update(query, parameters, keyHolder, new String[]{ID_FIELD});
-            return keyHolder.getKey().longValue();
+            return parameters.getValues().get(ID_FIELD) != null ? Long.parseLong(parameters.getValue(ID_FIELD).toString()) :
+                    keyHolder.getKey().longValue();
         } catch (final Exception e) {
             logger.error("Error saving info...", e);
             throw e;

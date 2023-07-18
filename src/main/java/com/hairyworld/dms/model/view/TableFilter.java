@@ -25,4 +25,5 @@ public enum TableFilter {
     public String toString() {
         return filter;
     }
+
 }

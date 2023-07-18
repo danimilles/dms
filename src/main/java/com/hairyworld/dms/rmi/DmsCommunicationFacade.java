@@ -15,13 +15,15 @@ public interface DmsCommunicationFacade {
 
     void saveClient(ClientViewData clientViewData);
 
+    void saveClientDog(Long idclient, Long iddog);
+
+    void deleteClientDog(Long idclient, Long iddog);
+
     void deleteClient(Long id);
 
     void saveDog(DogViewData dogViewData);
 
     void deleteDog(Long id);
 
-    DogViewData getDogViewData(Long clientId);
-
-    ClientViewData getClientDogViewData(Long clientId);
+    DogViewData getDogViewData(Long dogId);
 }

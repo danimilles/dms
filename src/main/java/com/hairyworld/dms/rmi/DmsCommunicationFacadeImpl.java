@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -57,16 +58,16 @@ public class DmsCommunicationFacadeImpl implements DmsCommunicationFacade {
     public List<SearchTableRow> getSearchTableData(final SearchTableRow searchTableRow) {
         if (searchTableRow instanceof DogViewData dogViewData) {
             return entityService.getAllEntites(EntityType.CLIENT).stream()
-                    .filter(x -> ((ClientEntity) x).getDogIds().contains(dogViewData.getId()))
+                    .filter(x -> !((ClientEntity) x).getDogIds().contains(dogViewData.getId()))
                     .map(x -> ServiceToClientMapper.mapClientDataToClientViewObj((ClientEntity) x))
                     .collect(Collectors.toList());
         } else if (searchTableRow instanceof ClientViewData clientViewData) {
             return entityService.getAllEntites(EntityType.DOG).stream()
-                    .filter(x -> ((DogEntity) x).getClientIds().contains(clientViewData.getId()))
+                    .filter(x -> !((DogEntity) x).getClientIds().contains(clientViewData.getId()))
                     .map(x -> ServiceToClientMapper.mapDogDataToDogViewObj((DogEntity) x))
                     .collect(Collectors.toList());
         }
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
@@ -94,6 +95,16 @@ public class DmsCommunicationFacadeImpl implements DmsCommunicationFacade {
     }
 
     @Override
+    public void saveClientDog(final Long idclient, final Long iddog) {
+        entityService.saveClientDogRelation(idclient, iddog);
+    }
+
+    @Override
+    public void deleteClientDog(final Long idclient, final Long iddog) {
+        entityService.deleteClientDogRelation(idclient, iddog);
+    }
+
+    @Override
     public void deleteClient(final Long id) {
         entityService.deleteEntity(ClientEntity.builder().id(id).build());
     }
@@ -101,7 +112,6 @@ public class DmsCommunicationFacadeImpl implements DmsCommunicationFacade {
     @Override
     public void saveDog(final DogViewData dogViewData) {
         dogViewData.setId(entityService.saveEntity(ClientToServiceMapper.mapDogDataToDogEntity(dogViewData)));
-        dogViewData.getClients().forEach(x -> entityService.saveClientDogRelation(x.getId(), dogViewData.getId()));
     }
 
     @Override
@@ -126,13 +136,6 @@ public class DmsCommunicationFacadeImpl implements DmsCommunicationFacade {
         final Collection<Entity> services = entityService.getAllEntites(EntityType.SERVICE);
 
         return ServiceToClientMapper.mapDogDataToDogView(dog, clients, nextDate, dates, services);
-    }
-
-    @Override
-    public ClientViewData getClientDogViewData(final Long clientId) {
-        return ServiceToClientMapper
-                .mapClientDataToClientViewObj((ClientEntity) entityService.getEntity(
-                        ClientEntity.builder().id(clientId).build()));
     }
 
 }

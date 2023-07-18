@@ -3,8 +3,7 @@ create table main.client
     name         TEXT    not null,
     phone        TEXT not null,
     observations TEXT,
-    dni TEXT
-        constraint client_dni_uq unique,
+    dni TEXT,
     id  integer not null
         constraint client_pk
             primary key autoincrement
@@ -31,10 +30,10 @@ create table main.clientdog
         constraint clientdog_client_id_fk
             references client on delete cascade,
     constraint clientdog_pk
-        primary key (idclient, iddog)
+        primary key (idclient, iddog) on conflict ignore
 );
 
-create table date
+create table main.date
 (
     id          integer not null
         constraint date_pk

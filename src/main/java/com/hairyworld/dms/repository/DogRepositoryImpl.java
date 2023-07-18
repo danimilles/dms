@@ -4,10 +4,8 @@ import com.hairyworld.dms.model.entity.DogEntity;
 import com.hairyworld.dms.model.entity.Entity;
 import com.hairyworld.dms.model.entity.EntityType;
 import com.hairyworld.dms.repository.rowmapper.DogResultSetExtractor;
-import com.sun.javafx.binding.StringFormatter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
@@ -40,12 +38,10 @@ public class DogRepositoryImpl extends EntityRepositoryImpl {
 
             final MapSqlParameterSource parameters = new MapSqlParameterSource();
 
-            final String query = dogEntity.getId() != null ?
-                    StringFormatter.format(Query.INSERT_DOG, ID_FIELD + ", ", ":" + ID_FIELD + ", ").getValue()
-                    : StringFormatter.format(Query.INSERT_DOG, Strings.EMPTY, Strings.EMPTY).getValue();
-
+            String query = Query.INSERT_DOG;
             if (dogEntity.getId() != null) {
                 parameters.addValue(ID_FIELD, dogEntity.getId());
+                query = Query.UPDATE_DOG;
             }
 
             parameters.addValue(NAME_FIELD, dogEntity.getName());

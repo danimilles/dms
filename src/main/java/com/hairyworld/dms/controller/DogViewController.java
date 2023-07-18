@@ -3,6 +3,7 @@ package com.hairyworld.dms.controller;
 import com.hairyworld.dms.model.entity.EntityType;
 import com.hairyworld.dms.model.event.DeleteEntityEvent;
 import com.hairyworld.dms.model.event.NewEntityEvent;
+import com.hairyworld.dms.model.event.UpdateEntityEvent;
 import com.hairyworld.dms.model.view.ClientViewData;
 import com.hairyworld.dms.model.view.DateViewData;
 import com.hairyworld.dms.model.view.DogViewData;
@@ -17,8 +18,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -35,6 +39,7 @@ import net.synedra.validatorfx.Validator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
@@ -44,12 +49,13 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.hairyworld.dms.util.Path.ICON_IMAGE;
 
 @Component
-public class DogViewController extends AbstractController {
+public class DogViewController extends AbstractController implements ApplicationListener<UpdateEntityEvent> {
     private static final Logger LOGGER = LogManager.getLogger(DogViewController.class);
 
     private final SearchViewController searchViewController;
@@ -134,6 +140,24 @@ public class DogViewController extends AbstractController {
         createValidations();
         bindClientTable();
         bindDateTable();
+        ContextMenu contextMenu = new ContextMenu();
+        MenuItem deleteMenuItem = new MenuItem("Quitar cliente");
+        deleteMenuItem.setOnAction(event -> {
+            final ClientViewData clientViewData = dogViewClientTable.getSelectionModel().getSelectedItem();
+            dmsCommunicationFacadeImpl.deleteClientDog(clientViewData.getId(), dogViewData.getId());
+            context.publishEvent(new NewEntityEvent(stage, dogViewData.getId(), EntityType.DOG));
+        });
+        contextMenu.getItems().add(deleteMenuItem);
+        dogViewClientTable.setRowFactory(tf -> {
+            final TableRow<ClientViewData> row = new TableRow<>();
+            row.setOnContextMenuRequested(event -> {
+                if (!row.isEmpty()) {
+                    contextMenu.show(row, event.getScreenX(), event.getScreenY());
+                }
+            });
+            return row;
+        });
+
         createTableResponsiveness(dogViewClientTable);
         createTableResponsiveness(dogViewDateTable);
         imageCircle.setOnMouseClicked(e -> showImagePopup());
@@ -142,7 +166,7 @@ public class DogViewController extends AbstractController {
         addImageButton.setOnAction(e -> openFileChooser());
         deleteImageButton.setOnAction(e -> deleteImage());
         deleteImageButton.setDisable(true);
-
+        dogViewNextDate.setDisable(true);
         scene = new Scene(root);
         stage = new Stage();
         stage.getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream(ICON_IMAGE)));
@@ -151,6 +175,10 @@ public class DogViewController extends AbstractController {
 
     private void openSearchView() {
         final SearchTableRow searchTableRow = searchViewController.showView(stage, dogViewData);
+        if (searchTableRow != null) {
+            dmsCommunicationFacadeImpl.saveClientDog(Long.parseLong(searchTableRow.getIdString()), dogViewData.getId());
+            context.publishEvent(new NewEntityEvent(stage, dogViewData.getId(), EntityType.DOG));
+        }
     }
 
     private Validator createValidations() {
@@ -225,6 +253,7 @@ public class DogViewController extends AbstractController {
                         .build();
 
                 dmsCommunicationFacadeImpl.saveDog(dogViewData);
+                dogViewData.getClients().forEach(x -> dmsCommunicationFacadeImpl.saveClientDog(x.getId(), dogViewData.getId()));
                 context.publishEvent(new NewEntityEvent(event.getSource(), dogViewData.getId(), EntityType.DOG));
                 stage.close();
             }
@@ -338,8 +367,8 @@ public class DogViewController extends AbstractController {
         addImageButton.setDisable(false);
     }
 
-    private void fill(final Long clientId) {
-        dogViewData = dmsCommunicationFacadeImpl.getDogViewData(clientId);
+    private void fill(final Long dogId) {
+        dogViewData = dmsCommunicationFacadeImpl.getDogViewData(dogId);
 
         stage.setTitle("Vista de mascota");
         stage.setHeight(root.getPrefHeight());
@@ -378,7 +407,7 @@ public class DogViewController extends AbstractController {
         final List<ClientViewData> clients = new ArrayList<>();
 
         if (clientId != null) {
-            final ClientViewData clientViewData = dmsCommunicationFacadeImpl.getClientDogViewData(clientId);
+            final ClientViewData clientViewData = dmsCommunicationFacadeImpl.getClientViewData(clientId);
             clients.add(clientViewData);
         }
 
@@ -405,8 +434,13 @@ public class DogViewController extends AbstractController {
         addClientToDogButton.setDisable(true);
         deleteImageButton.setDisable(true);
         addImageButton.setDisable(false);
+    }
 
-        dogViewClientTable.setItems(FXCollections.observableArrayList(dogViewData.getClients()));
-        dogViewDateTable.setItems(FXCollections.observableArrayList(dogViewData.getDates()));
+    @Override
+    public void onApplicationEvent(final UpdateEntityEvent event) {
+        if (event.getEntityType().equals(EntityType.DOG) && Objects.equals(event.getId(), dogViewData.getId())) {
+            dogViewData = dmsCommunicationFacadeImpl.getDogViewData(dogViewData.getId());
+            dogViewClientTable.setItems(FXCollections.observableArrayList(dogViewData.getClients()));
+        }
     }
 }

@@ -1,7 +1,7 @@
 package com.hairyworld.dms.controller;
 
 import com.calendarfx.view.CalendarView;
-import com.hairyworld.dms.model.event.EntityUpdateEvent;
+import com.hairyworld.dms.model.event.UpdateEntityEvent;
 import com.hairyworld.dms.model.view.ClientViewData;
 import com.hairyworld.dms.model.view.TableFilter;
 import com.hairyworld.dms.rmi.DmsCommunicationFacade;
@@ -15,6 +15,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
@@ -33,7 +34,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class MainViewController extends AbstractController implements ApplicationListener<EntityUpdateEvent> {
+public class MainViewController extends AbstractController implements ApplicationListener<UpdateEntityEvent> {
 
     private final DmsCommunicationFacade dmsCommunicationFacadeImpl;
     private final ClientViewController clientViewController;
@@ -103,7 +104,7 @@ public class MainViewController extends AbstractController implements Applicatio
         clientNameColumn.setSortType(TableColumn.SortType.ASCENDING);
         clientDogsColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDogsString()));
         clientDniColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDni()));
-        clientPhoneColumn.setCellValueFactory(cellData ->  new SimpleStringProperty(cellData.getValue().getPhone()));
+        clientPhoneColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPhone()));
         clientNextDateColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
                 cellData.getValue().getNextDate() != null ? DmsUtils.dateToString(cellData.getValue().getNextDate()) : null));
         clientNextDateColumn.setComparator(Comparator.comparing(DmsUtils::parseDate, Comparator.nullsLast(Comparator.naturalOrder())));
@@ -117,7 +118,9 @@ public class MainViewController extends AbstractController implements Applicatio
         clientSearchDatePicker = new DatePicker();
         clientSearchDatePicker.setValue(LocalDate.now());
 
-        clientSearchField.setItems(FXCollections.observableArrayList(TableFilter.values()));
+        clientSearchField.setItems(FXCollections.observableArrayList(TableFilter.NO_FILTER,
+                TableFilter.MANTAINMENT, TableFilter.DOG_NAME,
+                TableFilter.DNI, TableFilter.CLIENT_NAME, TableFilter.PHONE, TableFilter.NEXT_DATE));
         clientSearchField.setValue(TableFilter.NO_FILTER);
         clientSearchText.setDisable(true);
 
@@ -125,10 +128,15 @@ public class MainViewController extends AbstractController implements Applicatio
         createClientSearchTextListener();
         createClientSearchDatePickerListener();
 
-        clientTable.setOnMousePressed(event -> {
-            if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
-                showClientView(clientTable.getSelectionModel().getSelectedItem().getId());
-            }
+
+        clientTable.setRowFactory(tf -> {
+            final TableRow<ClientViewData> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty()) ) {
+                    showClientView(clientTable.getSelectionModel().getSelectedItem().getId());
+                }
+            });
+            return row;
         });
     }
 
@@ -139,13 +147,13 @@ public class MainViewController extends AbstractController implements Applicatio
     private void createClientSearchDatePickerListener() {
         clientSearchDatePicker.setOnAction(event ->
                 clientTable.setItems(clientTableData.filtered(clientData -> {
-                if (clientData.getNextDate() != null) {
-                    return DmsUtils.dateToString(clientData.getNextDate().toLocalDate())
-                            .contains(DmsUtils.dateToString(clientSearchDatePicker.getValue()));
-                } else {
-                    return false;
-                }
-            }))
+                    if (clientData.getNextDate() != null) {
+                        return DmsUtils.dateToString(clientData.getNextDate().toLocalDate())
+                                .contains(DmsUtils.dateToString(clientSearchDatePicker.getValue()));
+                    } else {
+                        return false;
+                    }
+                }))
         );
     }
 
@@ -174,9 +182,6 @@ public class MainViewController extends AbstractController implements Applicatio
         });
     }
 
-    private String toLower(final String string){
-        return Strings.isEmpty(string) ? Strings.EMPTY : string.toLowerCase();
-    }
 
     private void createClientSearchFieldListener() {
         clientSearchField.setOnAction(event -> {
@@ -213,13 +218,13 @@ public class MainViewController extends AbstractController implements Applicatio
                     Platform.runLater(() -> {
                         calendarView.setToday(LocalDate.now());
                         calendarView.setTime(LocalTime.now());
-                    }),0, 1, TimeUnit.SECONDS
+                    }), 0, 1, TimeUnit.SECONDS
             );
         }
     }
 
     @Override
-    public void onApplicationEvent(final EntityUpdateEvent event) {
+    public void onApplicationEvent(final UpdateEntityEvent event) {
         clientTableData = FXCollections.observableList(dmsCommunicationFacadeImpl.getClientTableData());
         clientTable.setItems(clientTableData);
     }

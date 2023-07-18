@@ -34,3 +34,6 @@ Select d.id FROM dog d INNER JOIN clientdog cd ON cd.iddog = d.id
 where cd.idclient = ? and id in
                           (SELECT cd.iddog FROM clientdog cd GROUP BY cd.iddog HAVING count(cd.iddog) = 1)
 SELECT idclient, iddog FROM clientdog
+
+INSERT OR REPLACE INTO client (name, dni, phone, observations)
+VALUES (:name, :dni, :phone, :observations)

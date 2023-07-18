@@ -22,5 +22,7 @@ public interface EntityService {
 
     void saveClientDogRelation(Long idclient, Long iddog);
 
+    void deleteClientDogRelation(Long idclient, Long iddog);
+
     void deleteEntity(Entity id);
 }

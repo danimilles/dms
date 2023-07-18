@@ -2,7 +2,7 @@ package com.hairyworld.dms.model.event;
 
 import com.hairyworld.dms.model.entity.EntityType;
 
-public class NewEntityEvent extends EntityUpdateEvent {
+public class NewEntityEvent extends UpdateEntityEvent {
 
     public NewEntityEvent(final Object source) {
         super(source);

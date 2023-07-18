@@ -196,7 +196,7 @@
                   </GridPane>
                </content>
           </Tab>
-            <Tab fx:id="clientViewPaymentTab" text="Pagos">
+            <Tab fx:id="clientViewPaymentTab" text="Cobros">
                <content>
                   <GridPane>
                      <columnConstraints>

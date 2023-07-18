@@ -102,6 +102,17 @@ public class EntityServiceImpl implements EntityService {
     }
 
     @Override
+    public void deleteClientDogRelation(final Long idclient, final Long iddog) {
+        ((ClientRepositoryImpl) entityRepositoryMap.get(EntityType.CLIENT)).deleteClientDogRelation(idclient, iddog);
+        final ClientEntity client = (ClientEntity) cacheManager.get(ClientEntity.builder().id(idclient).build());
+        final DogEntity dog = (DogEntity) cacheManager.get(DogEntity.builder().id(iddog).build());
+        client.getDogIds().remove(dog.getId());
+        dog.getClientIds().remove(client.getId());
+        cacheManager.put(client);
+        cacheManager.put(dog);
+    }
+
+    @Override
     public void deleteEntity(final Entity entity) {
         if (entity.getEntityType().equals(EntityType.CLIENT)) {
             final List<Long> iddogs = ((ClientRepositoryImpl) entityRepositoryMap.get(EntityType.CLIENT)).getDogToDeleteForClient(entity.getId());

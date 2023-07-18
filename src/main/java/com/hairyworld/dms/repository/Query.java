@@ -37,15 +37,27 @@ public class Query {
             from payment""";
 
     public static final String INSERT_CLIENT = """
-            INSERT OR REPLACE INTO client (%sname, dni, phone, observations)
-            VALUES (%s:name, :dni, :phone, :observations)""";
+            INSERT OR REPLACE INTO client (name, dni, phone, observations)
+            VALUES (:name, :dni, :phone, :observations)""";
 
     public static final String INSERT_DOG = """
-            INSERT OR REPLACE INTO dog (%sname, race,  maintainment, observations, image)
-            VALUES (%s:name, :race, :maintainment, :observations, :image)""";
+            INSERT INTO dog (name, race,  maintainment, observations, image)
+            VALUES (:name, :race, :maintainment, :observations, :image)""";
+
+    public static final String UPDATE_CLIENT = """
+            UPDATE client SET phone = :phone, observations = :observations, name = :name, dni = :dni WHERE id = :id""";
+
+    public static final String UPDATE_DOG = """
+            UPDATE dog
+            SET name = :name, race = :race, maintainment = :maintainment, observations = :observations, image = :image
+            WHERE id = :id""";
 
     public static final String INSERT_CLIENTDOG =
-            "INSERT OR REPLACE INTO clientdog (iddog, idclient) VALUES (:iddog, :idclient)";
+            "INSERT INTO clientdog (iddog, idclient) VALUES (:iddog, :idclient)";
+
+    public static final String DELETE_CLIENTDOG = """
+            DELETE FROM clientdog
+            WHERE idclient = :idclient and iddog = :iddog""";
 
     public static final String DELETE_CLIENT = """
             DELETE FROM client

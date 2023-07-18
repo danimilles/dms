@@ -55,4 +55,9 @@ public class ClientViewData implements SearchTableRow {
         searchColumns.put("Dni", dni);
         return searchColumns;
     }
+
+    @Override
+    public String getIdString() {
+        return id.toString();
+    }
 }

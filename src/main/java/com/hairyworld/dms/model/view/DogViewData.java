@@ -36,9 +36,14 @@ public class DogViewData implements SearchTableRow {
     public Map<String, String> getSearchColumns() {
         final Map<String, String> searchColumns = new HashMap<>();
         searchColumns.put("Id", id.toString());
-        searchColumns.put("Name", name);
-        searchColumns.put("Race", race);
-        searchColumns.put("Observations", observations);
+        searchColumns.put("Nombre", name);
+        searchColumns.put("Raza", race);
+        searchColumns.put("Observaciones", observations);
         return searchColumns;
+    }
+
+    @Override
+    public String getIdString() {
+        return id.toString();
     }
 }

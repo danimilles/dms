@@ -3,17 +3,17 @@ package com.hairyworld.dms.model.event;
 import com.hairyworld.dms.model.entity.EntityType;
 import org.springframework.context.ApplicationEvent;
 
-public abstract class EntityUpdateEvent extends ApplicationEvent {
+public abstract class UpdateEntityEvent extends ApplicationEvent {
     private final Long entityId;
     private final EntityType entityType;
     
-    protected EntityUpdateEvent(final Object source) {
+    protected UpdateEntityEvent(final Object source) {
         super(source);
         entityType = null;
         entityId = null;
     }
     
-    protected EntityUpdateEvent(final Object source, final Long entityId, final EntityType entityType) {
+    protected UpdateEntityEvent(final Object source, final Long entityId, final EntityType entityType) {
         super(source);
         this.entityId = entityId;
         this.entityType = entityType;
