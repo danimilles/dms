@@ -46,7 +46,7 @@ create table main.date
     description TEXT,
     idservice  integer constraint date_service_id_fk
         references service on delete set null,
-    idclient    integer not null constraint date_client_id_fk
+    idclient    integer constraint date_client_id_fk
         references client on delete cascade
 );
 

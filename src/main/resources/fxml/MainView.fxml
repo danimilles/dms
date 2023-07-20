@@ -162,7 +162,7 @@
           </Tab>
             <Tab text="Citas">
               <content>
-                  <GridPane fx:id="calendar">
+                  <GridPane fx:id="calendarPane">
                      <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
                      </columnConstraints>

@@ -1,6 +1,7 @@
 package com.hairyworld.dms.rmi;
 
 import com.hairyworld.dms.model.view.ClientViewData;
+import com.hairyworld.dms.model.view.DateViewData;
 import com.hairyworld.dms.model.view.DogViewData;
 import com.hairyworld.dms.model.view.SearchTableRow;
 
@@ -12,6 +13,8 @@ public interface DmsCommunicationFacade {
     List<SearchTableRow> getSearchTableData(SearchTableRow searchTableRow);
 
     ClientViewData getClientViewData(Long clientId);
+
+    List<DateViewData> getDateCalendarData();
 
     void saveClient(ClientViewData clientViewData);
 
@@ -26,4 +29,8 @@ public interface DmsCommunicationFacade {
     void deleteDog(Long id);
 
     DogViewData getDogViewData(Long dogId);
+
+    Long saveDate(DateViewData dateViewData);
+
+    void deleteDate(DateViewData dateViewData);
 }

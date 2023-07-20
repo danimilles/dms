@@ -5,14 +5,6 @@ public class Query {
     private Query() {
     }
 
-    public static final String SELECT_CLIENT_AND_DOGS = """
-            SELECT c.name as clientname, dni, phone, c.observations as clientobservations,
-            coalesce(iddog, d.id) as iddog, coalesce(idclient, c.id) as idclient, d.name as dogname,
-            maintainment, race, d.observations as dogobservations, image
-            FROM client c
-            LEFT join clientdog cd on c.id = cd.idclient
-            LEFT join dog d on d.id = cd.iddog""";
-
     public static final String SELECT_DOGS = """
             SELECT  d.id as iddog, d.name as dogname,
             maintainment, race, d.observations as dogobservations, image
@@ -27,6 +19,12 @@ public class Query {
     public static final String SELECT_DATES = """ 
             Select id, datetimestart, datetimeend, iddog, description, idservice, idclient
             from date""";
+
+    public static final String INSERT_DATE = """ 
+            INSERT OR REPLACE INTO date (%sdatetimestart, datetimeend, iddog, description, idservice, idclient)
+            VALUES (%s:datetimestart, :datetimeend, :iddog, :description, :idservice, :idclient);""";
+    public static final String DELETE_DATE = """ 
+            Delete from date where id = :id""";
 
     public static final String SELECT_SERVICES = """
             select description, id
@@ -44,8 +42,8 @@ public class Query {
             INSERT INTO dog (name, race,  maintainment, observations, image)
             VALUES (:name, :race, :maintainment, :observations, :image)""";
 
-    public static final String UPDATE_CLIENT = """
-            UPDATE client SET phone = :phone, observations = :observations, name = :name, dni = :dni WHERE id = :id""";
+    public static final String UPDATE_CLIENT =
+            "UPDATE client SET phone = :phone, observations = :observations, name = :name, dni = :dni WHERE id = :id";
 
     public static final String UPDATE_DOG = """
             UPDATE dog

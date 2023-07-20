@@ -20,6 +20,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Component;
 
@@ -75,7 +76,7 @@ public class SearchViewController extends AbstractController {
 
     }
 
-    public SearchTableRow showView(final Stage source, final SearchTableRow data) {
+    public SearchTableRow showView(final Window source, final SearchTableRow data) {
         columnValues = FXCollections.observableArrayList(dmsCommunicationFacadeImpl.getSearchTableData(data));
 
         stage = new Stage();

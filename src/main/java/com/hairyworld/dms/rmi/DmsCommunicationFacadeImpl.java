@@ -6,7 +6,9 @@ import com.hairyworld.dms.model.entity.DogEntity;
 import com.hairyworld.dms.model.entity.Entity;
 import com.hairyworld.dms.model.entity.EntityType;
 import com.hairyworld.dms.model.entity.PaymentEntity;
+import com.hairyworld.dms.model.entity.ServiceEntity;
 import com.hairyworld.dms.model.view.ClientViewData;
+import com.hairyworld.dms.model.view.DateViewData;
 import com.hairyworld.dms.model.view.DogViewData;
 import com.hairyworld.dms.model.view.SearchTableRow;
 import com.hairyworld.dms.rmi.mapper.ClientToServiceMapper;
@@ -58,12 +60,12 @@ public class DmsCommunicationFacadeImpl implements DmsCommunicationFacade {
     public List<SearchTableRow> getSearchTableData(final SearchTableRow searchTableRow) {
         if (searchTableRow instanceof DogViewData dogViewData) {
             return entityService.getAllEntites(EntityType.CLIENT).stream()
-                    .filter(x -> !((ClientEntity) x).getDogIds().contains(dogViewData.getId()))
+                    .filter(x -> dogViewData.getId() == null || !((ClientEntity) x).getDogIds().contains(dogViewData.getId()))
                     .map(x -> ServiceToClientMapper.mapClientDataToClientViewObj((ClientEntity) x))
                     .collect(Collectors.toList());
         } else if (searchTableRow instanceof ClientViewData clientViewData) {
             return entityService.getAllEntites(EntityType.DOG).stream()
-                    .filter(x -> !((DogEntity) x).getClientIds().contains(clientViewData.getId()))
+                    .filter(x -> clientViewData.getId() == null || !((DogEntity) x).getClientIds().contains(clientViewData.getId()))
                     .map(x -> ServiceToClientMapper.mapDogDataToDogViewObj((DogEntity) x))
                     .collect(Collectors.toList());
         }
@@ -87,6 +89,27 @@ public class DmsCommunicationFacadeImpl implements DmsCommunicationFacade {
         final Collection<Entity> services = entityService.getAllEntites(EntityType.SERVICE);
 
         return ServiceToClientMapper.mapClientDataToClientView(client, dogs, nextDate, dates, payments, services);
+    }
+
+    @Override
+    public List<DateViewData> getDateCalendarData() {
+        final Collection<Entity> dates = entityService.getAllEntites(EntityType.DATE);
+        final List<DateViewData> dateViewData = new ArrayList<>();
+        for (final Entity entry : dates) {
+            final DogEntity dog = (DogEntity)
+                    entityService.getAllEntitiesMatch(x -> x.getId().equals(((DateEntity) entry).getIddog()),
+                    EntityType.DOG).stream().findFirst().orElse(null);
+            final ClientEntity client = (ClientEntity)
+                    entityService.getAllEntitiesMatch(x -> x.getId().equals(((DateEntity) entry).getIdclient()),
+                    EntityType.CLIENT).stream().findFirst().orElse(null);
+            final ServiceEntity service = (ServiceEntity)
+                    entityService.getAllEntitiesMatch(x -> x.getId().equals(((DateEntity) entry).getIdservice()),
+                    EntityType.SERVICE).stream().findFirst().orElse(null);
+
+            dateViewData.add(ServiceToClientMapper.mapDateToMainViewObj(entry, dog, client, service));
+        }
+
+        return dateViewData;
     }
 
     @Override
@@ -136,6 +159,16 @@ public class DmsCommunicationFacadeImpl implements DmsCommunicationFacade {
         final Collection<Entity> services = entityService.getAllEntites(EntityType.SERVICE);
 
         return ServiceToClientMapper.mapDogDataToDogView(dog, clients, nextDate, dates, services);
+    }
+
+    @Override
+    public Long saveDate(final DateViewData dateViewData) {
+        return entityService.saveEntity(ClientToServiceMapper.mapDateDataToDateEntity(dateViewData));
+    }
+
+    @Override
+    public void deleteDate(final DateViewData dateViewData) {
+        entityService.deleteEntity(ClientToServiceMapper.mapDateDataToDateEntity(dateViewData));
     }
 
 }

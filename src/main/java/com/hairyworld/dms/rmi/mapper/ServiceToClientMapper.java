@@ -146,4 +146,37 @@ public class ServiceToClientMapper {
                 .image(dog.getImage())
                 .build();
     }
+
+    public static ServiceViewData mapServiceDataToDogViewObj(final ServiceEntity service) {
+        return ServiceViewData.builder()
+                .id(service.getId())
+                .description(service.getDescription())
+                .build();
+    }
+
+    public static DateViewData mapDateToMainViewObj(final Entity date, final Collection<Entity> dogs,
+                                                 final Collection<Entity> clients, final Collection<Entity> services) {
+        return DateViewData.builder()
+                .client(clients.iterator().hasNext() ? mapClientDataToClientViewObj((ClientEntity) clients.iterator().next()) : null)
+                .dog(dogs.iterator().hasNext() ? mapDogDataToDogViewObj((DogEntity) dogs.iterator().next()) : null)
+                .service(services.iterator().hasNext() ? mapServiceDataToDogViewObj((ServiceEntity) services.iterator().next()) : null)
+                .id(date.getId())
+                .description(((DateEntity) date).getDescription())
+                .datetimestart(((DateEntity) date).getDatetimestart())
+                .datetimeend(((DateEntity) date).getDatetimeend())
+                .build();
+    }
+
+    public static DateViewData mapDateToMainViewObj(final Entity entry, final DogEntity dog,
+                                                    final ClientEntity client, final ServiceEntity service) {
+        return DateViewData.builder()
+                .client(client != null ? mapClientDataToClientViewObj(client) : null)
+                .dog(dog != null ? mapDogDataToDogViewObj(dog) : null)
+                .service(service != null ? mapServiceDataToDogViewObj(service) : null)
+                .id(entry.getId())
+                .description(((DateEntity) entry).getDescription())
+                .datetimestart(((DateEntity) entry).getDatetimestart())
+                .datetimeend(((DateEntity) entry).getDatetimeend())
+                .build();
+    }
 }

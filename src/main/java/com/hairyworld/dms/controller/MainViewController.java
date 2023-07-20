@@ -1,19 +1,32 @@
 package com.hairyworld.dms.controller;
 
+import com.calendarfx.model.Calendar;
+import com.calendarfx.model.CalendarEvent;
+import com.calendarfx.model.CalendarSource;
+import com.calendarfx.model.Entry;
+import com.calendarfx.model.Interval;
 import com.calendarfx.view.CalendarView;
+import com.calendarfx.view.DateControl;
 import com.hairyworld.dms.model.event.UpdateEntityEvent;
 import com.hairyworld.dms.model.view.ClientViewData;
+import com.hairyworld.dms.model.view.DateViewData;
+import com.hairyworld.dms.model.view.DateViewDataEntryWrapper;
+import com.hairyworld.dms.model.view.DogViewData;
 import com.hairyworld.dms.model.view.TableFilter;
 import com.hairyworld.dms.rmi.DmsCommunicationFacade;
 import com.hairyworld.dms.util.DmsUtils;
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -21,17 +34,22 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import org.apache.logging.log4j.util.Strings;
+import org.controlsfx.control.PopOver;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Component
 public class MainViewController extends AbstractController implements ApplicationListener<UpdateEntityEvent> {
@@ -39,11 +57,12 @@ public class MainViewController extends AbstractController implements Applicatio
     private final DmsCommunicationFacade dmsCommunicationFacadeImpl;
     private final ClientViewController clientViewController;
     private final ApplicationContext context;
+    private final SearchViewController searchViewController;
 
     private ObservableList<ClientViewData> clientTableData;
 
     @FXML
-    private GridPane calendar;
+    private GridPane calendarPane;
 
     @FXML
     private Button addClientButton;
@@ -76,22 +95,22 @@ public class MainViewController extends AbstractController implements Applicatio
     private GridPane root;
 
     private CalendarView calendarView;
+    private DateViewData dateViewData;
+    private Calendar<DateViewData> calendar;
 
     public MainViewController(final DmsCommunicationFacade dmsCommunicationFacadeImpl,
                               final ClientViewController clientViewController,
-                              final ApplicationContext context) {
+                              final ApplicationContext context,
+                              final SearchViewController searchViewController) {
         this.dmsCommunicationFacadeImpl = dmsCommunicationFacadeImpl;
         this.clientViewController = clientViewController;
         this.context = context;
+        this.searchViewController = searchViewController;
     }
 
     @FXML
     private void initialize() {
-        calendarView = new CalendarView();
-        calendarView.setEnableTimeZoneSupport(true);
-        calendarView.setRequestedTime(LocalTime.now());
-        calendar.add(calendarView, 0, 0);
-
+        createCalendar();
         scheduleUpdateCalendarTime();
         initClientTable();
         createTableResponsiveness(clientTable);
@@ -227,5 +246,186 @@ public class MainViewController extends AbstractController implements Applicatio
     public void onApplicationEvent(final UpdateEntityEvent event) {
         clientTableData = FXCollections.observableList(dmsCommunicationFacadeImpl.getClientTableData());
         clientTable.setItems(clientTableData);
+    }
+
+    // dates
+    private void createCalendar() {
+        calendarView = new CalendarView();
+        calendarView.setEnableTimeZoneSupport(true);
+        calendarView.setRequestedTime(LocalTime.now());
+        calendarPane.add(calendarView, 0, 0);
+        calendarView.setShowAddCalendarButton(false);
+        calendarView.setShowSourceTrayButton(false);
+
+
+        calendar = new Calendar<>("Calendario");
+        calendar.addEntries(dmsCommunicationFacadeImpl.getDateCalendarData().stream()
+                .map(this::mapDateViewDataToCalendarEntry).collect(Collectors.toList()));
+        calendarView.setDefaultCalendarProvider(param -> calendar);
+
+        final EventHandler<CalendarEvent> calendarE = param -> {
+            if (param.getEventType().equals(CalendarEvent.ENTRY_CALENDAR_CHANGED) &&
+                    ((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getId().get() != null) {
+                dmsCommunicationFacadeImpl.deleteDate(((DateViewDataEntryWrapper) param.getEntry().getUserObject()).toDateViewData());
+            } else {
+                final Entry<DateViewDataEntryWrapper> entry = (Entry<DateViewDataEntryWrapper>) param.getEntry();
+                if (entry.getUserObject().getInterval().get() != null) {
+                    entry.getUserObject().getId().set(dmsCommunicationFacadeImpl.saveDate(entry.getUserObject().toDateViewData()));
+                }
+            }
+        };
+
+        calendar.addEventHandler(calendarE);
+
+
+        final CalendarSource calendarSource = new CalendarSource("Citas");
+        calendarSource.getCalendars().add(calendar);
+        calendarView.getCalendarSources().add(calendarSource);
+        calendarView.setDefaultCalendarProvider(param -> calendarSource.getCalendars().get(0));
+        calendarView.setEntryDetailsPopOverContentCallback(param -> createPopOver(param).getContentNode());
+        calendarView.setEntryFactory(this::createEntryFactory);
+    }
+
+
+    private Entry<DateViewDataEntryWrapper> createEntryFactory(final DateControl.CreateEntryParameter param) {
+        final Entry<DateViewDataEntryWrapper> entry = new Entry<>();
+        final DateViewDataEntryWrapper dateViewDataEntryWrapper = new DateViewDataEntryWrapper();
+        entry.setUserObject(dateViewDataEntryWrapper);
+        entry.setInterval(param.getZonedDateTime());
+        entry.intervalProperty().bindBidirectional(dateViewDataEntryWrapper.getInterval());
+        dateViewDataEntryWrapper.getDescription().set("Nueva cita");
+        entry.titleProperty().bindBidirectional(dateViewDataEntryWrapper.getDescription(), createTitleEntryConverter(dateViewDataEntryWrapper));
+        return entry;
+    }
+
+    private Entry<DateViewDataEntryWrapper> mapDateViewDataToCalendarEntry(final DateViewData dateCalendarData) {
+        final Entry<DateViewDataEntryWrapper> entry = new Entry<>();
+        final DateViewDataEntryWrapper dateViewDataEntryWrapper = new DateViewDataEntryWrapper(dateCalendarData);
+        entry.setUserObject(dateViewDataEntryWrapper);
+        entry.intervalProperty().bindBidirectional(dateViewDataEntryWrapper.getInterval());
+        entry.titleProperty().bindBidirectional(dateViewDataEntryWrapper.getDescription(), createTitleEntryConverter(dateViewDataEntryWrapper));
+        return entry;
+    }
+
+    private PopOver createPopOver(final DateControl.EntryDetailsPopOverContentParameter param) {
+        // Create a GridPane to hold the form elements
+        GridPane gridPane = new GridPane();
+        gridPane.setPadding(new Insets(10));
+        gridPane.setHgap(10);
+        gridPane.setVgap(5);
+
+        // Create labels and text fields for each data field
+        Label startLabel = new Label("Start Date/Time:");
+        TextField startTextField = new TextField();
+        startTextField.setText(param.getEntry().getInterval().getStartTime().toString());
+        startTextField.textProperty().bindBidirectional(param.getEntry().intervalProperty(), createStartDateStringConverter(param.getEntry().intervalProperty()));
+
+        Label endLabel = new Label("End Date/Time:");
+        TextField endTextField = new TextField();
+        endTextField.textProperty().bindBidirectional(param.getEntry().intervalProperty(), createEndDateStringConverter(param.getEntry().intervalProperty()));
+
+        Label descriptionLabel = new Label("Description:");
+        TextField descriptionTextField = new TextField();
+        descriptionTextField.textProperty().bindBidirectional(
+                ((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getDescription());
+
+        Label dogLabel = new Label("Dog:");
+        ChoiceBox<DogViewData> dogTextField = new ChoiceBox<>();
+        dogTextField.setMaxWidth(Double.MAX_VALUE);
+        dogTextField.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(final DogViewData object) {
+                return object != null ? object.getName() : null;
+            }
+
+            @Override
+            public DogViewData fromString(final String string) {
+                return null;
+            }
+        });
+        dogTextField.setOnMouseClicked(event -> {
+            dogTextField.setValue((DogViewData) searchViewController.showView(gridPane.getScene().getWindow(), ClientViewData.builder().build()));
+        });
+
+        dogTextField.valueProperty().bindBidirectional(((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getDog());
+
+
+        Label clientLabel = new Label("Client:");
+        TextField clientTextField = new TextField();
+
+        Label serviceLabel = new Label("Service:");
+        TextField serviceTextField = new TextField();
+
+        // Add the labels and text fields to the grid pane
+        gridPane.add(startLabel, 0, 0);
+        gridPane.add(startTextField, 1, 0);
+
+        gridPane.add(endLabel, 0, 1);
+        gridPane.add(endTextField, 1, 1);
+
+        gridPane.add(descriptionLabel, 0, 2);
+        gridPane.add(descriptionTextField, 1, 2);
+
+        gridPane.add(dogLabel, 0, 3);
+        gridPane.add(dogTextField, 1, 3);
+
+        gridPane.add(clientLabel, 0, 4);
+        gridPane.add(clientTextField, 1, 4);
+
+        gridPane.add(serviceLabel, 0, 5);
+        gridPane.add(serviceTextField, 1, 5);
+
+        // Create a PopOver instance
+        PopOver popOver = new PopOver(gridPane);
+        popOver.setCloseButtonEnabled(true);
+        popOver.setDetachable(false);
+        popOver.setUserData(param.getEntry().getUserObject());
+        return popOver;
+    }
+
+    private StringConverter<String> createTitleEntryConverter(final DateViewDataEntryWrapper dateViewDataEntryWrapper) {
+        return new StringConverter<>() {
+            @Override
+            public String toString(final String object) {
+                return dateViewDataEntryWrapper.getEntryTile();
+            }
+
+            @Override
+            public String fromString(final String string) {
+                return string;
+            }
+        };
+    }
+
+    private StringConverter<Interval> createEndDateStringConverter(ObjectProperty<Interval> intervalProperty) {
+        return new StringConverter<>() {
+            @Override
+            public String toString(final Interval object) {
+                return object.getEndDateTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+            }
+
+            @Override
+            public Interval fromString(final String string) {
+                return new Interval()
+                        .withEndDateTime(LocalDateTime.parse(string, DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")))
+                        .withStartDateTime(intervalProperty.get().getStartDateTime());
+            }
+        };
+    }
+
+    private StringConverter<Interval> createStartDateStringConverter(ObjectProperty<Interval> intervalProperty) {
+        return new StringConverter<>() {
+            @Override
+            public String toString(final Interval object) {
+                return object.getStartDateTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+            }
+
+            @Override
+            public Interval fromString(final String string) {
+                return new Interval()
+                        .withEndDateTime(intervalProperty.get().getEndDateTime())
+                        .withStartDateTime(LocalDateTime.parse(string, DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+            }
+        };
     }
 }
