@@ -7,8 +7,8 @@ import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 
 public class DmsUtils {
-    private static final String LOCALDATE_PATTERN = "dd/MM/yyyy";
-    private static final String DATETIME_PATTERN = "dd/MM/yyyy HH:mm:ss";
+    public static final String LOCALDATE_PATTERN = "dd/MM/yyyy";
+    public static final String DATETIME_PATTERN = "dd/MM/yyyy HH:mm:ss";
 
     private DmsUtils() {
     }

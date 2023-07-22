@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 @Component
-public class ServiceViewController extends AbstractController {
+public class PaymentViewController extends AbstractController {
 
 
     @FXML
@@ -44,7 +44,7 @@ public class ServiceViewController extends AbstractController {
     private ServiceViewData serviceViewData;
 
 
-    public ServiceViewController(final DmsCommunicationFacade dmsCommunicationFacadeImpl, final ApplicationContext context) {
+    public PaymentViewController(final DmsCommunicationFacade dmsCommunicationFacadeImpl, final ApplicationContext context) {
         this.dmsCommunicationFacadeImpl = dmsCommunicationFacadeImpl;
         this.context = context;
     }

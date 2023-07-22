@@ -1,10 +1,10 @@
 package com.hairyworld.dms.controller;
 
-import com.hairyworld.dms.model.entity.EntityType;
 import com.hairyworld.dms.model.event.DeleteDataEvent;
 import com.hairyworld.dms.model.event.NewDataEvent;
 import com.hairyworld.dms.model.event.UpdateDataEvent;
 import com.hairyworld.dms.model.view.ClientViewData;
+import com.hairyworld.dms.model.view.DataType;
 import com.hairyworld.dms.model.view.DateViewData;
 import com.hairyworld.dms.model.view.DogViewData;
 import com.hairyworld.dms.model.view.PaymentViewData;
@@ -144,14 +144,27 @@ public class ClientViewController extends AbstractController implements Applicat
         createTableResponsiveness(clientViewDogTable);
         createTableResponsiveness(clientViewDateTable);
 
-        ContextMenu contextMenu = new ContextMenu();
-        MenuItem deleteMenuItem = new MenuItem("Quitar mascota");
+        createDogTableMenu();
+
+        scene = new Scene(root);
+        stage = new Stage();
+        stage.setScene(scene);
+        stage.getIcons().add(getIcon());
+        stage.onCloseRequestProperty().setValue(e -> {
+            clientViewDataTab.getTabPane().getSelectionModel().selectFirst();
+        });
+    }
+
+    private void createDogTableMenu() {
+        final ContextMenu contextMenu = new ContextMenu();
+        final MenuItem deleteMenuItem = new MenuItem("Quitar mascota");
         deleteMenuItem.setOnAction(event -> {
             final DogViewData dogViewData = clientViewDogTable.getSelectionModel().getSelectedItem();
             dmsCommunicationFacadeImpl.deleteClientDog(clientViewData.getId(), dogViewData.getId());
-            context.publishEvent(new NewDataEvent(stage, dogViewData.getId(), EntityType.DOG));
+            context.publishEvent(new NewDataEvent(stage, dogViewData.getId(), DataType.DOG));
         });
         contextMenu.getItems().add(deleteMenuItem);
+
         clientViewDogTable.setRowFactory(tf -> {
             final TableRow<DogViewData> row = new TableRow<>();
             row.setOnContextMenuRequested(event -> {
@@ -165,14 +178,6 @@ public class ClientViewController extends AbstractController implements Applicat
                 }
             });
             return row;
-        });
-
-        scene = new Scene(root);
-        stage = new Stage();
-        stage.setScene(scene);
-        stage.getIcons().add(getIcon());
-        stage.onCloseRequestProperty().setValue(e -> {
-            clientViewDataTab.getTabPane().getSelectionModel().selectFirst();
         });
     }
 
@@ -219,6 +224,16 @@ public class ClientViewController extends AbstractController implements Applicat
         chargeClientViewData(clientId);
         createSubmitButtonAction();
         createDeleteButtonAction();
+        createAddDogButtonAction();
+
+        if (stage.getOwner() == null) {
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(source);
+        }
+        stage.show();
+    }
+
+    private void createAddDogButtonAction() {
         addDogButton.setOnAction(event -> {
             if (clientViewData.getId() != null) {
                 final ButtonType newDog = new ButtonType("Crear mascota", ButtonBar.ButtonData.YES);
@@ -240,12 +255,6 @@ public class ClientViewController extends AbstractController implements Applicat
                     alert.close();
                     showDogView(null);
                 }}});
-
-        if (stage.getOwner() == null) {
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(source);
-        }
-        stage.show();
     }
 
     private void chargeClientViewData(final Long clientId) {
@@ -275,7 +284,7 @@ public class ClientViewController extends AbstractController implements Applicat
                         .build();
 
                 dmsCommunicationFacadeImpl.saveClient(clientViewData);
-                context.publishEvent(new NewDataEvent(event.getSource(), clientViewData.getId(), EntityType.CLIENT));
+                context.publishEvent(new NewDataEvent(event.getSource(), clientViewData.getId(), DataType.CLIENT));
                 stage.close();
             }
         });
@@ -298,7 +307,7 @@ public class ClientViewController extends AbstractController implements Applicat
                 if (ButtonType.OK.equals(action.orElse(null))) {
                     alert.close();
                     dmsCommunicationFacadeImpl.deleteClient(clientViewData.getId());
-                    context.publishEvent(new DeleteDataEvent(event.getSource(), clientViewData.getId(), EntityType.CLIENT));
+                    context.publishEvent(new DeleteDataEvent(event.getSource(), clientViewData.getId(), DataType.CLIENT));
                     stage.close();
                 } else {
                     alert.close();
@@ -312,7 +321,7 @@ public class ClientViewController extends AbstractController implements Applicat
         final SearchTableRow searchTableRow = searchViewController.showView(stage, clientViewData);
         if (searchTableRow != null) {
             dmsCommunicationFacadeImpl.saveClientDog(clientViewData.getId(), Long.parseLong(searchTableRow.getIdString()));
-            context.publishEvent(new NewDataEvent(stage, Long.parseLong(searchTableRow.getIdString()), EntityType.DOG));
+            context.publishEvent(new NewDataEvent(stage, Long.parseLong(searchTableRow.getIdString()), DataType.DOG));
         }
     }
 
@@ -392,7 +401,7 @@ public class ClientViewController extends AbstractController implements Applicat
 
     @Override
     public void onApplicationEvent(final UpdateDataEvent event) {
-        if (EntityType.DOG.equals(event.getDataType())) {
+        if (DataType.DOG.equals(event.getDataType())) {
             clientViewData = dmsCommunicationFacadeImpl.getClientViewData(clientViewData.getId());
             clientViewDogTable.setItems(FXCollections.observableArrayList(clientViewData.getDogs()));
             clientViewDateTable.setItems(FXCollections.observableArrayList(clientViewData.getDates()));

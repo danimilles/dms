@@ -1,10 +1,10 @@
 package com.hairyworld.dms.controller;
 
-import com.hairyworld.dms.model.entity.EntityType;
 import com.hairyworld.dms.model.event.DeleteDataEvent;
 import com.hairyworld.dms.model.event.NewDataEvent;
 import com.hairyworld.dms.model.event.UpdateDataEvent;
 import com.hairyworld.dms.model.view.ClientViewData;
+import com.hairyworld.dms.model.view.DataType;
 import com.hairyworld.dms.model.view.DateViewData;
 import com.hairyworld.dms.model.view.DogViewData;
 import com.hairyworld.dms.model.view.SearchTableRow;
@@ -143,7 +143,7 @@ public class DogViewController extends AbstractController implements Application
         deleteMenuItem.setOnAction(event -> {
             final ClientViewData clientViewData = dogViewClientTable.getSelectionModel().getSelectedItem();
             dmsCommunicationFacadeImpl.deleteClientDog(clientViewData.getId(), dogViewData.getId());
-            context.publishEvent(new NewDataEvent(stage, dogViewData.getId(), EntityType.DOG));
+            context.publishEvent(new NewDataEvent(stage, dogViewData.getId(), DataType.DOG));
         });
         contextMenu.getItems().add(deleteMenuItem);
         dogViewClientTable.setRowFactory(tf -> {
@@ -161,10 +161,10 @@ public class DogViewController extends AbstractController implements Application
         imageCircle.setOnMouseClicked(e -> showImagePopup());
         addClientToDogButton.setOnAction(e -> openSearchView());
 
-        addImageButton.setOnAction(e -> openFileChooser());
+        addImageButton.setOnAction(e -> showImageChooser());
         deleteImageButton.setOnAction(e -> deleteImage());
-        deleteImageButton.setDisable(true);
         dogViewNextDate.setDisable(true);
+
         scene = new Scene(root);
         stage = new Stage();
         stage.getIcons().add(getIcon());
@@ -175,7 +175,7 @@ public class DogViewController extends AbstractController implements Application
         final SearchTableRow searchTableRow = searchViewController.showView(stage, dogViewData);
         if (searchTableRow != null) {
             dmsCommunicationFacadeImpl.saveClientDog(Long.parseLong(searchTableRow.getIdString()), dogViewData.getId());
-            context.publishEvent(new NewDataEvent(stage, dogViewData.getId(), EntityType.DOG));
+            context.publishEvent(new NewDataEvent(stage, dogViewData.getId(), DataType.DOG));
         }
     }
 
@@ -252,7 +252,7 @@ public class DogViewController extends AbstractController implements Application
 
                 dmsCommunicationFacadeImpl.saveDog(dogViewData);
                 dogViewData.getClients().forEach(x -> dmsCommunicationFacadeImpl.saveClientDog(x.getId(), dogViewData.getId()));
-                context.publishEvent(new NewDataEvent(event.getSource(), dogViewData.getId(), EntityType.DOG));
+                context.publishEvent(new NewDataEvent(event.getSource(), dogViewData.getId(), DataType.DOG));
                 stage.close();
             }
         });
@@ -274,7 +274,7 @@ public class DogViewController extends AbstractController implements Application
                 if (ButtonType.OK.equals(action.orElse(null))) {
                     alert.close();
                     dmsCommunicationFacadeImpl.deleteDog(dogViewData.getId());
-                    context.publishEvent(new DeleteDataEvent(event.getSource(), dogViewData.getId(), EntityType.DOG));
+                    context.publishEvent(new DeleteDataEvent(event.getSource(), dogViewData.getId(), DataType.DOG));
                     stage.close();
                 } else {
                     alert.close();
@@ -326,7 +326,7 @@ public class DogViewController extends AbstractController implements Application
         dogViewClientDniTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDni()));
     }
 
-    private void openFileChooser() {
+    private void showImageChooser() {
         final FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Selecciona una imagen");
         fileChooser.getExtensionFilters().add(
@@ -436,7 +436,7 @@ public class DogViewController extends AbstractController implements Application
 
     @Override
     public void onApplicationEvent(final UpdateDataEvent event) {
-        if (event.getDataType().equals(EntityType.DOG) && Objects.equals(event.getId(), dogViewData.getId())) {
+        if (event.getDataType().equals(DataType.DOG) && Objects.equals(event.getId(), dogViewData.getId())) {
             dogViewData = dmsCommunicationFacadeImpl.getDogViewData(dogViewData.getId());
             if (dogViewData != null) {
                 dogViewClientTable.setItems(FXCollections.observableArrayList(dogViewData.getClients()));

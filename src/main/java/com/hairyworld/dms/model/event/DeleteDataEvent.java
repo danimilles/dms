@@ -1,6 +1,6 @@
 package com.hairyworld.dms.model.event;
 
-import com.hairyworld.dms.model.entity.EntityType;
+import com.hairyworld.dms.model.view.DataType;
 
 public class DeleteDataEvent extends UpdateDataEvent {
 
@@ -8,7 +8,7 @@ public class DeleteDataEvent extends UpdateDataEvent {
         super(source);
     }
 
-    public DeleteDataEvent(final Object source, final Long entityId, final EntityType entityType) {
-        super(source, entityId, entityType);
+    public DeleteDataEvent(final Object source, final Long entityId, final DataType dataType) {
+        super(source, entityId, dataType);
     }
 }
