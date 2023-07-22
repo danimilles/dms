@@ -83,7 +83,9 @@ public class SearchViewController extends AbstractController {
         stage.getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream(ICON_IMAGE)));
         stage.setScene(scene);
         stage.initModality(Modality.APPLICATION_MODAL);
-        stage.initOwner(source);
+        if (source != null) {
+            stage.initOwner(source);
+        }
         stage.setTitle("Buscar");
 
 

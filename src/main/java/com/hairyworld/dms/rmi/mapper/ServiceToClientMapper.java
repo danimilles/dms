@@ -179,4 +179,11 @@ public class ServiceToClientMapper {
                 .datetimeend(((DateEntity) entry).getDatetimeend())
                 .build();
     }
+
+    public static ServiceViewData mapServiceDataToServiceViewObj(final ServiceEntity service) {
+        return ServiceViewData.builder()
+                .id(service.getId())
+                .description(service.getDescription())
+                .build();
+    }
 }

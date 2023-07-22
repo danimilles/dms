@@ -331,7 +331,8 @@ public class ClientViewController extends AbstractController implements Applicat
         clientViewDateServiceTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getService() != null ?
                 cellData.getValue().getService().getDescription() : null));
         clientViewDateDescriptionTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDescription()));
-        clientViewDateDogTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDog().getName()));
+        clientViewDateDogTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDog() != null ?
+                cellData.getValue().getDog().getName() : null));
     }
 
     private void bindPaymentTable() {

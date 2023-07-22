@@ -4,6 +4,7 @@ import com.hairyworld.dms.model.view.ClientViewData;
 import com.hairyworld.dms.model.view.DateViewData;
 import com.hairyworld.dms.model.view.DogViewData;
 import com.hairyworld.dms.model.view.SearchTableRow;
+import com.hairyworld.dms.model.view.ServiceViewData;
 
 import java.util.List;
 
@@ -33,4 +34,6 @@ public interface DmsCommunicationFacade {
     Long saveDate(DateViewData dateViewData);
 
     void deleteDate(DateViewData dateViewData);
+
+    List<ServiceViewData> getServiceViewTableData();
 }

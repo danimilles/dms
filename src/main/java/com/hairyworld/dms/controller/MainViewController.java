@@ -12,17 +12,20 @@ import com.hairyworld.dms.model.view.ClientViewData;
 import com.hairyworld.dms.model.view.DateViewData;
 import com.hairyworld.dms.model.view.DateViewDataEntryWrapper;
 import com.hairyworld.dms.model.view.DogViewData;
+import com.hairyworld.dms.model.view.ServiceViewData;
 import com.hairyworld.dms.model.view.TableFilter;
 import com.hairyworld.dms.rmi.DmsCommunicationFacade;
 import com.hairyworld.dms.util.DmsUtils;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
@@ -45,7 +48,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -97,6 +102,7 @@ public class MainViewController extends AbstractController implements Applicatio
     private CalendarView calendarView;
     private DateViewData dateViewData;
     private Calendar<DateViewData> calendar;
+    private PopOver entryPopOver;
 
     public MainViewController(final DmsCommunicationFacade dmsCommunicationFacadeImpl,
                               final ClientViewController clientViewController,
@@ -256,7 +262,8 @@ public class MainViewController extends AbstractController implements Applicatio
         calendarPane.add(calendarView, 0, 0);
         calendarView.setShowAddCalendarButton(false);
         calendarView.setShowSourceTrayButton(false);
-
+        calendarView.setShowPageToolBarControls(false);
+        calendarView.setShowPrintButton(false);
 
         calendar = new Calendar<>("Calendario");
         calendar.addEntries(dmsCommunicationFacadeImpl.getDateCalendarData().stream()
@@ -282,32 +289,47 @@ public class MainViewController extends AbstractController implements Applicatio
         calendarSource.getCalendars().add(calendar);
         calendarView.getCalendarSources().add(calendarSource);
         calendarView.setDefaultCalendarProvider(param -> calendarSource.getCalendars().get(0));
-        calendarView.setEntryDetailsPopOverContentCallback(param -> createPopOver(param).getContentNode());
+        calendarView.setEntryDetailsPopOverContentCallback(this::createPopOverContent);
         calendarView.setEntryFactory(this::createEntryFactory);
-    }
 
+    }
 
     private Entry<DateViewDataEntryWrapper> createEntryFactory(final DateControl.CreateEntryParameter param) {
         final Entry<DateViewDataEntryWrapper> entry = new Entry<>();
         final DateViewDataEntryWrapper dateViewDataEntryWrapper = new DateViewDataEntryWrapper();
-        entry.setUserObject(dateViewDataEntryWrapper);
         entry.setInterval(param.getZonedDateTime());
-        entry.intervalProperty().bindBidirectional(dateViewDataEntryWrapper.getInterval());
         dateViewDataEntryWrapper.getDescription().set("Nueva cita");
-        entry.titleProperty().bindBidirectional(dateViewDataEntryWrapper.getDescription(), createTitleEntryConverter(dateViewDataEntryWrapper));
-        return entry;
+        return getDateViewDataEntryWrapperEntry(entry, dateViewDataEntryWrapper);
     }
 
     private Entry<DateViewDataEntryWrapper> mapDateViewDataToCalendarEntry(final DateViewData dateCalendarData) {
         final Entry<DateViewDataEntryWrapper> entry = new Entry<>();
         final DateViewDataEntryWrapper dateViewDataEntryWrapper = new DateViewDataEntryWrapper(dateCalendarData);
+        return getDateViewDataEntryWrapperEntry(entry, dateViewDataEntryWrapper);
+    }
+
+    private Entry<DateViewDataEntryWrapper> getDateViewDataEntryWrapperEntry(Entry<DateViewDataEntryWrapper> entry, DateViewDataEntryWrapper dateViewDataEntryWrapper) {
         entry.setUserObject(dateViewDataEntryWrapper);
         entry.intervalProperty().bindBidirectional(dateViewDataEntryWrapper.getInterval());
-        entry.titleProperty().bindBidirectional(dateViewDataEntryWrapper.getDescription(), createTitleEntryConverter(dateViewDataEntryWrapper));
+        entry.titleProperty().bindBidirectional(new SimpleStringProperty(dateViewDataEntryWrapper.getEntryTile()));
+        dateViewDataEntryWrapper.getDescription().addListener((observable, oldValue, newValue) ->
+            entry.setTitle(entry.getUserObject().getEntryTile())
+        );
+        dateViewDataEntryWrapper.getClient().addListener(saveEntryChange(entry));
+        dateViewDataEntryWrapper.getDog().addListener(saveEntryChange(entry));
+        dateViewDataEntryWrapper.getService().addListener(saveEntryChange(entry));
         return entry;
     }
 
-    private PopOver createPopOver(final DateControl.EntryDetailsPopOverContentParameter param) {
+    private ChangeListener saveEntryChange(Entry<DateViewDataEntryWrapper> entry) {
+        return (observable, oldValue, newValue) -> {
+            dmsCommunicationFacadeImpl.saveDate((entry.getUserObject()).toDateViewData());
+            entry.setTitle(entry.getUserObject().getEntryTile());
+        };
+
+    }
+
+    private Node createPopOverContent(final DateControl.EntryDetailsPopOverContentParameter param) {
         // Create a GridPane to hold the form elements
         GridPane gridPane = new GridPane();
         gridPane.setPadding(new Insets(10));
@@ -315,27 +337,30 @@ public class MainViewController extends AbstractController implements Applicatio
         gridPane.setVgap(5);
 
         // Create labels and text fields for each data field
-        Label startLabel = new Label("Start Date/Time:");
+        Label startLabel = new Label("Fecha inicio:");
         TextField startTextField = new TextField();
         startTextField.setText(param.getEntry().getInterval().getStartTime().toString());
         startTextField.textProperty().bindBidirectional(param.getEntry().intervalProperty(), createStartDateStringConverter(param.getEntry().intervalProperty()));
 
-        Label endLabel = new Label("End Date/Time:");
+        Label endLabel = new Label("Fecha fin:");
         TextField endTextField = new TextField();
         endTextField.textProperty().bindBidirectional(param.getEntry().intervalProperty(), createEndDateStringConverter(param.getEntry().intervalProperty()));
 
-        Label descriptionLabel = new Label("Description:");
+        Label descriptionLabel = new Label("Descripcion:");
         TextField descriptionTextField = new TextField();
         descriptionTextField.textProperty().bindBidirectional(
                 ((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getDescription());
 
-        Label dogLabel = new Label("Dog:");
+        Label dogLabel = new Label("Mascota:");
         ChoiceBox<DogViewData> dogTextField = new ChoiceBox<>();
-        dogTextField.setMaxWidth(Double.MAX_VALUE);
+        dogTextField.setDisable(true);
+        descriptionTextField.widthProperty().addListener((observable, oldValue, newValue) -> {
+            dogTextField.setPrefWidth(newValue.doubleValue());
+        });
         dogTextField.setConverter(new StringConverter<>() {
             @Override
             public String toString(final DogViewData object) {
-                return object != null ? object.getName() : null;
+                return object != null ? object.getName() + " -> " + object.getRace() : null;
             }
 
             @Override
@@ -343,19 +368,72 @@ public class MainViewController extends AbstractController implements Applicatio
                 return null;
             }
         });
-        dogTextField.setOnMouseClicked(event -> {
-            dogTextField.setValue((DogViewData) searchViewController.showView(gridPane.getScene().getWindow(), ClientViewData.builder().build()));
+        dogTextField.setValue(((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getDog().get());
+        if ((((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getClient().get() != null)) {
+            final List<DogViewData> list = new ArrayList<>();
+            list.add(null);
+            list.addAll(dmsCommunicationFacadeImpl.getClientViewData(
+                    ((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getClient().get().getId()).getDogs());
+            dogTextField.setItems(FXCollections.observableList(list));
+            dogTextField.setDisable(false);
+        }
+
+        dogTextField.onActionProperty().setValue(event -> {
+            ((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getDog().set(dogTextField.getValue());
         });
 
-        dogTextField.valueProperty().bindBidirectional(((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getDog());
+        Label clientLabel = new Label("Cliente:");
+        Button clientTextField = new Button();
+        clientTextField.setMaxWidth(Double.MAX_VALUE);
+        clientTextField.setText(((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getClient().get() != null ?
+                ((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getClient().get().getName() : null);
+        clientTextField.setOnMouseClicked(event -> {
+            ((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getClient().set(
+                    (ClientViewData) searchViewController.showView(null, DogViewData.builder().build()));
+            clientTextField.setText(((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getClient().get() != null ?
+                    ((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getClient().get().getName() : null);
+            param.getPopOver().show(param.getPopOver().getOwnerWindow());
+        });
 
+        ((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getClient().addListener((observable, oldValue, newValue) -> {
+            if (newValue != oldValue) {
+                ((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getDog().set(null);
+                dogTextField.setValue(null);
+            }
+                if ((((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getClient().get() != null)){
+                    dogTextField.setDisable(false);
+                    final List<DogViewData> list = new ArrayList<>();
+                    list.add(null);
+                    list.addAll(dmsCommunicationFacadeImpl.getClientViewData(
+                                    ((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getClient().get().getId()).getDogs());
+                    dogTextField.setItems(FXCollections.observableList(list));
+                }
+            dogTextField.setDisable(newValue == null);
+        });
 
-        Label clientLabel = new Label("Client:");
-        TextField clientTextField = new TextField();
+        Label serviceLabel = new Label("Servicio:");
+        ChoiceBox<ServiceViewData> serviceTextField = new ChoiceBox<>();
+        descriptionTextField.widthProperty().addListener((observable, oldValue, newValue) -> serviceTextField.setPrefWidth(newValue.doubleValue()));
+        serviceTextField.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(final ServiceViewData object) {
+                return object != null ? object.getDescription() : null;
+            }
 
-        Label serviceLabel = new Label("Service:");
-        TextField serviceTextField = new TextField();
+            @Override
+            public ServiceViewData fromString(final String string) {
+                return null;
+            }
+        });
+        serviceTextField.setValue(((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getService().get());
+        final List<ServiceViewData> list = new ArrayList<>();
+        list.add(null);
+        list.addAll(dmsCommunicationFacadeImpl.getServiceViewTableData());
+        serviceTextField.setItems(FXCollections.observableList(list));
 
+        serviceTextField.onActionProperty().setValue(event -> {
+            ((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getService().set(serviceTextField.getValue());
+        });
         // Add the labels and text fields to the grid pane
         gridPane.add(startLabel, 0, 0);
         gridPane.add(startTextField, 1, 0);
@@ -366,36 +444,18 @@ public class MainViewController extends AbstractController implements Applicatio
         gridPane.add(descriptionLabel, 0, 2);
         gridPane.add(descriptionTextField, 1, 2);
 
-        gridPane.add(dogLabel, 0, 3);
-        gridPane.add(dogTextField, 1, 3);
+        gridPane.add(dogLabel, 0, 4);
+        gridPane.add(dogTextField, 1, 4);
 
-        gridPane.add(clientLabel, 0, 4);
-        gridPane.add(clientTextField, 1, 4);
+        gridPane.add(clientLabel, 0, 3);
+        gridPane.add(clientTextField, 1, 3);
 
         gridPane.add(serviceLabel, 0, 5);
         gridPane.add(serviceTextField, 1, 5);
 
-        // Create a PopOver instance
-        PopOver popOver = new PopOver(gridPane);
-        popOver.setCloseButtonEnabled(true);
-        popOver.setDetachable(false);
-        popOver.setUserData(param.getEntry().getUserObject());
-        return popOver;
+        return gridPane;
     }
 
-    private StringConverter<String> createTitleEntryConverter(final DateViewDataEntryWrapper dateViewDataEntryWrapper) {
-        return new StringConverter<>() {
-            @Override
-            public String toString(final String object) {
-                return dateViewDataEntryWrapper.getEntryTile();
-            }
-
-            @Override
-            public String fromString(final String string) {
-                return string;
-            }
-        };
-    }
 
     private StringConverter<Interval> createEndDateStringConverter(ObjectProperty<Interval> intervalProperty) {
         return new StringConverter<>() {

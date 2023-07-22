@@ -44,6 +44,8 @@ public class ClientToServiceMapper {
                 .description(dateViewData.getDescription())
                 .datetimeend(dateViewData.getDatetimeend())
                 .iddog(dateViewData.getDog() != null ? dateViewData.getDog().getId() : null)
+                .idclient(dateViewData.getClient() != null ? dateViewData.getClient().getId() : null)
+                .idservice(dateViewData.getService() != null ? dateViewData.getService().getId() : null)
                 .build();
     }
 }

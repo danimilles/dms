@@ -54,10 +54,21 @@ public class DateViewDataEntryWrapper {
     }
 
     public String getEntryTile() {
-       return "" + (this.getClient().get() != null && this.getClient().get().getName() != null ? this.getClient().get().getName() + " - "  : "")
-                + (this.getDog().get() != null && this.getDog().get().getName() != null ? this.getDog().get().getName() : "")
-                + "\n" + (this.getDescription() != null ? this.getDescription().get() : "")
-                + (this.getService().get() != null
-               && this.getService().get().getDescription() != null ? " - " + this.getService().get().getDescription() : "");
+        final String client = this.getClient().get() != null && this.getClient().get().getName() != null ?
+                this.getClient().get().getName()  : "";
+        final String dog = this.getDog().get() != null && this.getDog().get().getName() != null ?
+                this.getDog().get().getName() : "";
+        final String description = this.getDescription() != null ? this.getDescription().get() : "";
+        final String service = this.getService().get() != null
+                && this.getService().get().getDescription() != null ? " - " + this.getService().get().getDescription() : "";
+
+        return new StringBuilder()
+                .append(client)
+                .append(!client.isEmpty() && !dog.isEmpty() ? " - " : "")
+                .append(dog)
+                .append(!client.isEmpty() || !dog.isEmpty() ? "\n" : "")
+                .append(description)
+                .append(service)
+                .toString();
     }
 }
