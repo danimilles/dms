@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 @Data
-public class PaymentViewData {
+public class PaymentViewData implements ViewData {
     private Long id;
     private DateTime datetime;
     private String description;
@@ -20,4 +20,22 @@ public class PaymentViewData {
 
     private ServiceViewData service;
     private ClientViewData client;
+
+
+    @Override
+    public DataType getDataType() {
+        return DataType.PAYMENT;
+    }
+
+    public boolean isRelatedTo(final Long id, final DataType type) {
+        if (type == DataType.PAYMENT) {
+            return this.id.equals(id);
+        } else if (type == DataType.CLIENT) {
+            return client != null && client.getId().equals(id);
+        } else if (type == DataType.SERVICE) {
+            return service != null && service.getId().equals(id);
+        } else {
+            return false;
+        }
+    }
 }

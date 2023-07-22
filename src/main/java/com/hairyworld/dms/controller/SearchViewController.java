@@ -15,7 +15,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
@@ -26,8 +25,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 import java.util.Optional;
-
-import static com.hairyworld.dms.util.Path.ICON_IMAGE;
 
 @Component
 public class SearchViewController extends AbstractController {
@@ -80,7 +77,7 @@ public class SearchViewController extends AbstractController {
         columnValues = FXCollections.observableArrayList(dmsCommunicationFacadeImpl.getSearchTableData(data));
 
         stage = new Stage();
-        stage.getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream(ICON_IMAGE)));
+        stage.getIcons().add(getIcon());
         stage.setScene(scene);
         stage.initModality(Modality.APPLICATION_MODAL);
         if (source != null) {

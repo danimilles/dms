@@ -10,7 +10,12 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @Builder
-public class ServiceViewData {
+public class ServiceViewData implements ViewData {
     private Long id;
     private String description;
+
+    @Override
+    public DataType getDataType() {
+        return DataType.SERVICE;
+    }
 }

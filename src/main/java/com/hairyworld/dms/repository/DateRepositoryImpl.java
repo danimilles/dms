@@ -18,10 +18,6 @@ import java.util.Map;
 @Repository
 public class DateRepositoryImpl extends EntityRepositoryImpl {
     private static final Logger LOGGER = LogManager.getLogger(DateRepositoryImpl.class);
-    public static final String IDSERVICE_FIELD = "idservice";
-    public static final String DATETIMEEND_FIELD = "datetimeend";
-    public static final String DATETIMESTART_FIELD = "datetimestart";
-    public static final String DESCRIPTION_FIELD = "description";
 
     public DateRepositoryImpl(final DataSource dataSource) {
         super(dataSource, LOGGER);

@@ -1,9 +1,9 @@
 package com.hairyworld.dms.controller;
 
 import com.hairyworld.dms.model.entity.EntityType;
-import com.hairyworld.dms.model.event.DeleteEntityEvent;
-import com.hairyworld.dms.model.event.NewEntityEvent;
-import com.hairyworld.dms.model.event.UpdateEntityEvent;
+import com.hairyworld.dms.model.event.DeleteDataEvent;
+import com.hairyworld.dms.model.event.NewDataEvent;
+import com.hairyworld.dms.model.event.UpdateDataEvent;
 import com.hairyworld.dms.model.view.ClientViewData;
 import com.hairyworld.dms.model.view.DateViewData;
 import com.hairyworld.dms.model.view.DogViewData;
@@ -28,7 +28,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -40,10 +39,8 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Optional;
 
-import static com.hairyworld.dms.util.Path.ICON_IMAGE;
-
 @Component
-public class ClientViewController extends AbstractController implements ApplicationListener<UpdateEntityEvent> {
+public class ClientViewController extends AbstractController implements ApplicationListener<UpdateDataEvent> {
 
 
     @FXML
@@ -152,7 +149,7 @@ public class ClientViewController extends AbstractController implements Applicat
         deleteMenuItem.setOnAction(event -> {
             final DogViewData dogViewData = clientViewDogTable.getSelectionModel().getSelectedItem();
             dmsCommunicationFacadeImpl.deleteClientDog(clientViewData.getId(), dogViewData.getId());
-            context.publishEvent(new NewEntityEvent(stage, dogViewData.getId(), EntityType.DOG));
+            context.publishEvent(new NewDataEvent(stage, dogViewData.getId(), EntityType.DOG));
         });
         contextMenu.getItems().add(deleteMenuItem);
         clientViewDogTable.setRowFactory(tf -> {
@@ -173,7 +170,7 @@ public class ClientViewController extends AbstractController implements Applicat
         scene = new Scene(root);
         stage = new Stage();
         stage.setScene(scene);
-        stage.getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream(ICON_IMAGE)));
+        stage.getIcons().add(getIcon());
         stage.onCloseRequestProperty().setValue(e -> {
             clientViewDataTab.getTabPane().getSelectionModel().selectFirst();
         });
@@ -232,7 +229,7 @@ public class ClientViewController extends AbstractController implements Applicat
                 alert.setHeaderText(null);
                 alert.setTitle("Relacionar mascota");
                 ((Stage) alert.getDialogPane().getScene().getWindow()).getIcons()
-                        .add(new Image(this.getClass().getClassLoader().getResourceAsStream(ICON_IMAGE)));
+                        .add(getIcon());
 
                 final Optional<ButtonType> action = alert.showAndWait();
 
@@ -278,7 +275,7 @@ public class ClientViewController extends AbstractController implements Applicat
                         .build();
 
                 dmsCommunicationFacadeImpl.saveClient(clientViewData);
-                context.publishEvent(new NewEntityEvent(event.getSource(), clientViewData.getId(), EntityType.CLIENT));
+                context.publishEvent(new NewDataEvent(event.getSource(), clientViewData.getId(), EntityType.CLIENT));
                 stage.close();
             }
         });
@@ -290,18 +287,18 @@ public class ClientViewController extends AbstractController implements Applicat
                 final Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setHeaderText(null);
                 ((Stage) alert.getDialogPane().getScene().getWindow()).getIcons()
-                        .add(new Image(this.getClass().getClassLoader().getResourceAsStream(ICON_IMAGE)));
+                        .add(getIcon());
                 alert.setTitle("Borrar cliente");
                 alert.setContentText("¿Estas seguro de que quieres borrar el cliente? " +
                         "Se borraran las citas del cliente, las mascotas que no tengan otro dueño y" +
-                        " se eliminaran los datos del cliente de los pagos.");
+                        " se eliminaran los datos del cliente de los pagos asociados.");
 
                 final Optional<ButtonType> action = alert.showAndWait();
 
                 if (ButtonType.OK.equals(action.orElse(null))) {
                     alert.close();
                     dmsCommunicationFacadeImpl.deleteClient(clientViewData.getId());
-                    context.publishEvent(new DeleteEntityEvent(event.getSource(), clientViewData.getId(), EntityType.CLIENT));
+                    context.publishEvent(new DeleteDataEvent(event.getSource(), clientViewData.getId(), EntityType.CLIENT));
                     stage.close();
                 } else {
                     alert.close();
@@ -315,7 +312,7 @@ public class ClientViewController extends AbstractController implements Applicat
         final SearchTableRow searchTableRow = searchViewController.showView(stage, clientViewData);
         if (searchTableRow != null) {
             dmsCommunicationFacadeImpl.saveClientDog(clientViewData.getId(), Long.parseLong(searchTableRow.getIdString()));
-            context.publishEvent(new NewEntityEvent(stage, Long.parseLong(searchTableRow.getIdString()), EntityType.DOG));
+            context.publishEvent(new NewDataEvent(stage, Long.parseLong(searchTableRow.getIdString()), EntityType.DOG));
         }
     }
 
@@ -394,8 +391,8 @@ public class ClientViewController extends AbstractController implements Applicat
     }
 
     @Override
-    public void onApplicationEvent(final UpdateEntityEvent event) {
-        if (EntityType.DOG.equals(event.getEntityType())) {
+    public void onApplicationEvent(final UpdateDataEvent event) {
+        if (EntityType.DOG.equals(event.getDataType())) {
             clientViewData = dmsCommunicationFacadeImpl.getClientViewData(clientViewData.getId());
             clientViewDogTable.setItems(FXCollections.observableArrayList(clientViewData.getDogs()));
             clientViewDateTable.setItems(FXCollections.observableArrayList(clientViewData.getDates()));

@@ -16,7 +16,7 @@ import java.util.Map;
 @AllArgsConstructor
 @Builder
 @Data
-public class ClientViewData implements SearchTableRow {
+public class ClientViewData implements SearchTableRow, ViewData {
     private Long id;
     private String name;
     private String phone;
@@ -27,6 +27,11 @@ public class ClientViewData implements SearchTableRow {
     private List<DogViewData> dogs;
     private List<DateViewData> dates;
     private List<PaymentViewData> payments;
+
+    @Override
+    public DataType getDataType() {
+        return DataType.CLIENT;
+    }
 
     public String getDogsString() {
         return dogs.stream().map(dog -> dog.getName() + " -> " + dog.getRace())

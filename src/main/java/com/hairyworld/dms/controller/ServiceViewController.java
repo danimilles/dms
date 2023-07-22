@@ -1,8 +1,8 @@
 package com.hairyworld.dms.controller;
 
 import com.hairyworld.dms.model.entity.EntityType;
-import com.hairyworld.dms.model.event.DeleteEntityEvent;
-import com.hairyworld.dms.model.event.NewEntityEvent;
+import com.hairyworld.dms.model.event.DeleteDataEvent;
+import com.hairyworld.dms.model.event.NewDataEvent;
 import com.hairyworld.dms.model.view.ServiceViewData;
 import com.hairyworld.dms.rmi.DmsCommunicationFacade;
 import javafx.fxml.FXML;
@@ -11,7 +11,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -21,10 +20,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-import static com.hairyworld.dms.util.Path.ICON_IMAGE;
-
 @Component
-public class ServiceViewController {
+public class ServiceViewController extends AbstractController {
 
 
     @FXML
@@ -61,7 +58,7 @@ public class ServiceViewController {
         scene = new Scene(root);
         stage = new Stage();
         stage.setScene(scene);
-        stage.getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream(ICON_IMAGE)));
+        stage.getIcons().add(getIcon());
     }
 
     private Validator createValidations() {
@@ -110,7 +107,7 @@ public class ServiceViewController {
                         .build();
 
                 dmsCommunicationFacadeImpl.saveService(serviceViewData);
-                context.publishEvent(new NewEntityEvent(event.getSource(), serviceViewData.getId(), EntityType.SERVICE));
+                context.publishEvent(new NewDataEvent(event.getSource(), serviceViewData.getId(), EntityType.SERVICE));
                 stage.close();
             }
         });
@@ -122,7 +119,7 @@ public class ServiceViewController {
                 final Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setHeaderText(null);
                 ((Stage) alert.getDialogPane().getScene().getWindow()).getIcons()
-                        .add(new Image(this.getClass().getClassLoader().getResourceAsStream(ICON_IMAGE)));
+                        .add(getIcon());
                 alert.setTitle("Borrar servicio");
                 alert.setContentText("¿Estas seguro de que quieres borrar el servicio? " +
                         "Se borraran su informacion de las citas y cobros asociados.");
@@ -132,7 +129,7 @@ public class ServiceViewController {
                 if (ButtonType.OK.equals(action.orElse(null))) {
                     alert.close();
                     dmsCommunicationFacadeImpl.deleteService(serviceViewData);
-                    context.publishEvent(new DeleteEntityEvent(event.getSource(), serviceViewData.getId(), EntityType.SERVICE));
+                    context.publishEvent(new DeleteDataEvent(event.getSource(), serviceViewData.getId(), EntityType.SERVICE));
                     stage.close();
                 } else {
                     alert.close();

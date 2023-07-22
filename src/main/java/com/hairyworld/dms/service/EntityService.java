@@ -1,8 +1,7 @@
 package com.hairyworld.dms.service;
 
-import com.hairyworld.dms.model.entity.EntityType;
-import com.hairyworld.dms.model.entity.DateEntity;
 import com.hairyworld.dms.model.entity.Entity;
+import com.hairyworld.dms.model.entity.EntityType;
 
 import java.util.Collection;
 import java.util.function.Predicate;
@@ -15,8 +14,6 @@ public interface EntityService {
     Entity getEntity(Entity entity);
 
     Collection<Entity> getAllEntitiesMatch(Predicate<Entity> filter, EntityType entityType);
-
-    DateEntity getNextDate(Collection<Entity> dates);
 
     Long saveEntity(Entity entity);
 

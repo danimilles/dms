@@ -18,10 +18,6 @@ public enum TableFilter {
         this.filter = filter;
     }
 
-    public String getFilter() {
-        return filter;
-    }
-
     @Override
     public String toString() {
         return filter;

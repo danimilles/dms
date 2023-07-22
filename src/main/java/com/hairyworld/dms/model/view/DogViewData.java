@@ -15,7 +15,7 @@ import java.util.Map;
 @AllArgsConstructor
 @Builder
 @Data
-public class DogViewData implements SearchTableRow {
+public class DogViewData implements SearchTableRow, ViewData {
     private Long id;
     private String name;
     private String maintainment;
@@ -26,6 +26,11 @@ public class DogViewData implements SearchTableRow {
 
     private List<ClientViewData> clients;
     private List<DateViewData> dates;
+
+    @Override
+    public DataType getDataType() {
+        return DataType.DOG;
+    }
 
     @Override
     public List<TableFilter> getSearchFilters() {

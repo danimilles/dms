@@ -28,7 +28,13 @@ public abstract class EntityRepositoryImpl implements EntityRepository {
     protected static final String RACE_FIELD = "race";
     protected static final String IMAGE_FIELD = "image";
     protected static final String MAINTAINMENT_FIELD = "maintainment";
+    protected static final String DATETIME_FIELD = "datetime";
+    protected static final String AMOUNT = "amount";
     protected static final String PHONE_FIELD = "phone";
+    protected static final String IDSERVICE_FIELD = "idservice";
+    protected static final String DATETIMEEND_FIELD = "datetimeend";
+    protected static final String DATETIMESTART_FIELD = "datetimestart";
+    protected static final String DESCRIPTION_FIELD = "description";
 
 
     protected final NamedParameterJdbcTemplate jdbcTemplate;

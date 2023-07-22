@@ -3,6 +3,7 @@ package com.hairyworld.dms.rmi;
 import com.hairyworld.dms.model.view.ClientViewData;
 import com.hairyworld.dms.model.view.DateViewData;
 import com.hairyworld.dms.model.view.DogViewData;
+import com.hairyworld.dms.model.view.PaymentViewData;
 import com.hairyworld.dms.model.view.SearchTableRow;
 import com.hairyworld.dms.model.view.ServiceViewData;
 
@@ -10,6 +11,10 @@ import java.util.List;
 
 public interface DmsCommunicationFacade {
     List<ClientViewData> getClientTableData();
+
+    void deletePayment(PaymentViewData paymentViewData);
+
+    void savePayment(PaymentViewData paymentViewData);
 
     List<SearchTableRow> getSearchTableData(SearchTableRow searchTableRow);
 

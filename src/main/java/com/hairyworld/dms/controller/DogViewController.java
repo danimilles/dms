@@ -1,9 +1,9 @@
 package com.hairyworld.dms.controller;
 
 import com.hairyworld.dms.model.entity.EntityType;
-import com.hairyworld.dms.model.event.DeleteEntityEvent;
-import com.hairyworld.dms.model.event.NewEntityEvent;
-import com.hairyworld.dms.model.event.UpdateEntityEvent;
+import com.hairyworld.dms.model.event.DeleteDataEvent;
+import com.hairyworld.dms.model.event.NewDataEvent;
+import com.hairyworld.dms.model.event.UpdateDataEvent;
 import com.hairyworld.dms.model.view.ClientViewData;
 import com.hairyworld.dms.model.view.DateViewData;
 import com.hairyworld.dms.model.view.DogViewData;
@@ -52,10 +52,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static com.hairyworld.dms.util.Path.ICON_IMAGE;
-
 @Component
-public class DogViewController extends AbstractController implements ApplicationListener<UpdateEntityEvent> {
+public class DogViewController extends AbstractController implements ApplicationListener<UpdateDataEvent> {
     private static final Logger LOGGER = LogManager.getLogger(DogViewController.class);
 
     private final SearchViewController searchViewController;
@@ -145,7 +143,7 @@ public class DogViewController extends AbstractController implements Application
         deleteMenuItem.setOnAction(event -> {
             final ClientViewData clientViewData = dogViewClientTable.getSelectionModel().getSelectedItem();
             dmsCommunicationFacadeImpl.deleteClientDog(clientViewData.getId(), dogViewData.getId());
-            context.publishEvent(new NewEntityEvent(stage, dogViewData.getId(), EntityType.DOG));
+            context.publishEvent(new NewDataEvent(stage, dogViewData.getId(), EntityType.DOG));
         });
         contextMenu.getItems().add(deleteMenuItem);
         dogViewClientTable.setRowFactory(tf -> {
@@ -169,7 +167,7 @@ public class DogViewController extends AbstractController implements Application
         dogViewNextDate.setDisable(true);
         scene = new Scene(root);
         stage = new Stage();
-        stage.getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream(ICON_IMAGE)));
+        stage.getIcons().add(getIcon());
         stage.setScene(scene);
     }
 
@@ -177,7 +175,7 @@ public class DogViewController extends AbstractController implements Application
         final SearchTableRow searchTableRow = searchViewController.showView(stage, dogViewData);
         if (searchTableRow != null) {
             dmsCommunicationFacadeImpl.saveClientDog(Long.parseLong(searchTableRow.getIdString()), dogViewData.getId());
-            context.publishEvent(new NewEntityEvent(stage, dogViewData.getId(), EntityType.DOG));
+            context.publishEvent(new NewDataEvent(stage, dogViewData.getId(), EntityType.DOG));
         }
     }
 
@@ -254,7 +252,7 @@ public class DogViewController extends AbstractController implements Application
 
                 dmsCommunicationFacadeImpl.saveDog(dogViewData);
                 dogViewData.getClients().forEach(x -> dmsCommunicationFacadeImpl.saveClientDog(x.getId(), dogViewData.getId()));
-                context.publishEvent(new NewEntityEvent(event.getSource(), dogViewData.getId(), EntityType.DOG));
+                context.publishEvent(new NewDataEvent(event.getSource(), dogViewData.getId(), EntityType.DOG));
                 stage.close();
             }
         });
@@ -266,7 +264,7 @@ public class DogViewController extends AbstractController implements Application
                 final Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setHeaderText(null);
                 ((Stage) alert.getDialogPane().getScene().getWindow()).getIcons()
-                        .add(new Image(this.getClass().getClassLoader().getResourceAsStream(ICON_IMAGE)));
+                        .add(getIcon());
                 alert.setTitle("Borrar mascota");
                 alert.setContentText("¿Estas seguro de que quieres borrar la mascota? " +
                         "Se elimiran sus datos de todos los clientes y citas asociados a el.");
@@ -276,7 +274,7 @@ public class DogViewController extends AbstractController implements Application
                 if (ButtonType.OK.equals(action.orElse(null))) {
                     alert.close();
                     dmsCommunicationFacadeImpl.deleteDog(dogViewData.getId());
-                    context.publishEvent(new DeleteEntityEvent(event.getSource(), dogViewData.getId(), EntityType.DOG));
+                    context.publishEvent(new DeleteDataEvent(event.getSource(), dogViewData.getId(), EntityType.DOG));
                     stage.close();
                 } else {
                     alert.close();
@@ -303,7 +301,7 @@ public class DogViewController extends AbstractController implements Application
                     (observable, oldHeight, newHeight) -> popupImageView.setFitHeight(newHeight.doubleValue()));
 
             popupRoot.getChildren().add(popupImageView);
-            popup.getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream(ICON_IMAGE)));
+            popup.getIcons().add(getIcon());
             popup.setScene(popupScene);
             popup.setTitle("Ver imagen");
             popup.initModality(Modality.WINDOW_MODAL);
@@ -352,7 +350,7 @@ public class DogViewController extends AbstractController implements Application
             final Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setHeaderText(null);
             ((Stage) alert.getDialogPane().getScene().getWindow()).getIcons()
-                    .add(new Image(this.getClass().getClassLoader().getResourceAsStream(ICON_IMAGE)));
+                    .add(getIcon());
             alert.setTitle("Error");
             alert.setContentText("La imagen no puede ser mayor de 4MB");
             alert.showAndWait();
@@ -437,8 +435,8 @@ public class DogViewController extends AbstractController implements Application
     }
 
     @Override
-    public void onApplicationEvent(final UpdateEntityEvent event) {
-        if (event.getEntityType().equals(EntityType.DOG) && Objects.equals(event.getId(), dogViewData.getId())) {
+    public void onApplicationEvent(final UpdateDataEvent event) {
+        if (event.getDataType().equals(EntityType.DOG) && Objects.equals(event.getId(), dogViewData.getId())) {
             dogViewData = dmsCommunicationFacadeImpl.getDogViewData(dogViewData.getId());
             if (dogViewData != null) {
                 dogViewClientTable.setItems(FXCollections.observableArrayList(dogViewData.getClients()));

@@ -20,17 +20,6 @@ public class Query {
             Select id, datetimestart, datetimeend, iddog, description, idservice, idclient
             from date""";
 
-    public static final String INSERT_DATE = """ 
-            INSERT OR REPLACE INTO date (%sdatetimestart, datetimeend, iddog, description, idservice, idclient)
-            VALUES (%s:datetimestart, :datetimeend, :iddog, :description, :idservice, :idclient);""";
-
-    public static final String INSERT_SERVICE = """ 
-            INSERT OR REPLACE INTO service (%sdescription)
-            VALUES (%s:description);""";
-    public static final String DELETE_DATE = "Delete from date where id = :id";
-
-    public static final String DELETE_SERVICE = "Delete from service where id = :id";
-
     public static final String SELECT_SERVICES = """
             select description, id
             from service""";
@@ -38,6 +27,26 @@ public class Query {
     public static final String SELECT_PAYMENTS = """
             select id, idservice, idclient, description, datetime, amount
             from payment""";
+
+    public static final String SELECT_TO_DELETE_DOG_FROM_CLIENT = """
+            Select d.id FROM dog d INNER JOIN clientdog cd ON cd.iddog = d.id
+              where cd.idclient = :id and id in
+               (SELECT cd.iddog FROM clientdog cd GROUP BY cd.iddog HAVING count(cd.iddog) = 1)""";
+
+    public static final String INSERT_DATE = """ 
+            INSERT OR REPLACE INTO date (%sdatetimestart, datetimeend, iddog, description, idservice, idclient)
+            VALUES (%s:datetimestart, :datetimeend, :iddog, :description, :idservice, :idclient);""";
+
+    public static final String INSERT_PAYMENT = """ 
+            INSERT OR REPLACE INTO payment (%sdatetime, amount, description, idservice, idclient)
+            VALUES (%s:datetime, :amount, :description, :idservice, :idservice, :idclient);""";
+
+    public static final String INSERT_SERVICE = """ 
+            INSERT OR REPLACE INTO service (%sdescription)
+            VALUES (%s:description);""";
+
+    public static final String INSERT_CLIENTDOG =
+            "INSERT INTO clientdog (iddog, idclient) VALUES (:iddog, :idclient)";
 
     public static final String INSERT_CLIENT = """
             INSERT OR REPLACE INTO client (name, dni, phone, observations)
@@ -55,23 +64,19 @@ public class Query {
             SET name = :name, race = :race, maintainment = :maintainment, observations = :observations, image = :image
             WHERE id = :id""";
 
-    public static final String INSERT_CLIENTDOG =
-            "INSERT INTO clientdog (iddog, idclient) VALUES (:iddog, :idclient)";
-
-    public static final String DELETE_CLIENTDOG = """
-            DELETE FROM clientdog
-            WHERE idclient = :idclient and iddog = :iddog""";
-
-    public static final String DELETE_CLIENT = """
-            DELETE FROM client
+    public static final String UPDATE_SERVICE = """
+            UPDATE service
+            SET description = :description
             WHERE id = :id""";
+    public static final String DELETE_DATE = "DELETE FROM date WHERE id = :id";
 
-    public static final String DELETE_DOG = """
-            DELETE FROM dog
-            WHERE id = :id""";
+    public static final String DELETE_SERVICE = "DELETE FROM service WHERE id = :id";
 
-    public static final String SELECT_TO_DELETE_DOG_FROM_CLIENT = """
-            Select d.id FROM dog d INNER JOIN clientdog cd ON cd.iddog = d.id
-              where cd.idclient = :id and id in
-               (SELECT cd.iddog FROM clientdog cd GROUP BY cd.iddog HAVING count(cd.iddog) = 1)""";
+    public static final String DELETE_PAYMENT = "DELETE FROM payment WHERE id = :id";
+
+    public static final String DELETE_CLIENTDOG = "DELETE FROM clientdog WHERE idclient = :idclient and iddog = :iddog";
+
+    public static final String DELETE_CLIENT = "DELETE FROM client WHERE id = :id";
+
+    public static final String DELETE_DOG = "DELETE FROM dog WHERE id = :id";
 }

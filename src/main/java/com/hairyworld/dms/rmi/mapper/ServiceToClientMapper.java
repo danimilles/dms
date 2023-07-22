@@ -14,18 +14,21 @@ import com.hairyworld.dms.model.view.ServiceViewData;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Set;
 
 public class ServiceToClientMapper {
+
+    private ServiceToClientMapper() {
+    }
+
     public static ClientViewData mapClientDataToMainView(final ClientEntity client, final Set<Entity> dogs, final DateEntity date) {
         return ClientViewData.builder()
                 .id(client.getId())
                 .name(client.getName())
                 .dni(client.getDni())
                 .nextDate(date != null ? date.getDatetimestart() : null)
-                .dogs(dogs.stream().map(dog -> DogViewData.builder().name(((DogEntity) dog).getName()).id(dog.getId())
-                        .race(((DogEntity) dog).getRace()).maintainment(((DogEntity) dog).getMaintainment())
-                        .build()).toList())
+                .dogs(dogs.stream().map(dog -> mapDogDataToDogViewObj((DogEntity) dog)).toList())
                 .phone(client.getPhone())
                 .build();
     }
@@ -39,12 +42,7 @@ public class ServiceToClientMapper {
                 .name(client.getName())
                 .dni(client.getDni())
                 .nextDate(date != null ? date.getDatetimestart() : null)
-                .dogs(dogs.stream().map(dog -> DogViewData.builder()
-                                .name(((DogEntity) dog).getName())
-                                .id(dog.getId())
-                                .race(((DogEntity) dog).getRace())
-                                .maintainment(((DogEntity) dog).getMaintainment()).build())
-                        .toList())
+                .dogs(dogs.stream().map(dog -> mapDogDataToDogViewObj((DogEntity) dog)).toList())
                 .observations(client.getObservations())
                 .dates(dates.stream().map(dateEntity -> DateViewData.builder()
                                 .id(dateEntity.getId())
@@ -53,17 +51,12 @@ public class ServiceToClientMapper {
                                 .description(((DateEntity) dateEntity).getDescription())
                                 .dog(dogs.stream().filter(
                                         dog -> dog.getId().equals(((DateEntity) dateEntity).getIddog()))
-                                        .map(dog -> DogViewData.builder().id(dog.getId()).race(((DogEntity) dog).getRace())
-                                                .name(((DogEntity) dog).getName())
-                                                .maintainment(((DogEntity) dog).getMaintainment()).build())
+                                        .map(dog -> mapDogDataToDogViewObj((DogEntity) dog))
                                         .findFirst()
                                         .orElse(null))
                                 .service(services.stream().filter(
                                         service -> service.getId().equals(((DateEntity) dateEntity).getIdservice()))
-                                        .map(service -> ServiceViewData.builder()
-                                                .id(service.getId())
-                                                .description(((ServiceEntity) service).getDescription())
-                                                .build())
+                                        .map(service -> mapServiceDataToServiceViewObj((ServiceEntity) service))
                                         .findFirst()
                                         .orElse(null))
                                 .build())
@@ -76,10 +69,7 @@ public class ServiceToClientMapper {
                                 .description(((PaymentEntity) payment).getDescription())
                                 .service(services.stream().filter(
                                         service -> service.getId().equals(((PaymentEntity) payment).getIdservice()))
-                                        .map(service -> ServiceViewData.builder()
-                                                .id(service.getId())
-                                                .description(((ServiceEntity) service).getDescription())
-                                                .build())
+                                        .map(service ->  mapServiceDataToServiceViewObj((ServiceEntity) service))
                                         .findFirst()
                                         .orElse(null))
                                 .build())
@@ -102,10 +92,7 @@ public class ServiceToClientMapper {
                                         .orElse(null))
                                 .service(services.stream().filter(
                                         service -> service.getId().equals(((DateEntity) dateEntity).getIdservice()))
-                                        .map(service -> ServiceViewData.builder()
-                                                .id(service.getId())
-                                                .description(((ServiceEntity) service).getDescription())
-                                                .build())
+                                        .map(service -> mapServiceDataToServiceViewObj((ServiceEntity) service))
                                         .findFirst()
                                         .orElse(null))
                                 .build())
@@ -118,6 +105,20 @@ public class ServiceToClientMapper {
                 .id(dog.getId())
                 .image(dog.getImage())
                 .race(dog.getRace())
+                .build();
+    }
+
+    public static PaymentViewData mapPaymentDataToPaymentView(final PaymentEntity payment) {
+        return mapPaymentDataToPaymentViewObj(payment, null);
+    }
+    public static PaymentViewData mapPaymentDataToPaymentViewObj(final PaymentEntity payment,
+                                                                 final ServiceEntity service) {
+        return PaymentViewData.builder()
+                .id(payment.getId())
+                .amount(payment.getAmount())
+                .datetime(payment.getDatetime())
+                .description(payment.getDescription())
+                .service(service != null ? mapServiceDataToServiceViewObj(service) : null)
                 .build();
     }
 
@@ -147,32 +148,12 @@ public class ServiceToClientMapper {
                 .build();
     }
 
-    public static ServiceViewData mapServiceDataToDogViewObj(final ServiceEntity service) {
-        return ServiceViewData.builder()
-                .id(service.getId())
-                .description(service.getDescription())
-                .build();
-    }
-
-    public static DateViewData mapDateToMainViewObj(final Entity date, final Collection<Entity> dogs,
-                                                 final Collection<Entity> clients, final Collection<Entity> services) {
-        return DateViewData.builder()
-                .client(clients.iterator().hasNext() ? mapClientDataToClientViewObj((ClientEntity) clients.iterator().next()) : null)
-                .dog(dogs.iterator().hasNext() ? mapDogDataToDogViewObj((DogEntity) dogs.iterator().next()) : null)
-                .service(services.iterator().hasNext() ? mapServiceDataToDogViewObj((ServiceEntity) services.iterator().next()) : null)
-                .id(date.getId())
-                .description(((DateEntity) date).getDescription())
-                .datetimestart(((DateEntity) date).getDatetimestart())
-                .datetimeend(((DateEntity) date).getDatetimeend())
-                .build();
-    }
-
     public static DateViewData mapDateToMainViewObj(final Entity entry, final DogEntity dog,
                                                     final ClientEntity client, final ServiceEntity service) {
         return DateViewData.builder()
                 .client(client != null ? mapClientDataToClientViewObj(client) : null)
                 .dog(dog != null ? mapDogDataToDogViewObj(dog) : null)
-                .service(service != null ? mapServiceDataToDogViewObj(service) : null)
+                .service(service != null ? mapServiceDataToServiceViewObj(service) : null)
                 .id(entry.getId())
                 .description(((DateEntity) entry).getDescription())
                 .datetimestart(((DateEntity) entry).getDatetimestart())
@@ -186,4 +167,13 @@ public class ServiceToClientMapper {
                 .description(service.getDescription())
                 .build();
     }
+
+    public static DateEntity getNextDate(final Collection<Entity> dates) {
+        return (DateEntity) dates
+                .stream()
+                .filter(entity -> ((DateEntity) entity).getDatetimestart().getMillis() >= System.currentTimeMillis())
+                .min(Comparator.comparing(date -> ((DateEntity) date).getDatetimestart()))
+                .orElse(null);
+    }
+
 }

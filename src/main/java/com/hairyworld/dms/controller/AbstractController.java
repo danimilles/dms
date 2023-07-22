@@ -1,7 +1,10 @@
 package com.hairyworld.dms.controller;
 
 import javafx.scene.control.TableView;
+import javafx.scene.image.Image;
 import org.apache.logging.log4j.util.Strings;
+
+import static com.hairyworld.dms.util.Path.ICON_IMAGE;
 
 public abstract class AbstractController {
 
@@ -14,5 +17,9 @@ public abstract class AbstractController {
 
     protected String toLower(final String string){
         return Strings.isEmpty(string) ? Strings.EMPTY : string.toLowerCase();
+    }
+
+    protected Image getIcon() {
+        return new Image(this.getClass().getClassLoader().getResourceAsStream(ICON_IMAGE));
     }
 }

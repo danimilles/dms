@@ -26,7 +26,9 @@ public class DateEntity implements Entity {
     }
 
     public boolean isRelatedTo(final Long id, final EntityType type) {
-        if (type == EntityType.CLIENT) {
+        if (type == EntityType.DATE) {
+            return this.id.equals(id);
+        } else if (type == EntityType.CLIENT) {
             return id.equals(idclient);
         } else if (type == EntityType.DOG) {
             return id.equals(idclient);

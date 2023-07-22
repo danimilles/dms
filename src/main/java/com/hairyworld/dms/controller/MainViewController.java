@@ -9,9 +9,9 @@ import com.calendarfx.model.LoadEvent;
 import com.calendarfx.view.CalendarView;
 import com.calendarfx.view.DateControl;
 import com.hairyworld.dms.model.entity.EntityType;
-import com.hairyworld.dms.model.event.DeleteEntityEvent;
-import com.hairyworld.dms.model.event.NewEntityEvent;
-import com.hairyworld.dms.model.event.UpdateEntityEvent;
+import com.hairyworld.dms.model.event.DeleteDataEvent;
+import com.hairyworld.dms.model.event.NewDataEvent;
+import com.hairyworld.dms.model.event.UpdateDataEvent;
 import com.hairyworld.dms.model.view.ClientViewData;
 import com.hairyworld.dms.model.view.DateViewData;
 import com.hairyworld.dms.model.view.DateViewDataEntryWrapper;
@@ -61,7 +61,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Component
-public class MainViewController extends AbstractController implements ApplicationListener<UpdateEntityEvent> {
+public class MainViewController extends AbstractController implements ApplicationListener<UpdateDataEvent> {
 
     private final DmsCommunicationFacade dmsCommunicationFacadeImpl;
     private final ClientViewController clientViewController;
@@ -322,25 +322,25 @@ public class MainViewController extends AbstractController implements Applicatio
     }
 
     @Override
-    public void onApplicationEvent(final UpdateEntityEvent event) {
-        if (event.getEntityType().equals(EntityType.CLIENT) ||
-                event.getEntityType().equals(EntityType.DOG) ||
-                event.getEntityType().equals(EntityType.DATE)) {
+    public void onApplicationEvent(final UpdateDataEvent event) {
+        if (event.getDataType().equals(EntityType.CLIENT) ||
+                event.getDataType().equals(EntityType.DOG) ||
+                event.getDataType().equals(EntityType.DATE)) {
             clientTableData = FXCollections.observableList(dmsCommunicationFacadeImpl.getClientTableData());
             clientTable.setItems(clientTableData);
         }
-        if (event.getEntityType().equals(EntityType.SERVICE)) {
+        if (event.getDataType().equals(EntityType.SERVICE)) {
             serviceTableData = FXCollections.observableList(dmsCommunicationFacadeImpl.getServiceViewTableData());
             serviceTable.setItems(serviceTableData);
         }
-        if (event instanceof DeleteEntityEvent) {
-            if (EntityType.SERVICE.equals(event.getEntityType()) ||
-                    EntityType.DOG.equals(event.getEntityType())) {
+        if (event instanceof DeleteDataEvent) {
+            if (EntityType.SERVICE.equals(event.getDataType()) ||
+                    EntityType.DOG.equals(event.getDataType())) {
                 calendar.findEntries("").stream().filter(entry ->
                                 ((DateViewDataEntryWrapper) entry.getUserObject())
-                                        .toDateViewData().isRelatedTo(event.getId(), event.getEntityType()))
+                                        .toDateViewData().isRelatedTo(event.getId(), event.getDataType()))
                         .forEach(entry -> {
-                            if (EntityType.DOG.equals(event.getEntityType())) {
+                            if (EntityType.DOG.equals(event.getDataType())) {
                                 ((DateViewDataEntryWrapper) entry.getUserObject()).getDog().set(null);
                             }else {
                                 ((DateViewDataEntryWrapper) entry.getUserObject()).getService().set(null);
@@ -350,7 +350,7 @@ public class MainViewController extends AbstractController implements Applicatio
             } else {
                 calendar.findEntries("").stream().filter(entry ->
                                 ((DateViewDataEntryWrapper) entry.getUserObject())
-                                        .toDateViewData().isRelatedTo(event.getId(), event.getEntityType()))
+                                        .toDateViewData().isRelatedTo(event.getId(), event.getDataType()))
                         .forEach(entry -> calendar.removeEntry(entry));
             }
         }
@@ -377,11 +377,11 @@ public class MainViewController extends AbstractController implements Applicatio
             if (param.getEventType().equals(CalendarEvent.ENTRY_CALENDAR_CHANGED) &&
                     ((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getId().get() != null) {
                 dmsCommunicationFacadeImpl.deleteDate(((DateViewDataEntryWrapper) param.getEntry().getUserObject()).toDateViewData());
-                context.publishEvent(new DeleteEntityEvent(param.getSource(), entry.getUserObject().getId().get(), EntityType.DATE));
+                context.publishEvent(new DeleteDataEvent(param.getSource(), entry.getUserObject().getId().get(), EntityType.DATE));
             } else {
                 if (entry.getUserObject().getInterval().get() != null) {
                     entry.getUserObject().getId().set(dmsCommunicationFacadeImpl.saveDate(entry.getUserObject().toDateViewData()));
-                    context.publishEvent(new NewEntityEvent(param.getSource(), entry.getUserObject().getId().get(), EntityType.DATE));
+                    context.publishEvent(new NewDataEvent(param.getSource(), entry.getUserObject().getId().get(), EntityType.DATE));
                 }
             }
         };
@@ -431,7 +431,7 @@ public class MainViewController extends AbstractController implements Applicatio
         return (observable, oldValue, newValue) -> {
             dmsCommunicationFacadeImpl.saveDate((entry.getUserObject()).toDateViewData());
             entry.setTitle(entry.getUserObject().getEntryTile());
-            context.publishEvent(new NewEntityEvent(root, entry.getUserObject().getId().get(), EntityType.DATE));
+            context.publishEvent(new NewDataEvent(root, entry.getUserObject().getId().get(), EntityType.DATE));
         };
 
     }

@@ -4,16 +4,22 @@ import com.hairyworld.dms.model.entity.ClientEntity;
 import com.hairyworld.dms.model.entity.DateEntity;
 import com.hairyworld.dms.model.entity.DogEntity;
 import com.hairyworld.dms.model.entity.Entity;
+import com.hairyworld.dms.model.entity.PaymentEntity;
 import com.hairyworld.dms.model.entity.ServiceEntity;
 import com.hairyworld.dms.model.view.ClientViewData;
 import com.hairyworld.dms.model.view.DateViewData;
 import com.hairyworld.dms.model.view.DogViewData;
+import com.hairyworld.dms.model.view.PaymentViewData;
 import com.hairyworld.dms.model.view.ServiceViewData;
 
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
 public class ClientToServiceMapper {
+
+    private ClientToServiceMapper() {
+    }
+
     public static ClientEntity mapClientDataToClientEntity(final ClientViewData clientData) {
         return ClientEntity.builder()
                 .id(clientData.getId())
@@ -55,6 +61,16 @@ public class ClientToServiceMapper {
         return ServiceEntity.builder()
                 .id(serviceViewData.getId())
                 .description(serviceViewData.getDescription())
+                .build();
+    }
+
+    public static Entity mapPaymentDataToPaymentEntity(final PaymentViewData paymentViewData) {
+        return PaymentEntity.builder()
+                .id(paymentViewData.getId())
+                .amount(paymentViewData.getAmount())
+                .datetime(paymentViewData.getDatetime())
+                .idclient(paymentViewData.getClient() != null ? paymentViewData.getClient().getId() : null)
+                .idservice(paymentViewData.getService() != null ? paymentViewData.getService().getId() : null)
                 .build();
     }
 }

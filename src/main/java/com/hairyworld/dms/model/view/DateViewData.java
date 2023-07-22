@@ -1,6 +1,5 @@
 package com.hairyworld.dms.model.view;
 
-import com.hairyworld.dms.model.entity.EntityType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +10,7 @@ import org.joda.time.DateTime;
 @AllArgsConstructor
 @Builder
 @Data
-public class DateViewData {
+public class DateViewData implements ViewData {
     private Long id;
     private DateTime datetimestart;
     private DateTime datetimeend;
@@ -21,14 +20,19 @@ public class DateViewData {
     private ClientViewData client;
     private ServiceViewData service;
 
-    public boolean isRelatedTo(final Long id, final EntityType type) {
-        if (type == EntityType.CLIENT) {
+    @Override
+    public DataType getDataType() {
+        return DataType.DATE;
+    }
+
+    public boolean isRelatedTo(final Long id, final DataType type) {
+        if (type == DataType.DATE) {
             return this.id.equals(id);
-        } else if (type == EntityType.CLIENT) {
+        } else if (type == DataType.CLIENT) {
             return client != null && client.getId().equals(id);
-        } else if (type == EntityType.DOG) {
+        } else if (type == DataType.DOG) {
             return dog != null && dog.getId().equals(id);
-        } else if (type == EntityType.SERVICE) {
+        } else if (type == DataType.SERVICE) {
             return service != null && service.getId().equals(id);
         } else {
             return false;
