@@ -4,9 +4,11 @@ import com.hairyworld.dms.model.entity.ClientEntity;
 import com.hairyworld.dms.model.entity.DateEntity;
 import com.hairyworld.dms.model.entity.DogEntity;
 import com.hairyworld.dms.model.entity.Entity;
+import com.hairyworld.dms.model.entity.ServiceEntity;
 import com.hairyworld.dms.model.view.ClientViewData;
 import com.hairyworld.dms.model.view.DateViewData;
 import com.hairyworld.dms.model.view.DogViewData;
+import com.hairyworld.dms.model.view.ServiceViewData;
 
 import java.util.HashSet;
 import java.util.stream.Collectors;
@@ -46,6 +48,13 @@ public class ClientToServiceMapper {
                 .iddog(dateViewData.getDog() != null ? dateViewData.getDog().getId() : null)
                 .idclient(dateViewData.getClient() != null ? dateViewData.getClient().getId() : null)
                 .idservice(dateViewData.getService() != null ? dateViewData.getService().getId() : null)
+                .build();
+    }
+
+    public static Entity mapServiceDataToServiceEntity(final ServiceViewData serviceViewData) {
+        return ServiceEntity.builder()
+                .id(serviceViewData.getId())
+                .description(serviceViewData.getDescription())
                 .build();
     }
 }

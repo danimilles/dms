@@ -5,8 +5,12 @@ import com.calendarfx.model.CalendarEvent;
 import com.calendarfx.model.CalendarSource;
 import com.calendarfx.model.Entry;
 import com.calendarfx.model.Interval;
+import com.calendarfx.model.LoadEvent;
 import com.calendarfx.view.CalendarView;
 import com.calendarfx.view.DateControl;
+import com.hairyworld.dms.model.entity.EntityType;
+import com.hairyworld.dms.model.event.DeleteEntityEvent;
+import com.hairyworld.dms.model.event.NewEntityEvent;
 import com.hairyworld.dms.model.event.UpdateEntityEvent;
 import com.hairyworld.dms.model.view.ClientViewData;
 import com.hairyworld.dms.model.view.DateViewData;
@@ -39,7 +43,6 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.apache.logging.log4j.util.Strings;
-import org.controlsfx.control.PopOver;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -48,6 +51,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -63,21 +67,34 @@ public class MainViewController extends AbstractController implements Applicatio
     private final ClientViewController clientViewController;
     private final ApplicationContext context;
     private final SearchViewController searchViewController;
+    private final ServiceViewController serviceViewController;
+
+    @FXML
+    private TableColumn<ServiceViewData, String> serviceTableServiceColumn;
+    @FXML
+    private TableView<ServiceViewData> serviceTable;
 
     private ObservableList<ClientViewData> clientTableData;
+    private ObservableList<ServiceViewData> serviceTableData;
 
     @FXML
     private GridPane calendarPane;
 
     @FXML
     private Button addClientButton;
+    @FXML
+    private Button addServiceButton;
 
     @FXML
     private HBox searchHBox;
     @FXML
     private ChoiceBox<TableFilter> clientSearchField;
     @FXML
+    private ChoiceBox<TableFilter> serviceFilter;
+    @FXML
     private TextField clientSearchText;
+    @FXML
+    private TextField serviceFilterText;
     private DatePicker clientSearchDatePicker;
 
     @FXML
@@ -100,18 +117,18 @@ public class MainViewController extends AbstractController implements Applicatio
     private GridPane root;
 
     private CalendarView calendarView;
-    private DateViewData dateViewData;
     private Calendar<DateViewData> calendar;
-    private PopOver entryPopOver;
 
     public MainViewController(final DmsCommunicationFacade dmsCommunicationFacadeImpl,
                               final ClientViewController clientViewController,
                               final ApplicationContext context,
-                              final SearchViewController searchViewController) {
+                              final SearchViewController searchViewController,
+                              final ServiceViewController serviceViewController) {
         this.dmsCommunicationFacadeImpl = dmsCommunicationFacadeImpl;
         this.clientViewController = clientViewController;
         this.context = context;
         this.searchViewController = searchViewController;
+        this.serviceViewController = serviceViewController;
     }
 
     @FXML
@@ -119,8 +136,11 @@ public class MainViewController extends AbstractController implements Applicatio
         createCalendar();
         scheduleUpdateCalendarTime();
         initClientTable();
+        initServiceTable();
+        createTableResponsiveness(serviceTable);
         createTableResponsiveness(clientTable);
         addClientButton.setOnAction(event -> showClientView(null));
+        addServiceButton.setOnAction(event -> showServiceView(null));
     }
 
     private void initClientTable() {
@@ -137,6 +157,33 @@ public class MainViewController extends AbstractController implements Applicatio
 
         clientTable.setItems(clientTableData);
         createTableControls();
+    }
+
+    private void initServiceTable() {
+        serviceTableData = FXCollections.observableList(dmsCommunicationFacadeImpl.getServiceViewTableData());
+        serviceTableServiceColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDescription()));
+        serviceTableServiceColumn.setSortType(TableColumn.SortType.ASCENDING);
+        serviceTable.setItems(serviceTableData);
+        createServiceTableControls();
+    }
+
+    private void createServiceTableControls() {
+        serviceFilter.setItems(FXCollections.observableArrayList(TableFilter.NO_FILTER, TableFilter.SERVICE));
+        serviceFilter.setValue(TableFilter.NO_FILTER);
+        serviceFilterText.setDisable(true);
+
+        createServiceSearchFieldListener();
+        createServiceSearchTextListener();
+
+        serviceTable.setRowFactory(tf -> {
+            final TableRow<ServiceViewData> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty()) ) {
+                    showServiceView(serviceTable.getSelectionModel().getSelectedItem().getId());
+                }
+            });
+            return row;
+        });
     }
 
     private void createTableControls() {
@@ -167,6 +214,10 @@ public class MainViewController extends AbstractController implements Applicatio
 
     private void showClientView(final Long selectedItem) {
         clientViewController.showView((Stage) root.getScene().getWindow(), selectedItem);
+    }
+
+    private void showServiceView(final Long selectedItem) {
+        serviceViewController.showView((Stage) root.getScene().getWindow(), selectedItem);
     }
 
     private void createClientSearchDatePickerListener() {
@@ -207,6 +258,19 @@ public class MainViewController extends AbstractController implements Applicatio
         });
     }
 
+    private void createServiceSearchTextListener() {
+        serviceFilterText.setOnKeyTyped(event -> {
+            if (serviceFilter.getValue() != null) {
+                if (serviceFilter.getValue() == TableFilter.SERVICE) {
+                    serviceTable.setItems(serviceTableData.filtered(serviceData ->
+                            toLower(serviceData.getDescription()).contains(toLower(serviceFilterText.getText()))));
+                } else {
+                    clientTable.setItems(clientTableData);
+                }
+            }
+        });
+    }
+
 
     private void createClientSearchFieldListener() {
         clientSearchField.setOnAction(event -> {
@@ -237,6 +301,15 @@ public class MainViewController extends AbstractController implements Applicatio
         });
     }
 
+    private void createServiceSearchFieldListener() {
+        serviceFilter.setOnAction(event -> {
+            serviceFilterText.setText(Strings.EMPTY);
+            serviceTable.setItems(FXCollections.observableList(serviceTableData));
+
+            serviceFilterText.setDisable(serviceFilter.getValue().equals(TableFilter.NO_FILTER));
+        });
+    }
+
     private void scheduleUpdateCalendarTime() {
         try (final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor()) {
             executor.scheduleAtFixedRate(() ->
@@ -250,8 +323,37 @@ public class MainViewController extends AbstractController implements Applicatio
 
     @Override
     public void onApplicationEvent(final UpdateEntityEvent event) {
-        clientTableData = FXCollections.observableList(dmsCommunicationFacadeImpl.getClientTableData());
-        clientTable.setItems(clientTableData);
+        if (event.getEntityType().equals(EntityType.CLIENT) ||
+                event.getEntityType().equals(EntityType.DOG) ||
+                event.getEntityType().equals(EntityType.DATE)) {
+            clientTableData = FXCollections.observableList(dmsCommunicationFacadeImpl.getClientTableData());
+            clientTable.setItems(clientTableData);
+        }
+        if (event.getEntityType().equals(EntityType.SERVICE)) {
+            serviceTableData = FXCollections.observableList(dmsCommunicationFacadeImpl.getServiceViewTableData());
+            serviceTable.setItems(serviceTableData);
+        }
+        if (event instanceof DeleteEntityEvent) {
+            if (EntityType.SERVICE.equals(event.getEntityType()) ||
+                    EntityType.DOG.equals(event.getEntityType())) {
+                calendar.findEntries("").stream().filter(entry ->
+                                ((DateViewDataEntryWrapper) entry.getUserObject())
+                                        .toDateViewData().isRelatedTo(event.getId(), event.getEntityType()))
+                        .forEach(entry -> {
+                            if (EntityType.DOG.equals(event.getEntityType())) {
+                                ((DateViewDataEntryWrapper) entry.getUserObject()).getDog().set(null);
+                            }else {
+                                ((DateViewDataEntryWrapper) entry.getUserObject()).getService().set(null);
+                            }
+                            entry.setTitle(((DateViewDataEntryWrapper) entry.getUserObject()).getEntryTile());
+                        });
+            } else {
+                calendar.findEntries("").stream().filter(entry ->
+                                ((DateViewDataEntryWrapper) entry.getUserObject())
+                                        .toDateViewData().isRelatedTo(event.getId(), event.getEntityType()))
+                        .forEach(entry -> calendar.removeEntry(entry));
+            }
+        }
     }
 
     // dates
@@ -271,13 +373,15 @@ public class MainViewController extends AbstractController implements Applicatio
         calendarView.setDefaultCalendarProvider(param -> calendar);
 
         final EventHandler<CalendarEvent> calendarE = param -> {
+            final Entry<DateViewDataEntryWrapper> entry = (Entry<DateViewDataEntryWrapper>) param.getEntry();
             if (param.getEventType().equals(CalendarEvent.ENTRY_CALENDAR_CHANGED) &&
                     ((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getId().get() != null) {
                 dmsCommunicationFacadeImpl.deleteDate(((DateViewDataEntryWrapper) param.getEntry().getUserObject()).toDateViewData());
+                context.publishEvent(new DeleteEntityEvent(param.getSource(), entry.getUserObject().getId().get(), EntityType.DATE));
             } else {
-                final Entry<DateViewDataEntryWrapper> entry = (Entry<DateViewDataEntryWrapper>) param.getEntry();
                 if (entry.getUserObject().getInterval().get() != null) {
                     entry.getUserObject().getId().set(dmsCommunicationFacadeImpl.saveDate(entry.getUserObject().toDateViewData()));
+                    context.publishEvent(new NewEntityEvent(param.getSource(), entry.getUserObject().getId().get(), EntityType.DATE));
                 }
             }
         };
@@ -287,6 +391,8 @@ public class MainViewController extends AbstractController implements Applicatio
 
         final CalendarSource calendarSource = new CalendarSource("Citas");
         calendarSource.getCalendars().add(calendar);
+        calendarView.addEventHandler(LoadEvent.LOAD, evt -> evt.getCalendarSources().removeIf(x->!x.equals(calendarSource)));
+
         calendarView.getCalendarSources().add(calendarSource);
         calendarView.setDefaultCalendarProvider(param -> calendarSource.getCalendars().get(0));
         calendarView.setEntryDetailsPopOverContentCallback(this::createPopOverContent);
@@ -325,6 +431,7 @@ public class MainViewController extends AbstractController implements Applicatio
         return (observable, oldValue, newValue) -> {
             dmsCommunicationFacadeImpl.saveDate((entry.getUserObject()).toDateViewData());
             entry.setTitle(entry.getUserObject().getEntryTile());
+            context.publishEvent(new NewEntityEvent(root, entry.getUserObject().getId().get(), EntityType.DATE));
         };
 
     }
@@ -374,7 +481,7 @@ public class MainViewController extends AbstractController implements Applicatio
             list.add(null);
             list.addAll(dmsCommunicationFacadeImpl.getClientViewData(
                     ((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getClient().get().getId()).getDogs());
-            dogTextField.setItems(FXCollections.observableList(list));
+            dogTextField.setItems(FXCollections.observableList(list).sorted(Comparator.comparing(DogViewData::getName)));
             dogTextField.setDisable(false);
         }
 
@@ -406,7 +513,7 @@ public class MainViewController extends AbstractController implements Applicatio
                     list.add(null);
                     list.addAll(dmsCommunicationFacadeImpl.getClientViewData(
                                     ((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getClient().get().getId()).getDogs());
-                    dogTextField.setItems(FXCollections.observableList(list));
+                    dogTextField.setItems(FXCollections.observableList(list).sorted(Comparator.comparing(DogViewData::getName)));
                 }
             dogTextField.setDisable(newValue == null);
         });
@@ -466,9 +573,15 @@ public class MainViewController extends AbstractController implements Applicatio
 
             @Override
             public Interval fromString(final String string) {
-                return new Interval()
-                        .withEndDateTime(LocalDateTime.parse(string, DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")))
-                        .withStartDateTime(intervalProperty.get().getStartDateTime());
+                try {
+                    return new Interval()
+                            .withEndDateTime(LocalDateTime.parse(string, DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")))
+                            .withStartDateTime(intervalProperty.get().getStartDateTime());
+                } catch (DateTimeParseException e) {
+                    return new Interval()
+                            .withEndDateTime(intervalProperty.get().getEndDateTime())
+                            .withStartDateTime(intervalProperty.get().getStartDateTime());
+                }
             }
         };
     }
@@ -482,9 +595,15 @@ public class MainViewController extends AbstractController implements Applicatio
 
             @Override
             public Interval fromString(final String string) {
+            try {
                 return new Interval()
                         .withEndDateTime(intervalProperty.get().getEndDateTime())
                         .withStartDateTime(LocalDateTime.parse(string, DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+            } catch (DateTimeParseException e) {
+                return new Interval()
+                        .withEndDateTime(intervalProperty.get().getEndDateTime())
+                        .withStartDateTime(intervalProperty.get().getStartDateTime());
+            }
             }
         };
     }

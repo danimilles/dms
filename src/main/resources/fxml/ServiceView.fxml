@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane fx:id="root" maxWidth="1.7976931348623157E308" minWidth="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.hairyworld.dms.controller.ServiceViewController">
+   <columnConstraints>
+      <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints fillHeight="false" minHeight="60.0" valignment="TOP" vgrow="NEVER" />
+      <RowConstraints minHeight="60.0" valignment="TOP" />
+   </rowConstraints>
+   <children>
+      <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="60.0" GridPane.hgrow="ALWAYS" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
+         <children>
+            <VBox>
+               <children>
+                  <Label minHeight="-Infinity" minWidth="35.0" text="Descripcion">
+                     <padding>
+                        <Insets bottom="5.0" />
+                     </padding>
+                  </Label>
+               </children>
+               <padding>
+                  <Insets bottom="5.0" left="20.0" right="20.0" top="22.0" />
+               </padding>
+            </VBox>
+            <VBox alignment="CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" HBox.hgrow="ALWAYS">
+               <children>
+                  <TextField fx:id="descriptionField" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </TextField>
+               </children>
+               <HBox.margin>
+                  <Insets right="10.0" top="17.0" />
+               </HBox.margin>
+            </VBox>
+         </children>
+         <padding>
+            <Insets right="10.0" />
+         </padding>
+      </HBox>
+      <VBox layoutX="10.0" layoutY="148.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.rowIndex="1">
+         <children>
+            <HBox alignment="TOP_CENTER" fillHeight="false" maxWidth="1.7976931348623157E308" VBox.vgrow="NEVER">
+               <children>
+                  <Button fx:id="submitButton" alignment="BOTTOM_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" text="Guardar servicio" textAlignment="CENTER" HBox.hgrow="ALWAYS">
+                     <HBox.margin>
+                        <Insets right="20.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button fx:id="deleteButton" alignment="BOTTOM_RIGHT" contentDisplay="RIGHT" layoutX="276.0" layoutY="10.0" mnemonicParsing="false" text="Borrar servicio" textAlignment="CENTER" HBox.hgrow="ALWAYS">
+                     <HBox.margin>
+                        <Insets left="20.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="20.0" left="10.0" right="10.0" />
+         </padding>
+      </VBox>
+   </children>
+</GridPane>

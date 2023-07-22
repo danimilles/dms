@@ -36,4 +36,10 @@ public interface DmsCommunicationFacade {
     void deleteDate(DateViewData dateViewData);
 
     List<ServiceViewData> getServiceViewTableData();
+
+    ServiceViewData getServiceViewData(Long serviceId);
+
+    void deleteService(ServiceViewData serviceViewData);
+
+    void saveService(ServiceViewData serviceViewData);
 }

@@ -9,6 +9,7 @@ public enum TableFilter {
     MANTAINMENT("Mantenimiento"),
     NEXT_DATE("Proxima cita"),
     OBSERVATIONS("Observaciones"),
+    SERVICE("Servicio"),
     RACE("Raza");
 
     private final String filter;

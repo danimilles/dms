@@ -127,7 +127,7 @@ public class ClientViewController extends AbstractController implements Applicat
 
 
     public ClientViewController(final DmsCommunicationFacade dmsCommunicationFacadeImpl, final ApplicationContext context,
-                                final DogViewController dogViewController, SearchViewController searchViewController) {
+                                final DogViewController dogViewController, final SearchViewController searchViewController) {
         this.dmsCommunicationFacadeImpl = dmsCommunicationFacadeImpl;
         this.context = context;
         this.dogViewController = dogViewController;

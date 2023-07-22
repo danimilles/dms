@@ -42,7 +42,7 @@ create table main.date
     datetimeend    TEXT    not null,
     iddog     integer
         constraint date_dog_id_fk
-            references dog on delete set null,
+            references dog(id) on delete set null,
     description TEXT,
     idservice  integer constraint date_service_id_fk
         references service on delete set null,

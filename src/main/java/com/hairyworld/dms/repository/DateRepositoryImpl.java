@@ -21,7 +21,7 @@ public class DateRepositoryImpl extends EntityRepositoryImpl {
     public static final String IDSERVICE_FIELD = "idservice";
     public static final String DATETIMEEND_FIELD = "datetimeend";
     public static final String DATETIMESTART_FIELD = "datetimestart";
-    public static final String DESCRIPTION = "description";
+    public static final String DESCRIPTION_FIELD = "description";
 
     public DateRepositoryImpl(final DataSource dataSource) {
         super(dataSource, LOGGER);
@@ -54,7 +54,7 @@ public class DateRepositoryImpl extends EntityRepositoryImpl {
                 parameters.addValue(ID_FIELD, dateEntity.getId());
             }
 
-            parameters.addValue(DESCRIPTION, dateEntity.getDescription());
+            parameters.addValue(DESCRIPTION_FIELD, dateEntity.getDescription());
             parameters.addValue(DATETIMESTART_FIELD, DmsUtils.dateToString(dateEntity.getDatetimestart()));
             parameters.addValue(DATETIMEEND_FIELD, DmsUtils.dateToString(dateEntity.getDatetimeend()));
             parameters.addValue(IDDOG_FIELD, dateEntity.getIddog());

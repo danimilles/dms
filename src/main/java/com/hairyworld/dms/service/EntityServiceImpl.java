@@ -1,11 +1,11 @@
 package com.hairyworld.dms.service;
 
 import com.hairyworld.dms.cache.CacheManager;
-import com.hairyworld.dms.model.entity.EntityType;
 import com.hairyworld.dms.model.entity.ClientEntity;
 import com.hairyworld.dms.model.entity.DateEntity;
 import com.hairyworld.dms.model.entity.DogEntity;
 import com.hairyworld.dms.model.entity.Entity;
+import com.hairyworld.dms.model.entity.EntityType;
 import com.hairyworld.dms.repository.ClientRepositoryImpl;
 import com.hairyworld.dms.repository.EntityRepository;
 import com.hairyworld.dms.repository.EntityRepositoryImpl;
@@ -118,11 +118,14 @@ public class EntityServiceImpl implements EntityService {
             final List<Long> iddogs = ((ClientRepositoryImpl) entityRepositoryMap.get(EntityType.CLIENT)).getDogToDeleteForClient(entity.getId());
             iddogs.forEach(iddog -> entityRepositoryMap.get(EntityType.DOG).delete(iddog));
             cacheManager.removeAllMatch(ent -> iddogs.contains(ent.getId()), EntityType.DOG);
+            cacheManager.removeAllMatch(ent -> ((DateEntity)ent).isRelatedTo(entity.getId(), EntityType.CLIENT), EntityType.DATE);
         }
 
         if (entity.getEntityType().equals(EntityType.DOG)) {
             cacheManager.getAllMatch(client -> ((ClientEntity) client).getDogIds().contains(entity.getId()), EntityType.CLIENT)
                     .forEach(client -> ((ClientEntity)client).getDogIds().remove(entity.getId()));
+            cacheManager.getAllMatch(date -> ((DateEntity) date).isRelatedTo(entity.getId(), EntityType.DOG), EntityType.DATE)
+                    .forEach(date -> ((DateEntity)date).setIddog(null));
         }
 
         entityRepositoryMap.get(entity.getEntityType()).delete(entity.getId());

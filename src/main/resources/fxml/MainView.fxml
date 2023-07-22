@@ -180,7 +180,7 @@
                            <children>
                               <HBox>
                                  <children>
-                                    <Button mnemonicParsing="false" text="Añadir servicio" GridPane.halignment="RIGHT">
+                                    <Button fx:id="addServiceButton" mnemonicParsing="false" text="Añadir servicio" GridPane.halignment="RIGHT">
                                        <GridPane.margin>
                                           <Insets right="20.0" />
                                        </GridPane.margin>
@@ -201,12 +201,12 @@
                                           <Insets left="20.0" right="8.0" />
                                        </padding>
                                     </Label>
-                                    <ChoiceBox prefWidth="150.0">
+                                    <ChoiceBox fx:id="serviceFilter" prefWidth="150.0">
                                        <HBox.margin>
                                           <Insets right="10.0" />
                                        </HBox.margin>
                                     </ChoiceBox>
-                                    <TextField prefHeight="25.0" prefWidth="554.0">
+                                    <TextField fx:id="serviceFilterText" prefHeight="25.0" prefWidth="554.0">
                                        <HBox.margin>
                                           <Insets left="15.0" />
                                        </HBox.margin>
@@ -220,12 +220,9 @@
                         </VBox>
                         <VBox GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.valignment="BOTTOM" GridPane.vgrow="ALWAYS">
                            <children>
-                              <TableView fx:id="clientViewDateTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                              <TableView fx:id="serviceTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
                                  <columns>
-                                    <TableColumn fx:id="clientViewDateTableServiceColumn" maxWidth="1.7976931348623157E308" prefWidth="261.0" text="Servicio" />
-                                    <TableColumn fx:id="clientViewDateTableDescriptionColumn" maxWidth="1.7976931348623157E308" prefWidth="305.0" text="Descripcion" />
-                                    <TableColumn fx:id="clientViewDateTableAmountColumn" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="104.0" text="Precio" />
-                                    <TableColumn fx:id="clientViewDateTableActionsColumn" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="181.0" text="Acciones" />
+                                    <TableColumn fx:id="serviceTableServiceColumn" maxWidth="1.7976931348623157E308" prefWidth="261.0" text="Servicio" />
                                  </columns>
                                  <HBox.margin>
                                     <Insets bottom="1.0" />
@@ -299,7 +296,7 @@
                                     <TableColumn maxWidth="1.7976931348623157E308" prefWidth="152.0" text="Fecha" />
                                     <TableColumn maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="209.0" text="Servicio" />
                                     <TableColumn maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="215.0" text="Cliente" />
-                                    <TableColumn maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="165.0" text="Acciones" />
+                                    <TableColumn maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="165.0" text="Descripcion" />
                                  </columns>
                                  <HBox.margin>
                                     <Insets bottom="1.0" />

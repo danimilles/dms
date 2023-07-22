@@ -23,8 +23,13 @@ public class Query {
     public static final String INSERT_DATE = """ 
             INSERT OR REPLACE INTO date (%sdatetimestart, datetimeend, iddog, description, idservice, idclient)
             VALUES (%s:datetimestart, :datetimeend, :iddog, :description, :idservice, :idclient);""";
-    public static final String DELETE_DATE = """ 
-            Delete from date where id = :id""";
+
+    public static final String INSERT_SERVICE = """ 
+            INSERT OR REPLACE INTO service (%sdescription)
+            VALUES (%s:description);""";
+    public static final String DELETE_DATE = "Delete from date where id = :id";
+
+    public static final String DELETE_SERVICE = "Delete from service where id = :id";
 
     public static final String SELECT_SERVICES = """
             select description, id

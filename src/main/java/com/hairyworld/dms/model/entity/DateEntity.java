@@ -24,4 +24,16 @@ public class DateEntity implements Entity {
     public EntityType getEntityType() {
         return EntityType.DATE;
     }
+
+    public boolean isRelatedTo(final Long id, final EntityType type) {
+        if (type == EntityType.CLIENT) {
+            return id.equals(idclient);
+        } else if (type == EntityType.DOG) {
+            return id.equals(idclient);
+        } else if (type == EntityType.SERVICE) {
+            return id.equals(idservice);
+        } else {
+            return false;
+        }
+    }
 }

@@ -440,7 +440,9 @@ public class DogViewController extends AbstractController implements Application
     public void onApplicationEvent(final UpdateEntityEvent event) {
         if (event.getEntityType().equals(EntityType.DOG) && Objects.equals(event.getId(), dogViewData.getId())) {
             dogViewData = dmsCommunicationFacadeImpl.getDogViewData(dogViewData.getId());
-            dogViewClientTable.setItems(FXCollections.observableArrayList(dogViewData.getClients()));
+            if (dogViewData != null) {
+                dogViewClientTable.setItems(FXCollections.observableArrayList(dogViewData.getClients()));
+            }
         }
     }
 }

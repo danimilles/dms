@@ -179,4 +179,19 @@ public class DmsCommunicationFacadeImpl implements DmsCommunicationFacade {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public ServiceViewData getServiceViewData(final Long serviceId) {
+        return ServiceToClientMapper.mapServiceDataToServiceViewObj((ServiceEntity) entityService.getEntity(ServiceEntity.builder().id(serviceId).build()));
+    }
+
+    @Override
+    public void deleteService(final ServiceViewData serviceViewData) {
+        entityService.deleteEntity(ClientToServiceMapper.mapServiceDataToServiceEntity(serviceViewData));
+    }
+
+    @Override
+    public void saveService(ServiceViewData serviceViewData) {
+        entityService.saveEntity(ClientToServiceMapper.mapServiceDataToServiceEntity(serviceViewData));
+    }
+
 }
