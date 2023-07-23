@@ -179,6 +179,14 @@ public class DmsCommunicationFacadeImpl implements DmsCommunicationFacade {
     }
 
     @Override
+    public PaymentViewData getPaymentViewData(final Long paymentId) {
+        final PaymentEntity payment = (PaymentEntity) entityService.getEntity(PaymentEntity.builder().id(paymentId).build());
+        final ClientEntity client = (ClientEntity) entityService.getEntity(ClientEntity.builder().id(payment.getIdclient()).build());
+        final ServiceEntity service = (ServiceEntity) entityService.getEntity(ServiceEntity.builder().id(payment.getIdservice()).build());
+        return ServiceToClientMapper.mapPaymentDataToPaymentView(payment, service, client);
+    }
+
+    @Override
     public void deletePayment(final PaymentViewData paymentViewData) {
         entityService.deleteEntity(ClientToServiceMapper.mapPaymentDataToPaymentEntity(paymentViewData));
     }

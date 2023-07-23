@@ -108,17 +108,25 @@ public class ServiceToClientMapper {
                 .build();
     }
 
-    public static PaymentViewData mapPaymentDataToPaymentView(final PaymentEntity payment) {
-        return mapPaymentDataToPaymentViewObj(payment, null);
-    }
-    public static PaymentViewData mapPaymentDataToPaymentViewObj(final PaymentEntity payment,
-                                                                 final ServiceEntity service) {
+    public static PaymentViewData mapPaymentDataToPaymentView(final PaymentEntity payment,
+                                                              final ServiceEntity service,
+                                                              final ClientEntity client) {
         return PaymentViewData.builder()
                 .id(payment.getId())
                 .amount(payment.getAmount())
                 .datetime(payment.getDatetime())
                 .description(payment.getDescription())
                 .service(service != null ? mapServiceDataToServiceViewObj(service) : null)
+                .client(client != null ? mapClientDataToClientViewObj(client) : null)
+                .build();
+    }
+
+    public static PaymentViewData mapPaymentDataToPaymentViewObj(final PaymentEntity payment) {
+        return PaymentViewData.builder()
+                .id(payment.getId())
+                .amount(payment.getAmount())
+                .datetime(payment.getDatetime())
+                .description(payment.getDescription())
                 .build();
     }
 

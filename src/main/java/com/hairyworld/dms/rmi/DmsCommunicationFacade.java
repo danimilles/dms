@@ -47,4 +47,6 @@ public interface DmsCommunicationFacade {
     void deleteService(ServiceViewData serviceViewData);
 
     void saveService(ServiceViewData serviceViewData);
+
+    PaymentViewData getPaymentViewData(Long serviceId);
 }

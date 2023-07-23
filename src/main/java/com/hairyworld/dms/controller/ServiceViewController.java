@@ -23,7 +23,6 @@ import java.util.Optional;
 @Component
 public class ServiceViewController extends AbstractController {
 
-
     @FXML
     private GridPane root;
 

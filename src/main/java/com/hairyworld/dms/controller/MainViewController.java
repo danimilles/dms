@@ -70,6 +70,7 @@ public class MainViewController extends AbstractController implements Applicatio
     private final ApplicationContext context;
     private final SearchViewController searchViewController;
     private final ServiceViewController serviceViewController;
+    private final PaymentViewController paymentViewController;
 
     @FXML
     private TableColumn<ServiceViewData, String> serviceTableServiceColumn;
@@ -86,6 +87,8 @@ public class MainViewController extends AbstractController implements Applicatio
     private Button addClientButton;
     @FXML
     private Button addServiceButton;
+    @FXML
+    private Button addPaymentButton;
 
     @FXML
     private HBox searchHBox;
@@ -125,12 +128,14 @@ public class MainViewController extends AbstractController implements Applicatio
                               final ClientViewController clientViewController,
                               final ApplicationContext context,
                               final SearchViewController searchViewController,
-                              final ServiceViewController serviceViewController) {
+                              final ServiceViewController serviceViewController,
+                              final PaymentViewController paymentViewController) {
         this.dmsCommunicationFacadeImpl = dmsCommunicationFacadeImpl;
         this.clientViewController = clientViewController;
         this.context = context;
         this.searchViewController = searchViewController;
         this.serviceViewController = serviceViewController;
+        this.paymentViewController = paymentViewController;
     }
 
     @FXML
@@ -142,7 +147,12 @@ public class MainViewController extends AbstractController implements Applicatio
         createTableResponsiveness(serviceTable);
         createTableResponsiveness(clientTable);
         addClientButton.setOnAction(event -> showClientView(null));
+        addPaymentButton.setOnAction(event -> showPaymentView(null));
         addServiceButton.setOnAction(event -> showServiceView(null));
+    }
+
+    private void showPaymentView(final Long selectedId) {
+        paymentViewController.showView((Stage) root.getScene().getWindow(), selectedId);
     }
 
     private void initClientTable() {

@@ -250,7 +250,7 @@
                            <children>
                               <HBox>
                                  <children>
-                                    <Button mnemonicParsing="false" text="Añadir cobro" GridPane.halignment="RIGHT">
+                                    <Button fx:id="addPaymentButton" mnemonicParsing="false" text="Añadir cobro" GridPane.halignment="RIGHT">
                                        <GridPane.margin>
                                           <Insets right="20.0" />
                                        </GridPane.margin>
