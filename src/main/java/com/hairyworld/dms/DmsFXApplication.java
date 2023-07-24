@@ -34,7 +34,7 @@ public class DmsFXApplication extends Application {
 		try {
 			final Scene scene = new Scene(loadViews().get(MAIN_VIEW));
 			primaryStage.getIcons().add(new Image(Objects.requireNonNull(this.getClass().getClassLoader().getResourceAsStream(ICON_IMAGE))));
-			primaryStage.setTitle("Sistema de Gestion de citas de peluqueria canina");
+			primaryStage.setTitle("Sistema de gestion de citas de peluqueria animal");
 			primaryStage.setMaximized(true);
 			primaryStage.setScene(scene);
 			primaryStage.show();

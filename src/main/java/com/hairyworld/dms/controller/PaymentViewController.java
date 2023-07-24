@@ -4,6 +4,7 @@ import com.hairyworld.dms.model.event.DeleteDataEvent;
 import com.hairyworld.dms.model.event.NewDataEvent;
 import com.hairyworld.dms.model.view.ClientViewData;
 import com.hairyworld.dms.model.view.DataType;
+import com.hairyworld.dms.model.view.DogViewData;
 import com.hairyworld.dms.model.view.PaymentViewData;
 import com.hairyworld.dms.model.view.ServiceViewData;
 import com.hairyworld.dms.rmi.DmsCommunicationFacade;
@@ -18,11 +19,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import net.synedra.validatorfx.Validator;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +35,6 @@ public class PaymentViewController extends AbstractController {
 
     @FXML
     private GridPane root;
-
 
     @FXML
     private TextField descriptionTextField;
@@ -85,8 +87,10 @@ public class PaymentViewController extends AbstractController {
                 .dependsOn("amountTextField", amountTextField.textProperty())
                 .withMethod(c -> {
                     final String name = c.get("amountTextField");
-                    if (name == null || name.isEmpty()) {
-                        c.error("La cantidad no puede estar vacia");
+                    try {
+                        BigDecimal.valueOf(Double.parseDouble(name));
+                    } catch (final NumberFormatException e) {
+                        c.error("La cantidad no puede estar vacia y debe ser un numero (Ej: 100.00, 10, 0.5)");
                     }
                 })
                 .decorates(amountTextField)
@@ -96,8 +100,10 @@ public class PaymentViewController extends AbstractController {
                 .dependsOn("dateTextField", dateTextField.textProperty())
                 .withMethod(c -> {
                     final String value = c.get("dateTextField");
-                    if (DmsUtils.parseDate(value) == null && value != null && !value.isEmpty()) {
-                            c.error("La fecha debe estar en formato dd/MM/yyyy HH:mm:ss");
+                    if (value != null && !value.isEmpty() &&
+                            (DmsUtils.parseDate(value) == null ||
+                                    !value.matches("^\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}(:\\d{2})?$"))) {
+                            c.error("La fecha debe estar en formato dd/MM/yyyy HH:mm (Ej: 01/01/2020 00:00)");
                     }
                 })
                 .decorates(dateTextField)
@@ -106,8 +112,8 @@ public class PaymentViewController extends AbstractController {
         return validator;
     }
 
-    public void showView(final Stage source, final Long paymentId) {
-        chargePaymentViewData(paymentId);
+    public void showView(final Stage source, final Long paymentId, final Long clientId) {
+        chargePaymentViewData(paymentId, clientId);
         createSubmitButtonAction();
         createDeleteButtonAction();
         createSearchClientButtonAction();
@@ -121,9 +127,21 @@ public class PaymentViewController extends AbstractController {
     }
 
     private void createServiceField() {
+        serviceTextField.getItems().clear();
         final List<ServiceViewData> serviceViewData = new ArrayList<>();
         serviceViewData.add(null);
-        serviceViewData.addAll(dmsCommunicationFacadeImpl.getServiceViewTableData());
+        serviceViewData.addAll(dmsCommunicationFacadeImpl.getServiceTableData());
+        serviceTextField.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(final ServiceViewData object) {
+                return object != null ? object.getDescription() : "";
+            }
+
+            @Override
+            public ServiceViewData fromString(String string) {
+                return null;
+            }
+        });
         serviceTextField.getItems().addAll(serviceViewData);
         serviceTextField.setValue(paymentViewData.getService());
     }
@@ -131,20 +149,20 @@ public class PaymentViewController extends AbstractController {
     private void createSearchClientButtonAction() {
         searchClientButton.setOnAction(event -> {
                 paymentViewData.setClient(
-                        (ClientViewData) searchViewController.showView(stage, paymentViewData.getClient()));
+                        (ClientViewData) searchViewController.showView(stage, DogViewData.builder().build()));
                 if (paymentViewData.getClient() != null) {
                     searchClientButton.setText(paymentViewData.getClient().getName());
                 } else {
-                    searchClientButton.setText("Añadir cliente");
+                    searchClientButton.setText(null);
                 }
         });
     }
 
-    private void chargePaymentViewData(final Long clientId) {
-        if (clientId != null) {
-            fill(clientId);
+    private void chargePaymentViewData(final Long paymentId, final Long clientId) {
+        if (paymentId != null) {
+            fill(paymentId);
         } else {
-            clean();
+            clean(clientId);
         }
     }
 
@@ -160,8 +178,8 @@ public class PaymentViewController extends AbstractController {
                         .client(paymentViewData.getClient())
                         .build();
 
-                dmsCommunicationFacadeImpl.savePayment(paymentViewData);
-                context.publishEvent(new NewDataEvent(event.getSource(), paymentViewData.getId(), DataType.SERVICE));
+                context.publishEvent(new NewDataEvent(event.getSource(),
+                        dmsCommunicationFacadeImpl.savePayment(paymentViewData), DataType.PAYMENT));
                 stage.close();
             }
         });
@@ -199,24 +217,33 @@ public class PaymentViewController extends AbstractController {
 
         descriptionTextField.setText(paymentViewData.getDescription());
         dateTextField.setText(DmsUtils.dateToString(paymentViewData.getDatetime()));
-        amountTextField.setText(paymentViewData.getAmount().toString());
+        amountTextField.setText(paymentViewData.getAmount().setScale(2, RoundingMode.HALF_UP).toString());
         serviceTextField.setValue(paymentViewData.getService());
         searchClientButton.setText(paymentViewData.getClient() != null ? paymentViewData.getClient().getName()
-                : "Buscar cliente");
+                : null);
 
         stage.setTitle("Vista de cobro");
 
         deleteButton.setDisable(false);
     }
 
-    private void clean() {
+    private void clean(final Long clientId) {
         paymentViewData = PaymentViewData.builder().build();
 
         descriptionTextField.clear();
         dateTextField.clear();
         amountTextField.clear();
         serviceTextField.setValue(null);
-        searchClientButton.setText("Buscar cliente");
+
+        paymentViewData.setClient(dmsCommunicationFacadeImpl.getClientViewData(clientId));
+        if (paymentViewData.getClient() != null) {
+            searchClientButton.setText(paymentViewData.getClient().getName());
+            searchClientButton.setDisable(true);
+        } else {
+            searchClientButton.setText(null);
+            searchClientButton.setDisable(false);
+        }
+
         descriptionTextField.clear();
 
         stage.setTitle("Crear cobro");

@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 public class DmsUtils {
     public static final String LOCALDATE_PATTERN = "dd/MM/yyyy";
     public static final String DATETIME_PATTERN = "dd/MM/yyyy HH:mm:ss";
+    public static final String DATETIME_WO_SECONDS_PATTERN = "dd/MM/yyyy HH:mm";
 
     private DmsUtils() {
     }
@@ -17,7 +18,11 @@ public class DmsUtils {
         try {
             return dateTime != null ? new DateTime(new SimpleDateFormat(DATETIME_PATTERN).parse(dateTime)) : null;
         } catch (final Exception e) {
-            return null;
+            try {
+                return new DateTime(new SimpleDateFormat(DATETIME_WO_SECONDS_PATTERN).parse(dateTime));
+            } catch (final Exception ex) {
+                return null;
+            }
         }
     }
 

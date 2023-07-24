@@ -180,11 +180,6 @@
                                           <Insets left="20.0" right="20.0" />
                                        </HBox.margin>
                                     </Button>
-                                    <Button fx:id="addDateDogButton" alignment="BOTTOM_RIGHT" contentDisplay="RIGHT" layoutX="541.0" layoutY="10.0" mnemonicParsing="false" text="Añadir cita" textAlignment="CENTER">
-                                       <HBox.margin>
-                                          <Insets left="20.0" />
-                                       </HBox.margin>
-                                    </Button>
                                  </children>
                                  <VBox.margin>
                                     <Insets top="10.0" />

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.logging.log4j.util.Strings;
 import org.joda.time.DateTime;
 
 import java.util.Arrays;
@@ -51,4 +52,11 @@ public class DogViewData implements SearchTableRow, ViewData {
     public String getIdString() {
         return id.toString();
     }
+
+    public String getClientsString() {
+        return clients.stream().map(ClientViewData::getName)
+                .reduce((a, b) -> a + ",\n" + b)
+                .orElse(Strings.EMPTY);
+    }
+
 }

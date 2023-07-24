@@ -16,6 +16,7 @@ import com.hairyworld.dms.model.view.DataType;
 import com.hairyworld.dms.model.view.DateViewData;
 import com.hairyworld.dms.model.view.DateViewDataEntryWrapper;
 import com.hairyworld.dms.model.view.DogViewData;
+import com.hairyworld.dms.model.view.PaymentViewData;
 import com.hairyworld.dms.model.view.ServiceViewData;
 import com.hairyworld.dms.model.view.TableFilter;
 import com.hairyworld.dms.rmi.DmsCommunicationFacade;
@@ -47,6 +48,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -71,6 +73,41 @@ public class MainViewController extends AbstractController implements Applicatio
     private final SearchViewController searchViewController;
     private final ServiceViewController serviceViewController;
     private final PaymentViewController paymentViewController;
+    private final DogViewController dogViewController;
+    @FXML
+    private TableColumn<DogViewData, String> dogNameColumn;
+    @FXML
+    private TableColumn<DogViewData, String> dogRaceColumn;
+    @FXML
+    private TableColumn<DogViewData, String> dogClientColumn;
+    @FXML
+    private TableColumn<DogViewData, String> dogMantainmentColumn;
+    @FXML
+    private TableColumn<DogViewData, String> dogNextDateColumn;
+    @FXML
+    private TableView<DogViewData> dogTable;
+    @FXML
+    private TextField dogSearchTextField;
+    @FXML
+    private ChoiceBox<TableFilter> dogFilter;
+    @FXML
+    private Button addDogButton;
+    @FXML
+    private TableView<PaymentViewData>  paymentTable;
+    @FXML
+    private TextField paymentSearchTextField;
+    @FXML
+    private ChoiceBox<TableFilter> paymentFilter;
+    @FXML
+    private TableColumn<PaymentViewData, String>  paymentAmountColumn;
+    @FXML
+    private TableColumn<PaymentViewData, String>  paymentDescriptionColumn;
+    @FXML
+    private TableColumn<PaymentViewData, String>  paymentDateColumn;
+    @FXML
+    private TableColumn<PaymentViewData, String>  paymentServiceColumn;
+    @FXML
+    private TableColumn<PaymentViewData, String>  paymentClientColumn;
 
     @FXML
     private TableColumn<ServiceViewData, String> serviceTableServiceColumn;
@@ -79,6 +116,8 @@ public class MainViewController extends AbstractController implements Applicatio
 
     private ObservableList<ClientViewData> clientTableData;
     private ObservableList<ServiceViewData> serviceTableData;
+    private ObservableList<PaymentViewData> paymentTableData;
+    private ObservableList<DogViewData> dogTableData;
 
     @FXML
     private GridPane calendarPane;
@@ -91,6 +130,10 @@ public class MainViewController extends AbstractController implements Applicatio
     private Button addPaymentButton;
 
     @FXML
+    private HBox searchPaymentHbox;
+    @FXML
+    private HBox searchDogHbox;
+    @FXML
     private HBox searchHBox;
     @FXML
     private ChoiceBox<TableFilter> clientSearchField;
@@ -101,6 +144,8 @@ public class MainViewController extends AbstractController implements Applicatio
     @FXML
     private TextField serviceFilterText;
     private DatePicker clientSearchDatePicker;
+    private DatePicker paymentSearchDatePicker;
+    private DatePicker dogSearchDatePicker;
 
     @FXML
     private TableView<ClientViewData> clientTable;
@@ -129,13 +174,15 @@ public class MainViewController extends AbstractController implements Applicatio
                               final ApplicationContext context,
                               final SearchViewController searchViewController,
                               final ServiceViewController serviceViewController,
-                              final PaymentViewController paymentViewController) {
+                              final PaymentViewController paymentViewController,
+                              final DogViewController dogViewController) {
         this.dmsCommunicationFacadeImpl = dmsCommunicationFacadeImpl;
         this.clientViewController = clientViewController;
         this.context = context;
         this.searchViewController = searchViewController;
         this.serviceViewController = serviceViewController;
         this.paymentViewController = paymentViewController;
+        this.dogViewController = dogViewController;
     }
 
     @FXML
@@ -144,21 +191,244 @@ public class MainViewController extends AbstractController implements Applicatio
         scheduleUpdateCalendarTime();
         initClientTable();
         initServiceTable();
+        initPaymentTable();
+        initDogTable();
         createTableResponsiveness(serviceTable);
         createTableResponsiveness(clientTable);
+        createTableResponsiveness(paymentTable);
+        createTableResponsiveness(dogTable);
         addClientButton.setOnAction(event -> showClientView(null));
         addPaymentButton.setOnAction(event -> showPaymentView(null));
         addServiceButton.setOnAction(event -> showServiceView(null));
+        addDogButton.setOnAction(event -> showDogView(null));
+    }
+
+    private void initDogTable() {
+        dogTableData = FXCollections.observableList(dmsCommunicationFacadeImpl.getDogTableData());
+        dogNameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
+                cellData.getValue().getName()));
+        dogRaceColumn.setCellValueFactory(cellData -> new SimpleStringProperty
+                (cellData.getValue().getRace()));
+        dogClientColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
+                cellData.getValue().getClientsString())
+        );
+        dogMantainmentColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
+                cellData.getValue().getMaintainment()));
+        dogNextDateColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
+                cellData.getValue().getNextDate() != null ? DmsUtils.dateToString(cellData.getValue().getNextDate()) : null));
+
+        dogTable.setItems(dogTableData);
+        createDogTableControls();
+    }
+
+    private void createDogTableControls() {
+        dogSearchDatePicker = new DatePicker();
+        dogSearchDatePicker.setValue(LocalDate.now());
+
+        dogFilter.setItems(FXCollections.observableArrayList(TableFilter.NO_FILTER, TableFilter.DOG_NAME,
+                TableFilter.CLIENT_NAME, TableFilter.MANTAINMENT, TableFilter.NEXT_DATE, TableFilter.RACE));
+        dogFilter.setValue(TableFilter.NO_FILTER);
+        dogSearchTextField.setDisable(true);
+
+        createDogSearchFieldListener();
+        createDogSearchTextListener();
+        createDogSearchDatePickerListener();
+
+        dogTable.setRowFactory(tf -> {
+            final TableRow<DogViewData> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty()) ) {
+                    showDogView(dogTable.getSelectionModel().getSelectedItem().getId());
+                }
+            });
+            return row;
+        });
+    }
+
+    private void createDogSearchDatePickerListener() {
+        dogSearchDatePicker.setOnAction(event ->
+                dogTable.setItems(dogTableData.filtered(dogViewData -> {
+                    if (dogViewData.getNextDate() != null) {
+                        return DmsUtils.dateToString(dogViewData.getNextDate().toLocalDate())
+                                .contains(DmsUtils.dateToString(paymentSearchDatePicker.getValue()));
+                    } else {
+                        return false;
+                    }
+                }))
+        );
+    }
+
+    private void createDogSearchTextListener() {
+        dogSearchTextField.setOnKeyTyped(event -> {
+            if (dogFilter.getValue() != null) {
+                switch (dogFilter.getValue()) {
+                    case CLIENT_NAME -> dogTable.setItems(dogTableData.filtered(dogViewData ->
+                            toLower(dogViewData.getClientsString()).contains(toLower(dogSearchTextField.getText()))));
+
+                    case MANTAINMENT -> dogTable.setItems(dogTableData.filtered(dogViewData ->
+                            toLower(dogViewData.getMaintainment()).contains(toLower(dogSearchTextField.getText()))));
+
+                    case RACE -> dogTable.setItems(dogTableData.filtered(dogViewData ->
+                            toLower(dogViewData.getRace()).contains(toLower(dogSearchTextField.getText()))));
+
+                    case DOG_NAME -> dogTable.setItems(dogTableData.filtered(dogViewData ->
+                            toLower(dogViewData.getName()).contains(toLower(dogSearchTextField.getText()))));
+
+                    default -> dogTable.setItems(dogTableData);
+                }
+            }
+        });
+    }
+
+    private void createDogSearchFieldListener() {
+        dogFilter.setOnAction(event -> {
+            dogSearchTextField.setText(Strings.EMPTY);
+            dogTable.setItems(FXCollections.observableList(dogTableData));
+
+            if (dogFilter.getValue().equals(TableFilter.NO_FILTER)) {
+                dogSearchTextField.setDisable(true);
+
+                searchDogHbox.getChildren().remove(dogSearchDatePicker);
+
+                if (!searchDogHbox.getChildren().contains(dogSearchTextField)) {
+                    searchDogHbox.getChildren().add(dogSearchTextField);
+                }
+
+            } else if (dogFilter.getValue().equals(TableFilter.NEXT_DATE)) {
+                searchDogHbox.getChildren().remove(dogSearchTextField);
+                dogSearchDatePicker.setValue(LocalDate.now());
+                searchDogHbox.getChildren().add(dogSearchDatePicker);
+
+            } else {
+                dogSearchTextField.setDisable(false);
+                if (!searchDogHbox.getChildren().contains(dogSearchTextField)) {
+                    searchDogHbox.getChildren().add(dogSearchTextField);
+                }
+                searchDogHbox.getChildren().remove(dogSearchDatePicker);
+            }
+        });
+    }
+
+    private void showDogView(Long id) {
+        dogViewController.showView((Stage) root.getScene().getWindow(), null, id);
     }
 
     private void showPaymentView(final Long selectedId) {
-        paymentViewController.showView((Stage) root.getScene().getWindow(), selectedId);
+        paymentViewController.showView((Stage) root.getScene().getWindow(), selectedId, null);
+    }
+
+    private void initPaymentTable() {
+        paymentTableData = FXCollections.observableList(dmsCommunicationFacadeImpl.getPaymentTableData());
+        paymentDescriptionColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
+                cellData.getValue().getDescription()));
+        paymentAmountColumn.setCellValueFactory(cellData -> new SimpleStringProperty
+                (cellData.getValue().getAmount().setScale(2, RoundingMode.HALF_UP).toString()));
+        paymentDateColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
+                cellData.getValue().getDatetime() != null ? DmsUtils.dateToString(cellData.getValue().getDatetime()) : null)
+        );
+        paymentServiceColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
+                cellData.getValue().getService() != null ? cellData.getValue().getService().getDescription() : null));
+        paymentClientColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
+                cellData.getValue().getClient() != null ? cellData.getValue().getClient().getName() : null));
+        paymentDateColumn.setComparator(Comparator.comparing(DmsUtils::parseDate,
+                Comparator.nullsLast(Comparator.naturalOrder())));
+        paymentDateColumn.sortTypeProperty().setValue(TableColumn.SortType.DESCENDING);
+        paymentTable.setItems(paymentTableData);
+        createPaymentTableControls();
+    }
+
+    private void createPaymentTableControls() {
+        paymentSearchDatePicker = new DatePicker();
+        paymentSearchDatePicker.setValue(LocalDate.now());
+
+        paymentFilter.setItems(FXCollections.observableArrayList(TableFilter.NO_FILTER, TableFilter.CLIENT_NAME,
+                TableFilter.DESCRIPTION, TableFilter.SERVICE, TableFilter.DATE, TableFilter.AMOUNT));
+        paymentFilter.setValue(TableFilter.NO_FILTER);
+        paymentSearchTextField.setDisable(true);
+
+        createPaymentSearchFieldListener();
+        createPaymentSearchTextListener();
+        createPaymentSearchDatePickerListener();
+
+        paymentTable.setRowFactory(tf -> {
+            final TableRow<PaymentViewData> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty()) ) {
+                    showPaymentView(paymentTable.getSelectionModel().getSelectedItem().getId());
+                }
+            });
+            return row;
+        });
+    }
+
+    private void createPaymentSearchTextListener() {
+        paymentSearchTextField.setOnKeyTyped(event -> {
+            if (paymentFilter.getValue() != null) {
+                switch (paymentFilter.getValue()) {
+                    case CLIENT_NAME -> paymentTable.setItems(paymentTableData.filtered(paymentViewData ->
+                            toLower(paymentViewData.getClientString()).contains(toLower(paymentSearchTextField.getText()))));
+
+                    case DESCRIPTION -> paymentTable.setItems(paymentTableData.filtered(paymentViewData ->
+                            toLower(paymentViewData.getDescription()).contains(toLower(paymentSearchTextField.getText()))));
+
+                    case SERVICE -> paymentTable.setItems(paymentTableData.filtered(paymentViewData ->
+                            toLower(paymentViewData.getServiceString()).contains(toLower(paymentSearchTextField.getText()))));
+
+                    case AMOUNT -> paymentTable.setItems(paymentTableData.filtered(paymentViewData ->
+                            toLower(paymentViewData.getAmount().toString()).contains(toLower(paymentSearchTextField.getText()))));
+
+                    default -> paymentTable.setItems(paymentTableData);
+                }
+            }
+        });
+    }
+
+    private void createPaymentSearchFieldListener() {
+        paymentFilter.setOnAction(event -> {
+            paymentSearchTextField.setText(Strings.EMPTY);
+            paymentTable.setItems(FXCollections.observableList(paymentTableData));
+
+            if (paymentFilter.getValue().equals(TableFilter.NO_FILTER)) {
+                paymentSearchTextField.setDisable(true);
+
+                searchPaymentHbox.getChildren().remove(paymentSearchDatePicker);
+
+                if (!searchPaymentHbox.getChildren().contains(paymentSearchTextField)) {
+                    searchPaymentHbox.getChildren().add(paymentSearchTextField);
+                }
+
+            } else if (paymentFilter.getValue().equals(TableFilter.DATE)) {
+                searchPaymentHbox.getChildren().remove(paymentSearchTextField);
+                paymentSearchDatePicker.setValue(LocalDate.now());
+                searchPaymentHbox.getChildren().add(paymentSearchDatePicker);
+
+            } else {
+                paymentSearchTextField.setDisable(false);
+                if (!searchPaymentHbox.getChildren().contains(paymentSearchTextField)) {
+                    searchPaymentHbox.getChildren().add(paymentSearchTextField);
+                }
+                searchPaymentHbox.getChildren().remove(paymentSearchDatePicker);
+            }
+        });
+    }
+
+    private void createPaymentSearchDatePickerListener() {
+        paymentSearchDatePicker.setOnAction(event ->
+                paymentTable.setItems(paymentTableData.filtered(paymentData -> {
+                    if (paymentData.getDatetime() != null) {
+                        return DmsUtils.dateToString(paymentData.getDatetime().toLocalDate())
+                                .contains(DmsUtils.dateToString(paymentSearchDatePicker.getValue()));
+                    } else {
+                        return false;
+                    }
+                }))
+        );
     }
 
     private void initClientTable() {
         clientTableData = FXCollections.observableList(dmsCommunicationFacadeImpl.getClientTableData());
         clientNameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
-        clientNameColumn.setSortType(TableColumn.SortType.ASCENDING);
+        clientNameColumn.setSortType(TableColumn.SortType.DESCENDING);
         clientDogsColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDogsString()));
         clientDniColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDni()));
         clientPhoneColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPhone()));
@@ -168,11 +438,11 @@ public class MainViewController extends AbstractController implements Applicatio
         clientMaintainmentColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getMantainment()));
 
         clientTable.setItems(clientTableData);
-        createTableControls();
+        createClientTableControls();
     }
 
     private void initServiceTable() {
-        serviceTableData = FXCollections.observableList(dmsCommunicationFacadeImpl.getServiceViewTableData());
+        serviceTableData = FXCollections.observableList(dmsCommunicationFacadeImpl.getServiceTableData());
         serviceTableServiceColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDescription()));
         serviceTableServiceColumn.setSortType(TableColumn.SortType.ASCENDING);
         serviceTable.setItems(serviceTableData);
@@ -198,7 +468,7 @@ public class MainViewController extends AbstractController implements Applicatio
         });
     }
 
-    private void createTableControls() {
+    private void createClientTableControls() {
         clientSearchDatePicker = new DatePicker();
         clientSearchDatePicker.setValue(LocalDate.now());
 
@@ -340,10 +610,17 @@ public class MainViewController extends AbstractController implements Applicatio
                 event.getDataType().equals(DataType.DATE)) {
             clientTableData = FXCollections.observableList(dmsCommunicationFacadeImpl.getClientTableData());
             clientTable.setItems(clientTableData);
+            dogTableData = FXCollections.observableList(dmsCommunicationFacadeImpl.getDogTableData());
+            dogTable.setItems(dogTableData);
         }
         if (event.getDataType().equals(DataType.SERVICE)) {
-            serviceTableData = FXCollections.observableList(dmsCommunicationFacadeImpl.getServiceViewTableData());
+            serviceTableData = FXCollections.observableList(dmsCommunicationFacadeImpl.getServiceTableData());
             serviceTable.setItems(serviceTableData);
+        }
+        if (event.getDataType().equals(DataType.CLIENT) || event.getDataType().equals(DataType.SERVICE) ||
+                event.getDataType().equals(DataType.PAYMENT)) {
+            paymentTableData = FXCollections.observableList(dmsCommunicationFacadeImpl.getPaymentTableData());
+            paymentTable.setItems(paymentTableData);
         }
         if (event instanceof DeleteDataEvent) {
             if (DataType.SERVICE.equals(event.getDataType()) ||
@@ -364,6 +641,17 @@ public class MainViewController extends AbstractController implements Applicatio
                                 ((DateViewDataEntryWrapper) entry.getUserObject())
                                         .toDateViewData().isRelatedTo(event.getId(), event.getDataType()))
                         .forEach(entry -> calendar.removeEntry(entry));
+            }
+        } else {
+            if (event.getDataType().equals(DataType.DATE) && event.getSource() instanceof Button button &&
+                    button.getText().equals("dummy")) {
+                final DateViewData date = dmsCommunicationFacadeImpl.getDateViewData(event.getId());
+                if (date != null) {
+                    final Entry<DateViewDataEntryWrapper> entry = mapDateViewDataToCalendarEntry(date);
+                    entry.getUserObject().getId().set(-1L);
+                    calendar.addEntry(entry);
+                    entry.getUserObject().getId().set(date.getId());
+                }
             }
         }
     }
@@ -399,18 +687,18 @@ public class MainViewController extends AbstractController implements Applicatio
         return param -> {
             final Entry<DateViewDataEntryWrapper> entry = (Entry<DateViewDataEntryWrapper>) param.getEntry();
             if (param.getEventType().equals(CalendarEvent.ENTRY_CALENDAR_CHANGED) &&
-                    ((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getId().get() != null) {
+                    ((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getId().get() != null
+                    && !Long.valueOf(-1L).equals(entry.getUserObject().getId().get())) {
                 dmsCommunicationFacadeImpl.deleteDate(
                         ((DateViewDataEntryWrapper) param.getEntry().getUserObject()).toDateViewData());
                 context.publishEvent(
                         new DeleteDataEvent(param.getSource(), entry.getUserObject().getId().get(), DataType.DATE));
-            } else {
-                if (entry.getUserObject().getInterval().get() != null) {
-                    entry.getUserObject().getId().set(
-                            dmsCommunicationFacadeImpl.saveDate(entry.getUserObject().toDateViewData()));
-                    context.publishEvent(
-                            new NewDataEvent(param.getSource(), entry.getUserObject().getId().get(), DataType.DATE));
-                }
+            } else if (!Long.valueOf(-1L).equals(entry.getUserObject().getId().get()) &&
+                    entry.getUserObject().getInterval().get() != null) {
+                entry.getUserObject().getId().set(
+                        dmsCommunicationFacadeImpl.saveDate(entry.getUserObject().toDateViewData()));
+                context.publishEvent(
+                        new NewDataEvent(param.getSource(), entry.getUserObject().getId().get(), DataType.DATE));
             }
         };
     }
@@ -489,7 +777,7 @@ public class MainViewController extends AbstractController implements Applicatio
 
         serviceTextField.onActionProperty().setValue(event ->
                 ((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getService().set(serviceTextField.getValue()));
-        // Add the labels and text fields to the grid pane
+
         gridPane.add(startLabel, 0, 0);
         gridPane.add(startTextField, 1, 0);
 
@@ -519,7 +807,7 @@ public class MainViewController extends AbstractController implements Applicatio
 
         final List<ServiceViewData> list = new ArrayList<>();
         list.add(null);
-        list.addAll(dmsCommunicationFacadeImpl.getServiceViewTableData());
+        list.addAll(dmsCommunicationFacadeImpl.getServiceTableData());
         serviceTextField.setItems(FXCollections.observableList(list));
     }
 
@@ -533,7 +821,7 @@ public class MainViewController extends AbstractController implements Applicatio
                     (ClientViewData) searchViewController.showView(null, DogViewData.builder().build()));
             clientTextField.setText(((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getClient().get() != null ?
                     ((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getClient().get().getName() : null);
-            param.getPopOver().show(param.getPopOver().getOwnerWindow());
+            param.getPopOver().show(param.getPopOver().getOwnerWindow(), param.getPopOver().getX(), param.getPopOver().getY());
         });
     }
 
@@ -582,7 +870,8 @@ public class MainViewController extends AbstractController implements Applicatio
             list.addAll(dmsCommunicationFacadeImpl.getClientViewData(
                     ((DateViewDataEntryWrapper) param.getEntry().getUserObject()).getClient().get().getId()).getDogs());
 
-            dogTextField.setItems(FXCollections.observableList(list).sorted(Comparator.comparing(DogViewData::getName)));
+            dogTextField.setItems(FXCollections.observableList(list).sorted(Comparator.nullsFirst
+                    (Comparator.comparing(DogViewData::getName))));
             dogTextField.setDisable(false);
         }
     }

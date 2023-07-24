@@ -14,10 +14,11 @@ public class Path {
     public static final String SEARCH_VIEW = FXML_ROOT + "SearchView.fxml";
     public static final String SERVICE_VIEW = FXML_ROOT + "ServiceView.fxml";
     public static final String PAYMENT_VIEW = FXML_ROOT + "PaymentView.fxml";
+    public static final String DATE_VIEW = FXML_ROOT + "DateView.fxml";
     public static final String IMAGES_ROOT = "images/";
     public static final String ICON_IMAGE = IMAGES_ROOT + "icon.png";
 
     public static List<String> getViews() {
-        return List.of(CLIENT_VIEW, DOG_VIEW, MAIN_VIEW, SEARCH_VIEW, SERVICE_VIEW, PAYMENT_VIEW);
+        return List.of(CLIENT_VIEW, DOG_VIEW, MAIN_VIEW, SEARCH_VIEW, SERVICE_VIEW, PAYMENT_VIEW, DATE_VIEW);
     }
 }

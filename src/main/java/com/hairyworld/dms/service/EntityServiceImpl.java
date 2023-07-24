@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 
 @Service
@@ -101,7 +102,13 @@ public class EntityServiceImpl implements EntityService {
         ((ClientRepositoryImpl) entityRepositoryMap.get(EntityType.CLIENT)).deleteClientDogRelation(idclient, iddog);
         final ClientEntity client = (ClientEntity) cacheManager.get(ClientEntity.builder().id(idclient).build());
         final DogEntity dog = (DogEntity) cacheManager.get(DogEntity.builder().id(iddog).build());
-
+        final Set<Entity> dates = cacheManager.getAllMatch(
+                date -> ((DateEntity) date).isRelatedTo(iddog, EntityType.DOG) &&
+                        ((DateEntity) date).isRelatedTo(idclient, EntityType.CLIENT), EntityType.DATE);
+        dates.forEach(date -> {
+            ((DateEntity) date).setIddog(null);
+            saveEntity(date);
+        });
         client.getDogIds().remove(dog.getId());
         dog.getClientIds().remove(client.getId());
     }
@@ -119,10 +126,10 @@ public class EntityServiceImpl implements EntityService {
     private void deleteServiceRelations(Entity entity) {
         if (entity.getEntityType().equals(EntityType.SERVICE)) {
             cacheManager.getAllMatch(date -> ((DateEntity) date).isRelatedTo(entity.getId(), EntityType.SERVICE), EntityType.DATE)
-                    .forEach(date -> ((DateEntity) date).setIddog(null));
+                    .forEach(date -> ((DateEntity) date).setIdservice(null));
 
             cacheManager.getAllMatch(payment -> ((PaymentEntity) payment).isRelatedTo(entity.getId(), EntityType.SERVICE), EntityType.PAYMENT)
-                    .forEach(date -> ((DateEntity) date).setIddog(null));
+                    .forEach(date -> ((PaymentEntity) date).setIdservice(null));
         }
     }
 

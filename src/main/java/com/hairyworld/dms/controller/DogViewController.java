@@ -104,8 +104,6 @@ public class DogViewController extends AbstractController implements Application
     @FXML
     private Button addClientToDogButton;
     @FXML
-    private Button addDateDogButton;
-    @FXML
     private Label nextDateDogLabel;
     @FXML
     private Button submitDogButton;
@@ -138,24 +136,8 @@ public class DogViewController extends AbstractController implements Application
         createValidations();
         bindClientTable();
         bindDateTable();
-        ContextMenu contextMenu = new ContextMenu();
-        MenuItem deleteMenuItem = new MenuItem("Quitar cliente");
-        deleteMenuItem.setOnAction(event -> {
-            final ClientViewData clientViewData = dogViewClientTable.getSelectionModel().getSelectedItem();
-            dmsCommunicationFacadeImpl.deleteClientDog(clientViewData.getId(), dogViewData.getId());
-            context.publishEvent(new NewDataEvent(stage, dogViewData.getId(), DataType.DOG));
-        });
-        contextMenu.getItems().add(deleteMenuItem);
-        dogViewClientTable.setRowFactory(tf -> {
-            final TableRow<ClientViewData> row = new TableRow<>();
-            row.setOnContextMenuRequested(event -> {
-                if (!row.isEmpty()) {
-                    contextMenu.show(row, event.getScreenX(), event.getScreenY());
-                }
-            });
-            return row;
-        });
-
+        createClientContextMenu();
+        createDateContextMenu();
         createTableResponsiveness(dogViewClientTable);
         createTableResponsiveness(dogViewDateTable);
         imageCircle.setOnMouseClicked(e -> showImagePopup());
@@ -169,6 +151,48 @@ public class DogViewController extends AbstractController implements Application
         stage = new Stage();
         stage.getIcons().add(getIcon());
         stage.setScene(scene);
+    }
+
+    private void createDateContextMenu() {
+        final ContextMenu contextMenu = new ContextMenu();
+        final MenuItem deleteMenuItem = new MenuItem("Borrar cita");
+        deleteMenuItem.setOnAction(event -> {
+            final DateViewData dateViewData = dogViewDateTable.getSelectionModel().getSelectedItem();
+            dmsCommunicationFacadeImpl.deleteDate(dateViewData);
+            context.publishEvent(new DeleteDataEvent(stage, dateViewData.getId(), DataType.DATE));
+        });
+        contextMenu.getItems().add(deleteMenuItem);
+
+        dogViewDateTable.setRowFactory(tf -> {
+            final TableRow<DateViewData> row = new TableRow<>();
+            row.setOnContextMenuRequested(event -> {
+                if (!row.isEmpty()) {
+                    contextMenu.show(row, event.getScreenX(), event.getScreenY());
+                }
+            });
+            return row;
+        });
+    }
+
+    private void createClientContextMenu() {
+        final ContextMenu contextMenu = new ContextMenu();
+        final MenuItem deleteMenuItem = new MenuItem("Quitar cliente");
+        deleteMenuItem.setOnAction(event -> {
+            final ClientViewData clientViewData = dogViewClientTable.getSelectionModel().getSelectedItem();
+            dmsCommunicationFacadeImpl.deleteClientDog(clientViewData.getId(), dogViewData.getId());
+            context.publishEvent(new NewDataEvent(stage, dogViewData.getId(), DataType.DOG));
+        });
+        contextMenu.getItems().add(deleteMenuItem);
+
+        dogViewClientTable.setRowFactory(tf -> {
+            final TableRow<ClientViewData> row = new TableRow<>();
+            row.setOnContextMenuRequested(event -> {
+                if (!row.isEmpty()) {
+                    contextMenu.show(row, event.getScreenX(), event.getScreenY());
+                }
+            });
+            return row;
+        });
     }
 
     private void openSearchView() {
@@ -393,7 +417,6 @@ public class DogViewController extends AbstractController implements Application
         nextDateDogLabel.setVisible(true);
         dogViewNextDate.setVisible(true);
         deleteDogButton.setDisable(false);
-        addDateDogButton.setDisable(false);
         addClientToDogButton.setDisable(false);
         dogViewClientTable.getParent().getParent().setVisible(true);
 
@@ -428,7 +451,6 @@ public class DogViewController extends AbstractController implements Application
         nextDateDogLabel.setVisible(false);
         dogViewNextDate.setVisible(false);
         deleteDogButton.setDisable(true);
-        addDateDogButton.setDisable(true);
         addClientToDogButton.setDisable(true);
         deleteImageButton.setDisable(true);
         addImageButton.setDisable(false);
@@ -436,10 +458,14 @@ public class DogViewController extends AbstractController implements Application
 
     @Override
     public void onApplicationEvent(final UpdateDataEvent event) {
-        if (event.getDataType().equals(DataType.DOG) && Objects.equals(event.getId(), dogViewData.getId())) {
+        if (event.getDataType().equals(DataType.DOG) && Objects.equals(event.getId(), dogViewData.getId())
+        || (event.getDataType().equals(DataType.DATE)
+                && dogViewData.getDates().stream().anyMatch(x -> x.getId().equals(event.getId())))) {
             dogViewData = dmsCommunicationFacadeImpl.getDogViewData(dogViewData.getId());
             if (dogViewData != null) {
                 dogViewClientTable.setItems(FXCollections.observableArrayList(dogViewData.getClients()));
+                dogViewDateTable.setItems(FXCollections.observableArrayList(dogViewData.getDates()));
+                nextDateDogLabel.setText(DmsUtils.dateToString(dogViewData.getNextDate()));
             }
         }
     }

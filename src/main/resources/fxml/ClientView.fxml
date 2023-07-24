@@ -156,12 +156,11 @@
                            <children>
                               <TableView fx:id="clientViewDateTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
                                  <columns>
-                                    <TableColumn fx:id="clientViewDateDateStartTableColumn" maxWidth="1.7976931348623157E308" prefWidth="110.0" text="Fecha cita" />
-                                    <TableColumn fx:id="clientViewDateDateEndTableColumn" maxWidth="1.7976931348623157E308" prefWidth="152.0" text="Fecha finalizacion de cita" />
-                                    <TableColumn fx:id="clientViewDateServiceTableColumn" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="127.0" text="Servicio" />
-                                    <TableColumn fx:id="clientViewDateDogTableColumn" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="169.0" text="Mascota" />
-                                    <TableColumn fx:id="clientViewDateDescriptionTableColumn" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="169.0" text="Descripcion" />
-                                    <TableColumn fx:id="clientViewDateActionsTableColumn" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="169.0" text="Acciones" />
+                                    <TableColumn fx:id="clientViewDateDateStartTableColumn" maxWidth="1.7976931348623157E308" prefWidth="165.0" text="Fecha inicio" />
+                                    <TableColumn fx:id="clientViewDateDateEndTableColumn" maxWidth="1.7976931348623157E308" prefWidth="169.0" text="Fecha fin" />
+                                    <TableColumn fx:id="clientViewDateDescriptionTableColumn" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="203.0" text="Descripcion" />
+                                    <TableColumn fx:id="clientViewDateServiceTableColumn" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="155.0" text="Servicio" />
+                                    <TableColumn fx:id="clientViewDateDogTableColumn" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="206.0" text="Mascota" />
                                  </columns>
                                  <HBox.margin>
                                     <Insets bottom="1.0" />
@@ -211,11 +210,10 @@
                            <children>
                               <TableView fx:id="clientViewPaymentTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
                                  <columns>
-                                    <TableColumn fx:id="clientViewPaymentAmountTableColumn" maxWidth="1.7976931348623157E308" prefWidth="226.0" text="Importe" />
-                                    <TableColumn fx:id="clientViewPaymentDateTableColumn" maxWidth="1.7976931348623157E308" prefWidth="250.0" text="Fecha" />
-                                    <TableColumn fx:id="clientViewPaymentServiceTableColumn" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="192.0" text="Servicio" />
-                                    <TableColumn fx:id="clientViewPaymentDescriptionTableColumn" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="192.0" text="Servicio" />
-                                    <TableColumn fx:id="clientViewPaymentActionsTableColumn" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="229.0" text="Acciones" />
+                                    <TableColumn fx:id="clientViewPaymentAmountTableColumn" maxWidth="1.7976931348623157E308" prefWidth="198.0" text="Importe" />
+                                    <TableColumn fx:id="clientViewPaymentDateTableColumn" maxWidth="1.7976931348623157E308" prefWidth="270.0" text="Fecha" />
+                                    <TableColumn fx:id="clientViewPaymentServiceTableColumn" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="244.0" text="Servicio" />
+                                    <TableColumn fx:id="clientViewPaymentDescriptionTableColumn" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="187.0" text="Descripcion" />
                                  </columns>
                                  <HBox.margin>
                                     <Insets bottom="1.0" />

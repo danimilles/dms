@@ -70,7 +70,7 @@ public class DmsCommunicationFacadeImpl implements DmsCommunicationFacade {
         final Collection<Entity> dates = entityService.getAllEntitiesMatch(
                 entity -> clientId.equals(((DateEntity) entity).getIdclient()), EntityType.DATE);
         final DateEntity nextDate = ServiceToClientMapper.getNextDate(dates);
-        final Collection<Entity> payments  = entityService.getAllEntitiesMatch(payment -> ((PaymentEntity) payment).getIdclient().equals(clientId), EntityType.PAYMENT);
+        final Collection<Entity> payments  = entityService.getAllEntitiesMatch(payment -> clientId.equals(((PaymentEntity) payment).getIdclient()), EntityType.PAYMENT);
         final Collection<Entity> dogs  = entityService.getAllEntitiesMatch(dog -> ((DogEntity) dog).getClientIds().contains(clientId), EntityType.DOG);
         final Collection<Entity> services = entityService.getAllEntites(EntityType.SERVICE);
 
@@ -78,8 +78,8 @@ public class DmsCommunicationFacadeImpl implements DmsCommunicationFacade {
     }
 
     @Override
-    public void saveClient(final ClientViewData clientViewData) {
-        entityService.saveEntity(ClientToServiceMapper.mapClientDataToClientEntity(clientViewData));
+    public Long saveClient(final ClientViewData clientViewData) {
+        return entityService.saveEntity(ClientToServiceMapper.mapClientDataToClientEntity(clientViewData));
     }
 
     @Override
@@ -137,8 +137,8 @@ public class DmsCommunicationFacadeImpl implements DmsCommunicationFacade {
     }
 
     @Override
-    public void saveDog(final DogViewData dogViewData) {
-        dogViewData.setId(entityService.saveEntity(ClientToServiceMapper.mapDogDataToDogEntity(dogViewData)));
+    public Long saveDog(final DogViewData dogViewData) {
+       return entityService.saveEntity(ClientToServiceMapper.mapDogDataToDogEntity(dogViewData));
     }
 
     @Override
@@ -157,7 +157,7 @@ public class DmsCommunicationFacadeImpl implements DmsCommunicationFacade {
     }
 
     @Override
-    public List<ServiceViewData> getServiceViewTableData() {
+    public List<ServiceViewData> getServiceTableData() {
         return entityService.getAllEntites(EntityType.SERVICE).stream()
                 .map(x -> ServiceToClientMapper.mapServiceDataToServiceViewObj((ServiceEntity) x))
                 .collect(Collectors.toList());
@@ -174,8 +174,8 @@ public class DmsCommunicationFacadeImpl implements DmsCommunicationFacade {
     }
 
     @Override
-    public void saveService(final ServiceViewData serviceViewData) {
-        entityService.saveEntity(ClientToServiceMapper.mapServiceDataToServiceEntity(serviceViewData));
+    public Long saveService(final ServiceViewData serviceViewData) {
+        return entityService.saveEntity(ClientToServiceMapper.mapServiceDataToServiceEntity(serviceViewData));
     }
 
     @Override
@@ -187,13 +187,44 @@ public class DmsCommunicationFacadeImpl implements DmsCommunicationFacade {
     }
 
     @Override
+    public List<PaymentViewData> getPaymentTableData() {
+        return entityService.getAllEntites(EntityType.PAYMENT).stream()
+                .map(x -> ServiceToClientMapper.mapPaymentDataToPaymentView((PaymentEntity) x,
+                                (ServiceEntity) entityService.getEntity(
+                                        ServiceEntity.builder().id(((PaymentEntity) x).getIdservice()).build()),
+                                (ClientEntity) entityService.getEntity(
+                                        ClientEntity.builder().id(((PaymentEntity) x).getIdclient()).build())))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public DateViewData getDateViewData(final Long id) {
+        final DateEntity date = (DateEntity) entityService.getEntity(DateEntity.builder().id(id).build());
+        return ServiceToClientMapper.mapDateToMainViewObj(date,
+                (DogEntity) entityService.getEntity(DogEntity.builder().id(date.getIddog()).build()),
+                (ClientEntity) entityService.getEntity(ClientEntity.builder().id(date.getIdclient()).build()),
+                (ServiceEntity) entityService.getEntity(ServiceEntity.builder().id(date.getIdservice()).build()));
+    }
+
+    @Override
+    public List<DogViewData> getDogTableData() {
+        return entityService.getAllEntites(EntityType.DOG).stream()
+                .map(x -> ServiceToClientMapper.mapDogDataToDogView((DogEntity) x,
+                        entityService.getAllEntitiesMatch(client -> ((ClientEntity) client).getDogIds().contains(x.getId()), EntityType.CLIENT),
+                        ServiceToClientMapper.getNextDate(entityService.getAllEntitiesMatch(date -> x.getId().equals(((DateEntity) date).getIddog()), EntityType.DATE)),
+                        entityService.getAllEntitiesMatch(date -> x.getId().equals(((DateEntity) date).getIddog()), EntityType.DATE),
+                        entityService.getAllEntites(EntityType.SERVICE)))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public void deletePayment(final PaymentViewData paymentViewData) {
         entityService.deleteEntity(ClientToServiceMapper.mapPaymentDataToPaymentEntity(paymentViewData));
     }
 
     @Override
-    public void savePayment(final PaymentViewData paymentViewData) {
-        entityService.saveEntity(ClientToServiceMapper.mapPaymentDataToPaymentEntity(paymentViewData));
+    public Long savePayment(final PaymentViewData paymentViewData) {
+        return entityService.saveEntity(ClientToServiceMapper.mapPaymentDataToPaymentEntity(paymentViewData));
     }
 
     @Override

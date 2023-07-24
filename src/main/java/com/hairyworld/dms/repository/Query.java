@@ -39,7 +39,7 @@ public class Query {
 
     public static final String INSERT_PAYMENT = """ 
             INSERT OR REPLACE INTO payment (%sdatetime, amount, description, idservice, idclient)
-            VALUES (%s:datetime, :amount, :description, :idservice, :idservice, :idclient);""";
+            VALUES (%s:datetime, :amount, :description, :idservice, :idclient);""";
 
     public static final String INSERT_SERVICE = """ 
             INSERT OR REPLACE INTO service (%sdescription)

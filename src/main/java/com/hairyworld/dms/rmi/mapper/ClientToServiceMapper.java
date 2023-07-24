@@ -11,6 +11,7 @@ import com.hairyworld.dms.model.view.DateViewData;
 import com.hairyworld.dms.model.view.DogViewData;
 import com.hairyworld.dms.model.view.PaymentViewData;
 import com.hairyworld.dms.model.view.ServiceViewData;
+import org.joda.time.DateTime;
 
 import java.util.HashSet;
 import java.util.stream.Collectors;
@@ -68,7 +69,8 @@ public class ClientToServiceMapper {
         return PaymentEntity.builder()
                 .id(paymentViewData.getId())
                 .amount(paymentViewData.getAmount())
-                .datetime(paymentViewData.getDatetime())
+                .description(paymentViewData.getDescription())
+                .datetime(paymentViewData.getDatetime() != null ? paymentViewData.getDatetime() : DateTime.now())
                 .idclient(paymentViewData.getClient() != null ? paymentViewData.getClient().getId() : null)
                 .idservice(paymentViewData.getService() != null ? paymentViewData.getService().getId() : null)
                 .build();

@@ -38,4 +38,12 @@ public class PaymentViewData implements ViewData {
             return false;
         }
     }
+
+    public String getClientString() {
+        return client != null ? client.getName() : null;
+    }
+
+    public String getServiceString() {
+        return service != null ? service.getDescription() : null;
+    }
 }

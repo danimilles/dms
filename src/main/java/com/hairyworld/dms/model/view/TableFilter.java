@@ -8,8 +8,11 @@ public enum TableFilter {
     PHONE("Telefono cliente"),
     MANTAINMENT("Mantenimiento"),
     NEXT_DATE("Proxima cita"),
+    DATE("Fecha"),
+    AMOUNT("Cantidad"),
     OBSERVATIONS("Observaciones"),
     SERVICE("Servicio"),
+    DESCRIPTION("Descripcion"),
     RACE("Raza");
 
     private final String filter;

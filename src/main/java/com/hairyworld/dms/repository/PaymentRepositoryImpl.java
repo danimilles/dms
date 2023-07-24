@@ -9,6 +9,7 @@ import com.sun.javafx.binding.StringFormatter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.util.Strings;
+import org.joda.time.DateTime;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
@@ -53,7 +54,9 @@ public class PaymentRepositoryImpl extends EntityRepositoryImpl {
             parameters.addValue(AMOUNT, paymentEntity.getAmount());
             parameters.addValue(IDSERVICE_FIELD, paymentEntity.getIdservice());
             parameters.addValue(IDCLIENT_FIELD, paymentEntity.getIdclient());
-            parameters.addValue(DATETIME_FIELD, DmsUtils.dateToString(paymentEntity.getDatetime()));
+            parameters.addValue(DATETIME_FIELD, paymentEntity.getDatetime() != null ?
+                    DmsUtils.dateToString(paymentEntity.getDatetime()) :
+                    DmsUtils.dateToString(DateTime.now()));
 
             return super.save(query, parameters);
         }

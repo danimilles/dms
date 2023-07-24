@@ -14,7 +14,7 @@ public interface DmsCommunicationFacade {
 
     void deletePayment(PaymentViewData paymentViewData);
 
-    void savePayment(PaymentViewData paymentViewData);
+    Long savePayment(PaymentViewData paymentViewData);
 
     List<SearchTableRow> getSearchTableData(SearchTableRow searchTableRow);
 
@@ -22,7 +22,7 @@ public interface DmsCommunicationFacade {
 
     List<DateViewData> getDateCalendarData();
 
-    void saveClient(ClientViewData clientViewData);
+    Long saveClient(ClientViewData clientViewData);
 
     void saveClientDog(Long idclient, Long iddog);
 
@@ -30,7 +30,7 @@ public interface DmsCommunicationFacade {
 
     void deleteClient(Long id);
 
-    void saveDog(DogViewData dogViewData);
+    Long saveDog(DogViewData dogViewData);
 
     void deleteDog(Long id);
 
@@ -40,13 +40,19 @@ public interface DmsCommunicationFacade {
 
     void deleteDate(DateViewData dateViewData);
 
-    List<ServiceViewData> getServiceViewTableData();
+    List<ServiceViewData> getServiceTableData();
 
     ServiceViewData getServiceViewData(Long serviceId);
 
     void deleteService(ServiceViewData serviceViewData);
 
-    void saveService(ServiceViewData serviceViewData);
+    Long saveService(ServiceViewData serviceViewData);
 
     PaymentViewData getPaymentViewData(Long serviceId);
+
+    List<PaymentViewData> getPaymentTableData();
+
+    DateViewData getDateViewData(Long id);
+
+    List<DogViewData> getDogTableData();
 }

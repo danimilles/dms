@@ -89,9 +89,9 @@ public class ServiceViewController extends AbstractController {
         stage.show();
     }
 
-    private void chargeServiceViewData(final Long clientId) {
-        if (clientId != null) {
-            fill(clientId);
+    private void chargeServiceViewData(final Long serviceId) {
+        if (serviceId != null) {
+            fill(serviceId);
         } else {
             clean();
         }
@@ -105,8 +105,8 @@ public class ServiceViewController extends AbstractController {
                         .description(descriptionField.getText())
                         .build();
 
-                dmsCommunicationFacadeImpl.saveService(serviceViewData);
-                context.publishEvent(new NewDataEvent(event.getSource(), serviceViewData.getId(), DataType.SERVICE));
+                context.publishEvent(new NewDataEvent(event.getSource(),
+                        dmsCommunicationFacadeImpl.saveService(serviceViewData), DataType.SERVICE));
                 stage.close();
             }
         });

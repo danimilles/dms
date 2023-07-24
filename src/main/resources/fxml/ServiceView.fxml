@@ -5,7 +5,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane fx:id="root" maxWidth="1.7976931348623157E308" minWidth="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.hairyworld.dms.controller.ServiceViewController">
+<GridPane fx:id="root" maxWidth="1.7976931348623157E308" minWidth="400.0" prefWidth="400.0" style="-fx-font-size: 14;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.hairyworld.dms.controller.ServiceViewController">
    <columnConstraints>
       <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" />
    </columnConstraints>
@@ -18,7 +18,7 @@
          <children>
             <VBox>
                <children>
-                  <Label minHeight="-Infinity" minWidth="35.0" text="Descripcion">
+                  <Label minHeight="-Infinity" minWidth="35.0" text="Descripcion:">
                      <padding>
                         <Insets bottom="5.0" />
                      </padding>

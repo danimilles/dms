@@ -98,7 +98,7 @@
                            <children>
                               <HBox>
                                  <children>
-                                    <Button mnemonicParsing="false" text="Añadir mascota" GridPane.halignment="RIGHT">
+                                    <Button fx:id="addDogButton" mnemonicParsing="false" text="Añadir mascota" GridPane.halignment="RIGHT">
                                        <GridPane.margin>
                                           <Insets right="20.0" />
                                        </GridPane.margin>
@@ -112,19 +112,19 @@
                         </VBox>
                         <VBox GridPane.rowIndex="1">
                            <children>
-                              <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
+                              <HBox fx:id="searchDogHbox" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                  <children>
                                     <Label text="Filtrar por:">
                                        <padding>
                                           <Insets left="20.0" right="8.0" />
                                        </padding>
                                     </Label>
-                                    <ChoiceBox prefWidth="150.0">
+                                    <ChoiceBox fx:id="dogFilter" prefWidth="150.0">
                                        <HBox.margin>
                                           <Insets right="10.0" />
                                        </HBox.margin>
                                     </ChoiceBox>
-                                    <TextField prefHeight="25.0" prefWidth="554.0">
+                                    <TextField fx:id="dogSearchTextField" prefHeight="25.0" prefWidth="554.0">
                                        <HBox.margin>
                                           <Insets left="15.0" />
                                        </HBox.margin>
@@ -138,12 +138,13 @@
                         </VBox>
                         <VBox GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.valignment="BOTTOM" GridPane.vgrow="ALWAYS">
                            <children>
-                              <TableView maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+                              <TableView fx:id="dogTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
                                  <columns>
-                                    <TableColumn prefWidth="142.33333587646484" text="Nombre" />
-                                    <TableColumn prefWidth="231.66666412353516" text="Dueños" />
-                                    <TableColumn prefWidth="234.33334350585938" text="Proxima Cita" />
-                                    <TableColumn maxWidth="1.7976931348623157E308" prefWidth="239.66668701171875" text="Acciones" />
+                                    <TableColumn fx:id="dogNameColumn" prefWidth="160.0" text="Nombre" />
+                                    <TableColumn fx:id="dogRaceColumn" prefWidth="178.0" text="Raza" />
+                                    <TableColumn fx:id="dogClientColumn" prefWidth="182.0" text="Dueños" />
+                                    <TableColumn fx:id="dogMantainmentColumn" prefWidth="168.0" text="Mantenimiento" />
+                                    <TableColumn fx:id="dogNextDateColumn" prefWidth="163.0" text="Siguiente cita" />
                                  </columns>
                               </TableView>
                            </children>
@@ -264,19 +265,19 @@
                         </VBox>
                         <VBox GridPane.rowIndex="1">
                            <children>
-                              <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
+                              <HBox fx:id="searchPaymentHbox" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                  <children>
                                     <Label text="Filtrar por:">
                                        <padding>
                                           <Insets left="20.0" right="8.0" />
                                        </padding>
                                     </Label>
-                                    <ChoiceBox prefWidth="150.0">
+                                    <ChoiceBox fx:id="paymentFilter" prefWidth="150.0">
                                        <HBox.margin>
                                           <Insets right="10.0" />
                                        </HBox.margin>
                                     </ChoiceBox>
-                                    <TextField prefHeight="25.0" prefWidth="554.0">
+                                    <TextField fx:id="paymentSearchTextField" prefHeight="25.0" prefWidth="554.0">
                                        <HBox.margin>
                                           <Insets left="15.0" />
                                        </HBox.margin>
@@ -290,13 +291,13 @@
                         </VBox>
                         <VBox GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.valignment="BOTTOM" GridPane.vgrow="ALWAYS">
                            <children>
-                              <TableView maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                              <TableView fx:id="paymentTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
                                  <columns>
-                                    <TableColumn maxWidth="1.7976931348623157E308" prefWidth="110.0" text="Importe" />
-                                    <TableColumn maxWidth="1.7976931348623157E308" prefWidth="152.0" text="Fecha" />
-                                    <TableColumn maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="209.0" text="Servicio" />
-                                    <TableColumn maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="215.0" text="Cliente" />
-                                    <TableColumn maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="165.0" text="Descripcion" />
+                                    <TableColumn fx:id="paymentAmountColumn" maxWidth="1.7976931348623157E308" prefWidth="110.0" text="Importe" />
+                                    <TableColumn fx:id="paymentDateColumn" maxWidth="1.7976931348623157E308" prefWidth="152.0" text="Fecha" />
+                                    <TableColumn fx:id="paymentDescriptionColumn" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="165.0" text="Descripcion" />
+                                    <TableColumn fx:id="paymentServiceColumn" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="209.0" text="Servicio" />
+                                    <TableColumn fx:id="paymentClientColumn" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="215.0" text="Cliente" />
                                  </columns>
                                  <HBox.margin>
                                     <Insets bottom="1.0" />

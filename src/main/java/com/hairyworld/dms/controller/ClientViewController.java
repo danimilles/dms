@@ -121,14 +121,19 @@ public class ClientViewController extends AbstractController implements Applicat
     private Scene scene;
     private Stage stage;
     private ClientViewData clientViewData;
+    private DateViewController dateViewController;
+    private PaymentViewController paymentViewController;
 
 
     public ClientViewController(final DmsCommunicationFacade dmsCommunicationFacadeImpl, final ApplicationContext context,
-                                final DogViewController dogViewController, final SearchViewController searchViewController) {
+                                final DogViewController dogViewController, final SearchViewController searchViewController,
+                                final DateViewController dateViewController, final PaymentViewController paymentViewController) {
         this.dmsCommunicationFacadeImpl = dmsCommunicationFacadeImpl;
         this.context = context;
         this.dogViewController = dogViewController;
         this.searchViewController = searchViewController;
+        this.dateViewController = dateViewController;
+        this.paymentViewController = paymentViewController;
     }
 
     @FXML
@@ -145,6 +150,10 @@ public class ClientViewController extends AbstractController implements Applicat
         createTableResponsiveness(clientViewDateTable);
 
         createDogTableMenu();
+        createPaymentTableMenu();
+        createDateTableMenu();
+        createAddDateButton();
+        createAddPaymentButton();
 
         scene = new Scene(root);
         stage = new Stage();
@@ -152,6 +161,48 @@ public class ClientViewController extends AbstractController implements Applicat
         stage.getIcons().add(getIcon());
         stage.onCloseRequestProperty().setValue(e -> {
             clientViewDataTab.getTabPane().getSelectionModel().selectFirst();
+        });
+    }
+
+    private void createPaymentTableMenu() {
+        final ContextMenu contextMenu = new ContextMenu();
+        final MenuItem deleteMenuItem = new MenuItem("Borrar pago");
+        deleteMenuItem.setOnAction(event -> {
+            final PaymentViewData paymentViewData = clientViewPaymentTable.getSelectionModel().getSelectedItem();
+            dmsCommunicationFacadeImpl.deletePayment(paymentViewData);
+            context.publishEvent(new DeleteDataEvent(stage, paymentViewData.getId(), DataType.PAYMENT));
+        });
+        contextMenu.getItems().add(deleteMenuItem);
+
+        clientViewPaymentTable.setRowFactory(tf -> {
+            final TableRow<PaymentViewData> row = new TableRow<>();
+            row.setOnContextMenuRequested(event -> {
+                if (!row.isEmpty()) {
+                    contextMenu.show(row, event.getScreenX(), event.getScreenY());
+                }
+            });
+            return row;
+        });
+    }
+
+    private void createDateTableMenu() {
+        final ContextMenu contextMenu = new ContextMenu();
+        final MenuItem deleteMenuItem = new MenuItem("Borrar cita");
+        deleteMenuItem.setOnAction(event -> {
+            final DateViewData dateViewData = clientViewDateTable.getSelectionModel().getSelectedItem();
+            dmsCommunicationFacadeImpl.deleteDate(dateViewData);
+            context.publishEvent(new DeleteDataEvent(stage, dateViewData.getId(), DataType.DATE));
+        });
+        contextMenu.getItems().add(deleteMenuItem);
+
+        clientViewDateTable.setRowFactory(tf -> {
+            final TableRow<DateViewData> row = new TableRow<>();
+            row.setOnContextMenuRequested(event -> {
+                if (!row.isEmpty()) {
+                    contextMenu.show(row, event.getScreenX(), event.getScreenY());
+                }
+            });
+            return row;
         });
     }
 
@@ -178,6 +229,18 @@ public class ClientViewController extends AbstractController implements Applicat
                 }
             });
             return row;
+        });
+    }
+
+    private void createAddDateButton() {
+        addDateButton.setOnAction(event -> {
+            showDateView();
+        });
+    }
+
+    private void createAddPaymentButton() {
+        addPaymentButton.setOnAction(event -> {
+            showPaymentView();
         });
     }
 
@@ -254,7 +317,9 @@ public class ClientViewController extends AbstractController implements Applicat
                 } else {
                     alert.close();
                     showDogView(null);
-                }}});
+                }
+            }
+        });
     }
 
     private void chargeClientViewData(final Long clientId) {
@@ -283,8 +348,8 @@ public class ClientViewController extends AbstractController implements Applicat
                         .payments(clientViewData.getPayments())
                         .build();
 
-                dmsCommunicationFacadeImpl.saveClient(clientViewData);
-                context.publishEvent(new NewDataEvent(event.getSource(), clientViewData.getId(), DataType.CLIENT));
+                context.publishEvent(new NewDataEvent(event.getSource(),
+                        dmsCommunicationFacadeImpl.saveClient(clientViewData), DataType.CLIENT));
                 stage.close();
             }
         });
@@ -398,14 +463,30 @@ public class ClientViewController extends AbstractController implements Applicat
     private void showDogView(final Long dogId) {
         dogViewController.showView(stage, clientViewData.getId(), dogId);
     }
+    private void showDateView() {
+        dateViewController.showView(stage, clientViewData.getId());
+    }
+
+    private void showPaymentView() {
+        paymentViewController.showView(stage, null, clientViewData.getId());
+    }
 
     @Override
     public void onApplicationEvent(final UpdateDataEvent event) {
-        if (DataType.DOG.equals(event.getDataType())) {
+        if (DataType.DOG.equals(event.getDataType()) ||
+                DataType.DATE.equals(event.getDataType()) ||
+                DataType.PAYMENT.equals(event.getDataType())) {
             clientViewData = dmsCommunicationFacadeImpl.getClientViewData(clientViewData.getId());
-            clientViewDogTable.setItems(FXCollections.observableArrayList(clientViewData.getDogs()));
-            clientViewDateTable.setItems(FXCollections.observableArrayList(clientViewData.getDates()));
-            clientViewPaymentTable.setItems(FXCollections.observableArrayList(clientViewData.getPayments()));
+
+            if (clientViewData != null) {
+                clientViewNextDate.setText(DmsUtils.dateToString(clientViewData.getNextDate()));
+                clientViewDogTable.setItems(FXCollections.observableArrayList(clientViewData.getDogs()));
+                clientViewDateTable.setItems(FXCollections.observableArrayList(clientViewData.getDates()));
+                clientViewPaymentTable.setItems(FXCollections.observableArrayList(clientViewData.getPayments()));
+            } else {
+                clientViewData = ClientViewData.builder()
+                        .dogs(new ArrayList<>()).dates(new ArrayList<>()).payments(new ArrayList<>()).build();
+            }
         }
     }
 }
