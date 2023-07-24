@@ -212,7 +212,7 @@ public class ClientViewController extends AbstractController implements Applicat
         deleteMenuItem.setOnAction(event -> {
             final DogViewData dogViewData = clientViewDogTable.getSelectionModel().getSelectedItem();
             dmsCommunicationFacadeImpl.deleteClientDog(clientViewData.getId(), dogViewData.getId());
-            context.publishEvent(new NewDataEvent(stage, dogViewData.getId(), DataType.DOG));
+            context.publishEvent(new DeleteDataEvent(stage, dogViewData.getId(), DataType.DOG));
         });
         contextMenu.getItems().add(deleteMenuItem);
 

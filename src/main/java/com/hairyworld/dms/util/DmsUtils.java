@@ -1,6 +1,7 @@
 package com.hairyworld.dms.util;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 
 import java.text.SimpleDateFormat;
@@ -16,7 +17,8 @@ public class DmsUtils {
 
     public static DateTime parseDate(final String dateTime) {
         try {
-            return dateTime != null ? new DateTime(new SimpleDateFormat(DATETIME_PATTERN).parse(dateTime)) : null;
+            return dateTime != null ? new DateTime(new SimpleDateFormat(DATETIME_PATTERN).parse(dateTime))
+                    .withZoneRetainFields(DateTimeZone.forID("Europe/Madrid")) : null;
         } catch (final Exception e) {
             try {
                 return new DateTime(new SimpleDateFormat(DATETIME_WO_SECONDS_PATTERN).parse(dateTime));
@@ -27,7 +29,8 @@ public class DmsUtils {
     }
 
     public static String dateToString(final DateTime dateTime) {
-        return dateTime != null ? new SimpleDateFormat(DATETIME_PATTERN).format(dateTime.toDate()) : null;
+        return dateTime != null ? new SimpleDateFormat(DATETIME_PATTERN).format(dateTime
+                .withZoneRetainFields(DateTimeZone.forID("Europe/Madrid")).toDate()) : null;
     }
 
     public static String dateToString(final LocalDate localDate) {
@@ -35,6 +38,6 @@ public class DmsUtils {
     }
 
     public static String dateToString(final java.time.LocalDate localDate) {
-        return localDate != null ? localDate.format(DateTimeFormatter.ofPattern(LOCALDATE_PATTERN)) : null;
+        return localDate != null ? localDate.atStartOfDay().format(DateTimeFormatter.ofPattern(LOCALDATE_PATTERN)) : null;
     }
 }

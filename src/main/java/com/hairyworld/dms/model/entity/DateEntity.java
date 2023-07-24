@@ -31,7 +31,7 @@ public class DateEntity implements Entity {
         } else if (type == EntityType.CLIENT) {
             return id.equals(idclient);
         } else if (type == EntityType.DOG) {
-            return id.equals(idclient);
+            return id.equals(iddog);
         } else if (type == EntityType.SERVICE) {
             return id.equals(idservice);
         } else {

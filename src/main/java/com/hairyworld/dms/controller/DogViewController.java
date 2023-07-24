@@ -338,7 +338,8 @@ public class DogViewController extends AbstractController implements Application
         dogViewDateDateStartTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(DmsUtils.dateToString(cellData.getValue().getDatetimestart())));
         dogViewDateDateEndTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(DmsUtils.dateToString(cellData.getValue().getDatetimeend())));
         dogViewDateDateStartTableColumn.setComparator(Comparator.comparing(DmsUtils::parseDate, Comparator.nullsLast(Comparator.naturalOrder())));
-        dogViewDateClientNameTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getClient().getName()));
+        dogViewDateClientNameTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
+                cellData.getValue().getClient() != null ? cellData.getValue().getClient().getName() : null));
         dogViewDateServiceTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getService() != null ?
                 cellData.getValue().getService().getDescription() : null));
         dogViewDateDescriptionTableColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDescription()));
@@ -458,14 +459,15 @@ public class DogViewController extends AbstractController implements Application
 
     @Override
     public void onApplicationEvent(final UpdateDataEvent event) {
-        if (event.getDataType().equals(DataType.DOG) && Objects.equals(event.getId(), dogViewData.getId())
+        if (this.dogViewData != null
+        && (event.getDataType().equals(DataType.DOG) && Objects.equals(event.getId(), dogViewData.getId())
         || (event.getDataType().equals(DataType.DATE)
-                && dogViewData.getDates().stream().anyMatch(x -> x.getId().equals(event.getId())))) {
+                && dogViewData.getDates().stream().anyMatch(x -> x.getId().equals(event.getId()))))) {
             dogViewData = dmsCommunicationFacadeImpl.getDogViewData(dogViewData.getId());
             if (dogViewData != null) {
                 dogViewClientTable.setItems(FXCollections.observableArrayList(dogViewData.getClients()));
                 dogViewDateTable.setItems(FXCollections.observableArrayList(dogViewData.getDates()));
-                nextDateDogLabel.setText(DmsUtils.dateToString(dogViewData.getNextDate()));
+                dogViewNextDate.setText(DmsUtils.dateToString(dogViewData.getNextDate()));
             }
         }
     }
